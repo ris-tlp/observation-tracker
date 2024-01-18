@@ -16,8 +16,13 @@ public class UserAccount {
     private String email;
 
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    @Column(unique = true, updatable = false)
+    private String uuid;
 
+    @PrePersist
+    private void initializeUuid() {
+        this.setUuid(UUID.randomUUID().toString());
+    }
 
     public UserAccount() {
     }
@@ -51,11 +56,11 @@ public class UserAccount {
         this.email = email;
     }
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
