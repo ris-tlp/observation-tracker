@@ -2,15 +2,21 @@ package com.observatory.observationscheduler.useraccount;
 
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 public class UserAccount {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long userId;
 
     private String name;
 
     @Column(unique = true)
     private String email;
+
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID uuid;
 
 
     public UserAccount() {
@@ -45,12 +51,21 @@ public class UserAccount {
         this.email = email;
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
-        return "User{" +
+        return "UserAccount{" +
                 "userId=" + userId +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", uuid=" + uuid +
                 '}';
     }
 }
