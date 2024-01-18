@@ -33,11 +33,7 @@ public class UserAccountService {
 
     public EntityModel<UserAccount> oneUser(Long id) {
         UserAccount account = repository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-
-        return EntityModel.of(
-                account,
-                linkTo(methodOn(UserAccountController.class).oneUser(account.getUserId())).withSelfRel()
-        );
+        return assembler.toModel(account);
     }
 
     public ResponseEntity<EntityModel<UserAccount>> createUser(UserAccount newAccount) {

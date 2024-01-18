@@ -18,7 +18,9 @@ public class DataInit implements CommandLineRunner{
 
     @Override
     public void run(String... args) throws Exception {
-//        userRepo.save(new UserAccount("name", "emaila"));
-//        userRepo.save(new UserAccount("newName", "newEmail"));
+
+        userRepo.deleteAll();
+        userRepo.save(new UserAccount("name", "emaila"));
+        userRepo.save(new UserAccount("newName", "newEmail"));
     }
 }
