@@ -2,10 +2,8 @@ package com.observatory.observationscheduler.useraccount;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -23,15 +21,15 @@ public class UserAccountService {
         this.assembler = assembler;
     }
 
-    public CollectionModel<EntityModel<UserAccount>> allUsers() {
+    public CollectionModel<EntityModel<UserAccount>> getAllUsers() {
         CollectionModel<EntityModel<UserAccount>> assembledRequest = assembler.toCollectionModel(repository.findAll());
         return CollectionModel.of(
                 assembledRequest,
-                linkTo(methodOn(UserAccountController.class).allUsers()).withSelfRel()
+                linkTo(methodOn(UserAccountController.class).getAllUsers()).withSelfRel()
         );
     }
 
-    public EntityModel<UserAccount> oneUser(Long id) {
+    public EntityModel<UserAccount> oneUserById(Long id) {
         UserAccount account = repository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         return assembler.toModel(account);
     }
@@ -52,8 +50,8 @@ class UserModelAssembler implements RepresentationModelAssembler<UserAccount, En
     public EntityModel<UserAccount> toModel(UserAccount account) {
         return EntityModel.of(
                 account,
-                linkTo(methodOn(UserAccountController.class).oneUser(account.getUserId())).withSelfRel(),
-                linkTo(methodOn(UserAccountController.class).allUsers()).withRel("user-accounts"));
+                linkTo(methodOn(UserAccountController.class).getOneUserById(account.getUserId())).withSelfRel(),
+                linkTo(methodOn(UserAccountController.class).getAllUsers()).withRel("user-accounts"));
     }
 
     @Override

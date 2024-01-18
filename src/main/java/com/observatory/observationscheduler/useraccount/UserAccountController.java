@@ -15,13 +15,13 @@ public class UserAccountController {
     }
 
     @GetMapping("/users")
-    public CollectionModel<EntityModel<UserAccount>> allUsers() {
-        return service.allUsers();
+    public CollectionModel<EntityModel<UserAccount>> getAllUsers() {
+        return service.getAllUsers();
     }
 
     @GetMapping("/users/{id}")
-    public EntityModel<UserAccount> oneUser(@PathVariable Long id) {
-        return service.oneUser(id);
+    public EntityModel<UserAccount> getOneUserById(@PathVariable Long id) {
+        return service.oneUserById(id);
     }
 
     @PostMapping("/users")
