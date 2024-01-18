@@ -2,9 +2,8 @@ package com.observatory.observationscheduler.useraccount;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -23,6 +22,11 @@ public class UserAccountController {
     @GetMapping("/users/{id}")
     public EntityModel<UserAccount> oneUser(@PathVariable Long id) {
         return service.oneUser(id);
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
+        return service.createUser(newAccount);
     }
 
 }
