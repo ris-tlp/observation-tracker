@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.useraccount;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -8,6 +9,7 @@ import java.util.UUID;
 public class UserAccount {
     @Id
     @GeneratedValue
+    @JsonIgnore
     private Long userId;
 
     private String name;
