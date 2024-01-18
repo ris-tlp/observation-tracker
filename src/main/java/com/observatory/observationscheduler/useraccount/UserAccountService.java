@@ -29,8 +29,8 @@ public class UserAccountService {
         );
     }
 
-    public EntityModel<UserAccount> oneUserById(Long id) {
-        UserAccount account = repository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    public EntityModel<UserAccount> oneUserByUuid(String uuid) {
+        UserAccount account = repository.findUserAccountByUuid(uuid).orElseThrow(() -> new UserNotFoundException(uuid));
         return assembler.toModel(account);
     }
 
@@ -50,7 +50,7 @@ class UserModelAssembler implements RepresentationModelAssembler<UserAccount, En
     public EntityModel<UserAccount> toModel(UserAccount account) {
         return EntityModel.of(
                 account,
-                linkTo(methodOn(UserAccountController.class).getOneUserById(account.getUserId())).withSelfRel(),
+                linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel(),
                 linkTo(methodOn(UserAccountController.class).getAllUsers()).withRel("user-accounts"));
     }
 

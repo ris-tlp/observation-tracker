@@ -19,9 +19,9 @@ public class UserAccountController {
         return service.getAllUsers();
     }
 
-    @GetMapping("/users/{id}")
-    public EntityModel<UserAccount> getOneUserById(@PathVariable Long id) {
-        return service.oneUserById(id);
+    @GetMapping("/users/{uuid}")
+    public EntityModel<UserAccount> getOneUserByUuid(@PathVariable String uuid) {
+        return service.oneUserByUuid(uuid);
     }
 
     @PostMapping("/users")
