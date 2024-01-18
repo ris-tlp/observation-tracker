@@ -30,11 +30,16 @@ public class Observation {
     public Observation() {
     }
 
-    public Observation(Long id, String observationName, Date createdTimestamp, Date updatedTimestamp, UserAccount owner) {
-        this.id = id;
+//    public Observation(String observationName, Date createdTimestamp, Date updatedTimestamp, UserAccount owner) {
+//        this.observationName = observationName;
+//        this.createdTimestamp = createdTimestamp;
+//        this.updatedTimestamp = updatedTimestamp;
+//        this.owner = owner;
+//    }
+
+
+    public Observation(String observationName, UserAccount owner) {
         this.observationName = observationName;
-        this.createdTimestamp = createdTimestamp;
-        this.updatedTimestamp = updatedTimestamp;
         this.owner = owner;
     }
 
