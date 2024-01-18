@@ -1,22 +1,23 @@
 package com.observatory.observationscheduler.observation;
 
 import com.observatory.observationscheduler.useraccount.UserAccount;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.UUID;
 
-@Entity(name = "Observation")
+@Entity
 public class Observation {
     @Id
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String observationName;
+
+    private String observationDescription;
 
     @CreationTimestamp
     private Date createdTimestamp;
@@ -25,21 +26,29 @@ public class Observation {
     private Date updatedTimestamp;
 
     @ManyToOne
+    @Column(nullable = false)
     private UserAccount owner;
+
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(unique = true, updatable = false, nullable = false)
+    private String uuid;
+
+    @PrePersist
+    private void initializeUuid() {
+        this.setUuid(UUID.randomUUID().toString());
+    }
+
+    @PreUpdate
+    private void updateTimestamp() {
+        this.setUpdatedTimestamp(new Date());
+    }
 
     public Observation() {
     }
 
-//    public Observation(String observationName, Date createdTimestamp, Date updatedTimestamp, UserAccount owner) {
-//        this.observationName = observationName;
-//        this.createdTimestamp = createdTimestamp;
-//        this.updatedTimestamp = updatedTimestamp;
-//        this.owner = owner;
-//    }
-
-
-    public Observation(String observationName, UserAccount owner) {
+    public Observation(String observationName, String observationDescription, UserAccount owner) {
         this.observationName = observationName;
+        this.observationDescription = observationDescription;
         this.owner = owner;
     }
 
@@ -83,14 +92,24 @@ public class Observation {
         this.owner = owner;
     }
 
+    public String getObservationDescription() {
+        return observationDescription;
+    }
+
+    public void setObservationDescription(String observationDescription) {
+        this.observationDescription = observationDescription;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
-        return "Observation{" +
-                "id=" + id +
-                ", observationName='" + observationName + '\'' +
-                ", createdTimestamp=" + createdTimestamp +
-                ", updatedTimestamp=" + updatedTimestamp +
-                ", owner=" + owner +
-                '}';
+        return "Observation{" + "id=" + id + ", observationName='" + observationName + '\'' + ", createdTimestamp=" + createdTimestamp + ", updatedTimestamp=" + updatedTimestamp + ", owner=" + owner + '}';
     }
 }

@@ -28,4 +28,4 @@ public class UserAccountController {
     public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
         return service.createUser(newAccount);
     }
-    }
+}

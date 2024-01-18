@@ -27,6 +27,10 @@ public class ObservationService {
         );
     }
 
+    public EntityModel<Observation> getObservationByUuid(String uuid) {
+        return assembler.toModel(repository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid)));
+
+    }
 }
 
 @Component
