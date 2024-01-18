@@ -4,6 +4,8 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -39,14 +41,11 @@ public class UserAccountService {
     }
 
     public ResponseEntity<EntityModel<UserAccount>> createUser(UserAccount newAccount) {
-
-//            return assembler.toModel(repository.save(newAccount));
         EntityModel<UserAccount> entityModel = assembler.toModel(repository.save(newAccount));
 
         return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+                .status(HttpStatus.CREATED)
                 .body(entityModel);
-
     }
 }
 

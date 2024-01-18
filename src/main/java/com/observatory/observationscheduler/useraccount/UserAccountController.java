@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserAccountController {
-    private UserAccountService service;
+    private final UserAccountService service;
 
     public UserAccountController(UserAccountService service) {
         this.service = service;
@@ -28,5 +28,4 @@ public class UserAccountController {
     public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
         return service.createUser(newAccount);
     }
-
-}
+    }
