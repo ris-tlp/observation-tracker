@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.observation;
 
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -26,7 +27,6 @@ public class Observation {
     private Date updatedTimestamp;
 
     @ManyToOne
-    @Column(nullable = false)
     private UserAccount owner;
 
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -110,6 +110,14 @@ public class Observation {
 
     @Override
     public String toString() {
-        return "Observation{" + "id=" + id + ", observationName='" + observationName + '\'' + ", createdTimestamp=" + createdTimestamp + ", updatedTimestamp=" + updatedTimestamp + ", owner=" + owner + '}';
+        return "Observation{" +
+                "id=" + id +
+                ", observationName='" + observationName + '\'' +
+                ", observationDescription='" + observationDescription + '\'' +
+                ", createdTimestamp=" + createdTimestamp +
+                ", updatedTimestamp=" + updatedTimestamp +
+                ", owner=" + owner +
+                ", uuid='" + uuid + '\'' +
+                '}';
     }
 }

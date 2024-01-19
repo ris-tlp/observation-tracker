@@ -9,7 +9,6 @@ import java.util.UUID;
 public class UserAccount {
     @Id
     @GeneratedValue
-    @JsonIgnore
     private Long userId;
 
     private String name;
