@@ -68,6 +68,9 @@ public class ObservationService {
     }
 
 
+    public EntityModel<Observation> createObservation(Observation newObservation) {
+        return assembler.toModel(repository.save(newObservation));
+    }
 }
 
 @Component

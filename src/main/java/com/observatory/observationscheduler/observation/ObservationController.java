@@ -38,4 +38,9 @@ public class ObservationController {
     public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String uuid, @RequestBody JsonPatch patch) {
         return service.patchObservation(uuid, patch);
     }
+
+    @PostMapping("/observations")
+    public EntityModel<Observation> createObservation(@RequestBody Observation newObservation) {
+        return service.createObservation(newObservation);
+    }
 }

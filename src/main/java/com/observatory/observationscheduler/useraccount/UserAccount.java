@@ -67,11 +67,6 @@ public class UserAccount {
 
     @Override
     public String toString() {
-        return "UserAccount{" +
-                "userId=" + userId +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", uuid=" + uuid +
-                '}';
+        return "UserAccount{" + "userId=" + userId + ", name='" + name + '\'' + ", email='" + email + '\'' + ", uuid=" + uuid + '}';
     }
 }
