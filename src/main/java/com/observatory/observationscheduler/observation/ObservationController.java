@@ -38,4 +38,8 @@ public class ObservationController {
         return service.createObservation(newObservation, user_uuid);
     }
 
+    @DeleteMapping("/v1/users/{user_uuid}/observations/{observation_uuid}")
+    public ResponseEntity<?> deleteObservation(@PathVariable String user_uuid, @PathVariable String observation_uuid) {
+        return service.deleteObservation(user_uuid, observation_uuid);
+    }
 }

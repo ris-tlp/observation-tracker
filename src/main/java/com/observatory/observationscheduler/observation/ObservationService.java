@@ -38,7 +38,7 @@ public class ObservationService {
     }
 
     public CollectionModel<EntityModel<Observation>> getAllObservations(String user_uuid) {
-        List<Observation> observations = observationRepository.findByOwnerUuid(user_uuid).orElseThrow(RuntimeException::new);
+        List<Observation> observations = observationRepository.findByOwnerUuid(user_uuid).orElseThrow(() -> new UserNotFoundException(user_uuid));
         CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
         return CollectionModel.of(
                 assembledRequest,
@@ -65,7 +65,7 @@ public class ObservationService {
             observationRepository.save(updatedObservation);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(updatedObservation));
         } catch (JsonPatchException | JsonProcessingException exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new IncorrectObservationFormat();
         }
     }
 
@@ -76,6 +76,12 @@ public class ObservationService {
     }
 
 
+    public ResponseEntity<?> deleteObservation(String userUuid, String observationUuid) {
+        Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+        observationRepository.delete(observation);
+
+        return ResponseEntity.ok().build();
+    }
 }
 
 @Component
