@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 public class UserNotFoundException extends RuntimeException{
-    UserNotFoundException(String uuid) {
+    public UserNotFoundException(String uuid) {
         super("Could not find User with UUID: " + uuid);
     }
 }
