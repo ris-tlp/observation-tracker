@@ -24,23 +24,24 @@ public class ObservationController {
         this.service = service;
     }
 
-    @GetMapping("/observations")
+    @GetMapping("/v1/observations")
     public CollectionModel<EntityModel<Observation>> getAllObservations() {
         return service.getAllObservations();
     }
 
-    @GetMapping("/observations/{uuid}")
+    @GetMapping("/v1/observations/{uuid}")
     public EntityModel<Observation> getObservationByUuid(@PathVariable String uuid) {
         return service.getObservationByUuid(uuid);
     }
 
-    @PatchMapping(path = "/observations/{uuid}", consumes = "application/json-patch+json")
+    @PatchMapping(path = "/v1/observations/{uuid}", consumes = "application/json-patch+json")
     public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String uuid, @RequestBody JsonPatch patch) {
         return service.patchObservation(uuid, patch);
     }
 
-    @PostMapping("/observations")
+    @PostMapping(path = "/v1/observations", consumes = "application/json")
     public EntityModel<Observation> createObservation(@RequestBody Observation newObservation) {
         return service.createObservation(newObservation);
     }
+
 }

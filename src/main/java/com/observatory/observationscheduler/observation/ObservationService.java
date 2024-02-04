@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.startup.DataInit;
+import com.observatory.observationscheduler.useraccount.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -47,11 +48,10 @@ public class ObservationService {
     }
 
     public ResponseEntity<EntityModel<Observation>> patchObservation(String uuid, JsonPatch patch) {
-
         try {
             Observation observation = repository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
-            repository.saveAndFlush(updatedObservation);
+            repository.save(updatedObservation);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(updatedObservation));
         } catch (JsonPatchException | JsonProcessingException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
