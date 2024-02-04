@@ -12,7 +12,7 @@
 	<artifactId>observation-scheduler</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>observation-scheduler</name>
-	<description>Observation planner for amatuer and professional astronomers alike.</description>
+	<description>Observation planner for amateur and professional astronomers alike.</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
