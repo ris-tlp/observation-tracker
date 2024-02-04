@@ -15,17 +15,17 @@ public class UserAccountController {
         this.service = service;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/v1/users")
     public CollectionModel<EntityModel<UserAccount>> getAllUsers() {
         return service.getAllUsers();
     }
 
-    @GetMapping("/users/{uuid}")
+    @GetMapping("/v1/users/{uuid}")
     public EntityModel<UserAccount> getOneUserByUuid(@PathVariable String uuid) {
         return service.oneUserByUuid(uuid);
     }
 
-    @PostMapping("/users")
+    @PostMapping("/v1/users")
     public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
         return service.createUser(newAccount);
     }
@@ -33,7 +33,7 @@ public class UserAccountController {
     /*
     * Uses JSON Patch RFC 6902 for the patch format
     * */
-    @PatchMapping("/users/{uuid}")
+    @PatchMapping("/v1/users/{uuid}")
     public ResponseEntity<EntityModel<UserAccount>> patchUser(@PathVariable String uuid, @RequestBody JsonPatch patch) {
         return service.patchUser(uuid, patch);
     }
