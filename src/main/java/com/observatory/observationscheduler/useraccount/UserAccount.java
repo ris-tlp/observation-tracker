@@ -1,6 +1,5 @@
 package com.observatory.observationscheduler.useraccount;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -9,7 +8,7 @@ import java.util.UUID;
 public class UserAccount {
     @Id
     @GeneratedValue
-    private Long userId;
+    private Long id;
 
     private String name;
 
@@ -33,12 +32,12 @@ public class UserAccount {
         this.email = email;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getId() {
+        return id;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long userId) {
+        this.id = userId;
     }
 
     public String getName() {
@@ -67,6 +66,6 @@ public class UserAccount {
 
     @Override
     public String toString() {
-        return "UserAccount{" + "userId=" + userId + ", name='" + name + '\'' + ", email='" + email + '\'' + ", uuid=" + uuid + '}';
+        return "UserAccount{" + "userId=" + id + ", name='" + name + '\'' + ", email='" + email + '\'' + ", uuid=" + uuid + '}';
     }
 }

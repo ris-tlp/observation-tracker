@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.useraccount;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,13 @@ public class UserAccountController {
     @PostMapping("/users")
     public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
         return service.createUser(newAccount);
+    }
+
+    /*
+    * Uses JSON Patch RFC 6902 for the patch format
+    * */
+    @PatchMapping("/users/{uuid}")
+    public ResponseEntity<EntityModel<UserAccount>> patchUser(@PathVariable String uuid, @RequestBody JsonPatch patch) {
+        return service.patchUser(uuid, patch);
     }
 }
