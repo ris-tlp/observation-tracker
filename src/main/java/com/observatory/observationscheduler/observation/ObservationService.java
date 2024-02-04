@@ -8,7 +8,6 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;
 import com.observatory.observationscheduler.useraccount.UserNotFoundException;
-import org.h2.engine.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -43,13 +42,19 @@ public class ObservationService {
         CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
         return CollectionModel.of(
                 assembledRequest,
-                linkTo(methodOn(ObservationController.class).getAllObservations(user_uuid)).withSelfRel()
+                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(user_uuid)).withSelfRel()
         );
     }
 
     public EntityModel<Observation> getObservationByUuid(String observation_uuid, String user_uuid) {
         return assembler.toModel(observationRepository.findObservationByUuid(observation_uuid).orElseThrow(() -> new ObservationNotFoundException(observation_uuid)));
 
+    }
+
+    public EntityModel<Observation> createObservation(Observation newObservation, String user_uuid) {
+        UserAccount user = userRepository.findUserAccountByUuid(user_uuid).orElseThrow(() -> new UserNotFoundException(user_uuid));
+        newObservation.setOwner(user);
+        return assembler.toModel(observationRepository.save(newObservation));
     }
 
     // Used to patch specific fields of a PATCH request
@@ -64,18 +69,13 @@ public class ObservationService {
         }
     }
 
-    public Observation applyPatchToObservation(JsonPatch patch, Observation targetObservation) throws JsonPatchException, JsonProcessingException {
+    private Observation applyPatchToObservation(JsonPatch patch, Observation targetObservation) throws JsonPatchException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode patched = patch.apply(mapper.convertValue(targetObservation, JsonNode.class));
         return mapper.treeToValue(patched, Observation.class);
     }
 
 
-    public EntityModel<Observation> createObservation(Observation newObservation, String user_uuid) {
-        UserAccount user = userRepository.findUserAccountByUuid(user_uuid).orElseThrow(() -> new UserNotFoundException(user_uuid));
-        newObservation.setOwner(user);
-        return assembler.toModel(observationRepository.save(newObservation));
-    }
 }
 
 @Component
@@ -85,8 +85,9 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
     public EntityModel<Observation> toModel(Observation observation) {
         return EntityModel.of(
                 observation,
-                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(), observation.getOwner().getUuid())).withSelfRel(),
-                linkTo(methodOn(ObservationController.class).getAllObservations(observation.getOwner().getUuid())).withRel("observations")
+                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(), observation.getOwner().getUuid())).withSelfRel().withType("GET"),
+                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner().getUuid())).withRel("observations").withType("GET, POST"),
+                linkTo(methodOn(ObservationController.class).patchObservation(observation.getUuid(), null, observation.getOwner().getUuid())).withRel("observation").withType("GET, PATCH, DELETE")
         );
     }
 

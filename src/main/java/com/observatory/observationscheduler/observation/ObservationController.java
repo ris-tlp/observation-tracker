@@ -19,7 +19,7 @@ public class ObservationController {
     }
 
     @GetMapping("/v1/users/{user_uuid}/observations")
-    public CollectionModel<EntityModel<Observation>> getAllObservations(@PathVariable String user_uuid) {
+    public CollectionModel<EntityModel<Observation>> getAllObservationsOfUser(@PathVariable String user_uuid) {
         return service.getAllObservations(user_uuid);
     }
 
@@ -29,7 +29,7 @@ public class ObservationController {
     }
 
     @PatchMapping(path = "/v1/users/{user_uuid}/observations/{observation_uuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observation_uuid, @RequestBody JsonPatch patch) {
+    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observation_uuid, @RequestBody JsonPatch patch, @PathVariable String user_uuid) {
         return service.patchObservation(observation_uuid, patch);
     }
 
