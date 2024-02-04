@@ -19,13 +19,13 @@ public class ObservationController {
     }
 
     @GetMapping("/v1/users/{user_uuid}/observations")
-    public CollectionModel<EntityModel<Observation>> getAllObservations() {
-        return service.getAllObservations();
+    public CollectionModel<EntityModel<Observation>> getAllObservations(@PathVariable String user_uuid) {
+        return service.getAllObservations(user_uuid);
     }
 
     @GetMapping("/v1/users/{user_uuid}/observations/{observation_uuid}")
-    public EntityModel<Observation> getObservationByUuid(@PathVariable String observation_uuid) {
-        return service.getObservationByUuid(observation_uuid);
+    public EntityModel<Observation> getObservationByUuid(@PathVariable String observation_uuid, @PathVariable String user_uuid) {
+        return service.getObservationByUuid(observation_uuid, user_uuid);
     }
 
     @PatchMapping(path = "/v1/users/{user_uuid}/observations/{observation_uuid}", consumes = "application/json-patch+json")

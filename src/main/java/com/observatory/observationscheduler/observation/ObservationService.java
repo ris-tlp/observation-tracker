@@ -8,6 +8,7 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;
 import com.observatory.observationscheduler.useraccount.UserNotFoundException;
+import org.h2.engine.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -35,19 +38,21 @@ public class ObservationService {
         this.observationRepository = observationRepository;
     }
 
-    public CollectionModel<EntityModel<Observation>> getAllObservations() {
-        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observationRepository.findAll());
+    public CollectionModel<EntityModel<Observation>> getAllObservations(String user_uuid) {
+        List<Observation> observations = observationRepository.findByOwnerUuid(user_uuid).orElseThrow(RuntimeException::new);
+        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
         return CollectionModel.of(
                 assembledRequest,
-                linkTo(methodOn(ObservationController.class).getAllObservations()).withSelfRel()
+                linkTo(methodOn(ObservationController.class).getAllObservations(user_uuid)).withSelfRel()
         );
     }
 
-    public EntityModel<Observation> getObservationByUuid(String uuid) {
-        return assembler.toModel(observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid)));
+    public EntityModel<Observation> getObservationByUuid(String observation_uuid, String user_uuid) {
+        return assembler.toModel(observationRepository.findObservationByUuid(observation_uuid).orElseThrow(() -> new ObservationNotFoundException(observation_uuid)));
 
     }
 
+    // Used to patch specific fields of a PATCH request
     public ResponseEntity<EntityModel<Observation>> patchObservation(String uuid, JsonPatch patch) {
         try {
             Observation observation = observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
@@ -59,9 +64,6 @@ public class ObservationService {
         }
     }
 
-    /*
-     * Use JsonPatch to only update the fields passed in the PATCH request
-     * */
     public Observation applyPatchToObservation(JsonPatch patch, Observation targetObservation) throws JsonPatchException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode patched = patch.apply(mapper.convertValue(targetObservation, JsonNode.class));
@@ -83,8 +85,8 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
     public EntityModel<Observation> toModel(Observation observation) {
         return EntityModel.of(
                 observation,
-                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid())).withSelfRel(),
-                linkTo(methodOn(ObservationController.class).getAllObservations()).withRel("observations")
+                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(), observation.getOwner().getUuid())).withSelfRel(),
+                linkTo(methodOn(ObservationController.class).getAllObservations(observation.getOwner().getUuid())).withRel("observations")
         );
     }
 
