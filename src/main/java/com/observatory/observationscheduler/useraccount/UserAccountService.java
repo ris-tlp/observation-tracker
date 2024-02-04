@@ -54,12 +54,9 @@ public class UserAccountService {
             UserAccount user = repository.findUserAccountByUuid(uuid).orElseThrow(() -> new UserNotFoundException(uuid));
             UserAccount userPatched = applyPatchToUser(patch, user);
             repository.save(userPatched);
-
-            return ResponseEntity.ok(assembler.toModel(userPatched));
-        } catch (JsonPatchException e) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(userPatched));
+        } catch (JsonPatchException | JsonProcessingException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
