@@ -1,5 +1,7 @@
 package com.observatory.observationscheduler.celestialevent;
 
+import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
+import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -28,8 +30,8 @@ public class CelestialEventService {
         return assembler.toCollectionModel(celestialEventRepository.findAll());
     }
 
-    public CollectionModel<EntityModel<CelestialEvent>> getCelestialEventsByStatus(Optional<CelestialEventStatus> status) {
-        return assembler.toCollectionModel(celestialEventRepository.findCelestialEventByEventStatus(status.get()).orElseThrow());
+    public CollectionModel<EntityModel<CelestialEvent>> getCelestialEventsByStatus(CelestialEventStatus status) {
+        return assembler.toCollectionModel(celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status)));
 
     }
 
@@ -37,7 +39,7 @@ public class CelestialEventService {
     * Temporary way to batch update all celestial events that have already expired or completed
     */
     public CollectionModel<EntityModel<CelestialEvent>> updateCelestialEventStatus() {
-        List<CelestialEvent> events = celestialEventRepository.findCelestialEventByEventStatus(CelestialEventStatus.UPCOMING).orElseThrow();
+        List<CelestialEvent> events = celestialEventRepository.findCelestialEventByEventStatus(CelestialEventStatus.UPCOMING).orElseThrow(() -> new CelestialEventStatusNotFoundException(CelestialEventStatus.UPCOMING));
         List<CelestialEvent> updatedEvents = events.stream().map(this::updateEventStatus).filter(Objects::nonNull).toList();
 
         return assembler.toCollectionModel(updatedEvents);
@@ -56,7 +58,7 @@ public class CelestialEventService {
     }
 
     public EntityModel<CelestialEvent> getCelestialEventByUuid(String celestialEventUuid) {
-        return assembler.toModel(celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow());
+        return assembler.toModel(celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid)));
     }
 }
 

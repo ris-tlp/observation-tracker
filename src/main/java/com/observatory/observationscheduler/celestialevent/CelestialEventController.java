@@ -18,7 +18,7 @@ public class CelestialEventController {
     @GetMapping("/v1/celestial-events")
     public CollectionModel<EntityModel<CelestialEvent>> getCelestialEventsByStatus(@RequestParam(required = false) Optional<CelestialEventStatus> status) {
         if (status.isPresent()) {
-            return celestialEventService.getCelestialEventsByStatus(status);
+            return celestialEventService.getCelestialEventsByStatus(status.get());
         } else {
             return celestialEventService.getAllCelestialEvents();
         }
