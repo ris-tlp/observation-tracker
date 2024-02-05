@@ -67,7 +67,7 @@ class CelestialEventAssembler implements RepresentationModelAssembler<CelestialE
     public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {
         return EntityModel.of(
                 celestialEvent,
-                linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(Optional.ofNullable(celestialEvent.getEventStatus()))).withSelfRel()
+                linkTo(methodOn(CelestialEventController.class).getCelestialEventByUuid(celestialEvent.getUuid())).withSelfRel().withType("GET")
         );
     }
 
