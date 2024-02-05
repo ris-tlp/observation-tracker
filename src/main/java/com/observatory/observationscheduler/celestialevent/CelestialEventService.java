@@ -30,7 +30,13 @@ public class CelestialEventService {
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getAllCelestialEvents() {
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(celestialEventRepository.findAll()));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                CollectionModel.of(
+                        assembler.toCollectionModel(celestialEventRepository.findAll()),
+                        linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withSelfRel().withType("GET"),
+                        linkTo(methodOn(CelestialEventController.class).createCelestialEvent(null)).withRel("create-celestial-events").withType("POST")));
+
+
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEventsByStatus(CelestialEventStatus status) {
@@ -80,7 +86,8 @@ class CelestialEventAssembler implements RepresentationModelAssembler<CelestialE
 
     @Override
     public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {
-        return EntityModel.of(celestialEvent, linkTo(methodOn(CelestialEventController.class).getCelestialEventByUuid(celestialEvent.getUuid())).withSelfRel().withType("GET"), linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(Optional.empty())).withRel("get-celestial-events").withType("GET"), linkTo(methodOn(CelestialEventController.class).createCelestialEvent(celestialEvent)).withRel("create-celestial-events").withType("POST"));
+        return EntityModel.of(celestialEvent, linkTo(methodOn(CelestialEventController.class).getCelestialEventByUuid(celestialEvent.getUuid())).withSelfRel().withType("GET"),
+                linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(Optional.empty())).withRel("get-celestial-events").withType("GET"));
     }
 
     @Override
