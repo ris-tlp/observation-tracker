@@ -18,28 +18,28 @@ public class ObservationController {
         this.service = service;
     }
 
-    @GetMapping("/v1/users/{user_uuid}/observations")
-    public CollectionModel<EntityModel<Observation>> getAllObservationsOfUser(@PathVariable String user_uuid) {
-        return service.getAllObservations(user_uuid);
+    @GetMapping("/v1/users/{userUuid}/observations")
+    public CollectionModel<EntityModel<Observation>> getAllObservationsOfUser(@PathVariable String userUuid) {
+        return service.getAllObservations(userUuid);
     }
 
-    @GetMapping("/v1/users/{user_uuid}/observations/{observation_uuid}")
-    public EntityModel<Observation> getObservationByUuid(@PathVariable String observation_uuid, @PathVariable String user_uuid) {
-        return service.getObservationByUuid(observation_uuid, user_uuid);
+    @GetMapping("/v1/users/{userUuid}/observations/{observationUuid}")
+    public EntityModel<Observation> getObservationByUuid(@PathVariable String observationUuid, @PathVariable String userUuid) {
+        return service.getObservationByUuid(observationUuid, userUuid);
     }
 
-    @PatchMapping(path = "/v1/users/{user_uuid}/observations/{observation_uuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observation_uuid, @RequestBody JsonPatch patch, @PathVariable String user_uuid) {
-        return service.patchObservation(observation_uuid, patch);
+    @PatchMapping(path = "/v1/users/{userUuid}/observations/{observationUuid}", consumes = "application/json-patch+json")
+    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observationUuid, @RequestBody JsonPatch patch, @PathVariable String userUuid) {
+        return service.patchObservation(observationUuid, patch);
     }
 
-    @PostMapping(path = "/v1/users/{user_uuid}/observations", consumes = "application/json")
-    public EntityModel<Observation> createObservation(@PathVariable String user_uuid, @RequestBody Observation newObservation) {
-        return service.createObservation(newObservation, user_uuid);
+    @PostMapping(path = "/v1/users/{userUuid}/observations", consumes = "application/json")
+    public EntityModel<Observation> createObservation(@PathVariable String userUuid, @RequestBody Observation newObservation) {
+        return service.createObservation(newObservation, userUuid);
     }
 
-    @DeleteMapping("/v1/users/{user_uuid}/observations/{observation_uuid}")
-    public ResponseEntity<?> deleteObservation(@PathVariable String user_uuid, @PathVariable String observation_uuid) {
-        return service.deleteObservation(user_uuid, observation_uuid);
+    @DeleteMapping("/v1/users/{userUuid}/observations/{observationUuid}")
+    public ResponseEntity<?> deleteObservation(@PathVariable String userUuid, @PathVariable String observationUuid) {
+        return service.deleteObservation(userUuid, observationUuid);
     }
 }

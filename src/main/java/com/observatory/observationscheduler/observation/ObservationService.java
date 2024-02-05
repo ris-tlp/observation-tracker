@@ -39,22 +39,22 @@ public class ObservationService {
         this.observationRepository = observationRepository;
     }
 
-    public CollectionModel<EntityModel<Observation>> getAllObservations(String user_uuid) {
-        List<Observation> observations = observationRepository.findByOwnerUuid(user_uuid).orElseThrow(() -> new UserNotFoundException(user_uuid));
+    public CollectionModel<EntityModel<Observation>> getAllObservations(String userUuid) {
+        List<Observation> observations = observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
         CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
         return CollectionModel.of(
                 assembledRequest,
-                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(user_uuid)).withSelfRel()
+                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(userUuid)).withSelfRel()
         );
     }
 
-    public EntityModel<Observation> getObservationByUuid(String observation_uuid, String user_uuid) {
-        return assembler.toModel(observationRepository.findObservationByUuid(observation_uuid).orElseThrow(() -> new ObservationNotFoundException(observation_uuid)));
+    public EntityModel<Observation> getObservationByUuid(String observationUuid, String userUuid) {
+        return assembler.toModel(observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid)));
 
     }
 
-    public EntityModel<Observation> createObservation(Observation newObservation, String user_uuid) {
-        UserAccount user = userRepository.findUserAccountByUuid(user_uuid).orElseThrow(() -> new UserNotFoundException(user_uuid));
+    public EntityModel<Observation> createObservation(Observation newObservation, String userUuid) {
+        UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
         newObservation.setOwner(user);
         return assembler.toModel(observationRepository.save(newObservation));
     }
