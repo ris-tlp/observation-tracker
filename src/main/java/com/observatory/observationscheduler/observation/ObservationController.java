@@ -19,12 +19,12 @@ public class ObservationController {
     }
 
     @GetMapping("/v1/users/{userUuid}/observations")
-    public CollectionModel<EntityModel<Observation>> getAllObservationsOfUser(@PathVariable String userUuid) {
+    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservationsOfUser(@PathVariable String userUuid) {
         return service.getAllObservations(userUuid);
     }
 
     @GetMapping("/v1/users/{userUuid}/observations/{observationUuid}")
-    public EntityModel<Observation> getObservationByUuid(@PathVariable String observationUuid, @PathVariable String userUuid) {
+    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(@PathVariable String observationUuid, @PathVariable String userUuid) {
         return service.getObservationByUuid(observationUuid, userUuid);
     }
 
@@ -34,7 +34,7 @@ public class ObservationController {
     }
 
     @PostMapping(path = "/v1/users/{userUuid}/observations", consumes = "application/json")
-    public EntityModel<Observation> createObservation(@PathVariable String userUuid, @RequestBody Observation newObservation) {
+    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestBody Observation newObservation) {
         return service.createObservation(newObservation, userUuid);
     }
 

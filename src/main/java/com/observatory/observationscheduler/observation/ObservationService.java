@@ -10,6 +10,7 @@ import com.observatory.observationscheduler.observation.exceptions.ObservationNo
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;
 import com.observatory.observationscheduler.useraccount.exceptions.UserNotFoundException;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -39,24 +40,31 @@ public class ObservationService {
         this.observationRepository = observationRepository;
     }
 
-    public CollectionModel<EntityModel<Observation>> getAllObservations(String userUuid) {
+    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservations(String userUuid) {
         List<Observation> observations = observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
         CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
-        return CollectionModel.of(
-                assembledRequest,
-                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(userUuid)).withSelfRel()
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                CollectionModel.of(
+                        assembledRequest,
+                        linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(userUuid)).withSelfRel()
+                )
         );
     }
 
-    public EntityModel<Observation> getObservationByUuid(String observationUuid, String userUuid) {
-        return assembler.toModel(observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid)));
-
+    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(String observationUuid, String userUuid) {
+        Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation));
     }
 
-    public EntityModel<Observation> createObservation(Observation newObservation, String userUuid) {
-        UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
-        newObservation.setOwner(user);
-        return assembler.toModel(observationRepository.save(newObservation));
+    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid) {
+        try {
+            UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+            newObservation.setOwner(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(observationRepository.save(newObservation)));
+        } catch (RuntimeException e) {
+            throw new IncorrectObservationFormatException();
+        }
     }
 
     // Used to patch specific fields of a PATCH request
@@ -82,7 +90,7 @@ public class ObservationService {
         Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
         observationRepository.delete(observation);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
 
