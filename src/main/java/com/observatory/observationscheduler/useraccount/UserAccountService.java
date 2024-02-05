@@ -66,8 +66,7 @@ class UserModelAssembler implements RepresentationModelAssembler<UserAccount, En
     public EntityModel<UserAccount> toModel(UserAccount account) {
         return EntityModel.of(
                 account,
-                linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel(),
-                linkTo(methodOn(UserAccountController.class).getAllUsers()).withRel("user-accounts"));
+                linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel());
     }
 
     @Override
