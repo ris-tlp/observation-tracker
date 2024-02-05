@@ -58,14 +58,14 @@ public class CelestialEvent {
     /*
      * Inefficient, used to change status of an event according to the current date.
      */
-    @PostLoad
-    private void updateEventStatus() {
-        if (this.getCelestialEventDateTime().isBefore(LocalDateTime.now())) {
-            System.out.println("IN HERE");
-            this.setEventStatus(CelestialEventStatus.COMPLETED);
-        }
-
-    }
+//    @PostLoad
+//    private void updateEventStatus() {
+//        if (this.getCelestialEventDateTime().isBefore(LocalDateTime.now()) && this.getEventStatus() == CelestialEventStatus.UPCOMING) {
+//            System.out.println("IN HERE");
+//            this.setEventStatus(CelestialEventStatus.COMPLETED);
+//        }
+//
+//    }
 
     public Long getId() {
         return id;
