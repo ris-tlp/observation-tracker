@@ -24,6 +24,11 @@ public class CelestialEventController {
         }
     }
 
+    @GetMapping("/v1/celestial-events/{celestialEventUuid}")
+    public EntityModel<CelestialEvent> getCelestialEventByUuid(@PathVariable String celestialEventUuid) {
+        return this.celestialEventService.getCelestialEventByUuid(celestialEventUuid);
+    }
+
     @PatchMapping("/v1/celestial-events/batch-status")
     public CollectionModel<EntityModel<CelestialEvent>> updateCelestialEventStatus() {
         return celestialEventService.updateCelestialEventStatus();

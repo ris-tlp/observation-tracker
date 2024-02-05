@@ -29,7 +29,7 @@ public class CelestialEventService {
     }
 
     public CollectionModel<EntityModel<CelestialEvent>> getCelestialEventsByStatus(Optional<CelestialEventStatus> status) {
-        return assembler.toCollectionModel(celestialEventRepository.getCelestialEventByEventStatus(status.get()).orElseThrow());
+        return assembler.toCollectionModel(celestialEventRepository.findCelestialEventByEventStatus(status.get()).orElseThrow());
 
     }
 
@@ -37,7 +37,7 @@ public class CelestialEventService {
     * Temporary way to batch update all celestial events that have already expired or completed
     */
     public CollectionModel<EntityModel<CelestialEvent>> updateCelestialEventStatus() {
-        List<CelestialEvent> events = celestialEventRepository.getCelestialEventByEventStatus(CelestialEventStatus.UPCOMING).orElseThrow();
+        List<CelestialEvent> events = celestialEventRepository.findCelestialEventByEventStatus(CelestialEventStatus.UPCOMING).orElseThrow();
         List<CelestialEvent> updatedEvents = events.stream().map(this::updateEventStatus).filter(Objects::nonNull).toList();
 
         return assembler.toCollectionModel(updatedEvents);
@@ -53,6 +53,10 @@ public class CelestialEventService {
             return celestialEvent;
         }
         return null;
+    }
+
+    public EntityModel<CelestialEvent> getCelestialEventByUuid(String celestialEventUuid) {
+        return assembler.toModel(celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow());
     }
 }
 

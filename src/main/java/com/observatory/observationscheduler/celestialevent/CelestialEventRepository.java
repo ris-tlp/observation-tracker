@@ -6,5 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CelestialEventRepository extends JpaRepository<CelestialEvent, Long> {
-    Optional<List<CelestialEvent>> getCelestialEventByEventStatus(CelestialEventStatus status);
+    Optional<List<CelestialEvent>> findCelestialEventByEventStatus(CelestialEventStatus status);
+    Optional<CelestialEvent> findCelestialEventByUuid(String uuid);
 }
