@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
+import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;
-import com.observatory.observationscheduler.useraccount.UserNotFoundException;
+import com.observatory.observationscheduler.useraccount.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -65,7 +67,7 @@ public class ObservationService {
             observationRepository.save(updatedObservation);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(updatedObservation));
         } catch (JsonPatchException | JsonProcessingException exception) {
-            throw new IncorrectObservationFormat();
+            throw new IncorrectObservationFormatException();
         }
     }
 

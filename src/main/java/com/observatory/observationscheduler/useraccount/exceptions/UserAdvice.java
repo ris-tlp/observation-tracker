@@ -1,23 +1,25 @@
-package com.observatory.observationscheduler.useraccount;
+package com.observatory.observationscheduler.useraccount.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-public class UserNotFoundException extends RuntimeException{
-    public UserNotFoundException(String uuid) {
-        super("Could not find User with UUID: " + uuid);
-    }
-}
-
 @ControllerAdvice
-class UserNotFoundAdvice {
+public class UserAdvice {
     @ResponseBody
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     String userNotFoundHandler(UserNotFoundException ex) {
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(IncorrectUserFormatException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String incorrectFormatHandler(IncorrectUserFormatException ex) {
+        return ex.getMessage();
+    }
 }
+
+
