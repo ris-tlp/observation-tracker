@@ -27,9 +27,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class ObservationService {
-    public final ObservationRepository observationRepository;
-    public final UserAccountRepository userRepository;
-    public final ObservationAssembler assembler;
+    private final ObservationRepository observationRepository;
+    private final UserAccountRepository userRepository;
+    private final ObservationAssembler assembler;
     private static final Logger log = LoggerFactory.getLogger(ObservationService.class);
 
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ObservationController {
-    public final ObservationService service;
+    private final ObservationService service;
     private static final Logger log = LoggerFactory.getLogger(DataInit.class);
 
     public ObservationController(ObservationService service) {
