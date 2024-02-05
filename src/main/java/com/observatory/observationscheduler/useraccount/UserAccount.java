@@ -1,8 +1,11 @@
 package com.observatory.observationscheduler.useraccount;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.UUID;
+import java.sql.Timestamp;
 
 @Entity
 public class UserAccount {
@@ -19,6 +22,12 @@ public class UserAccount {
     @Column(unique = true, updatable = false)
     private String uuid;
 
+    @CreationTimestamp
+    private Timestamp createdTimestamp;
+
+    @UpdateTimestamp
+    private Timestamp updatedTimestamp;
+
     @PrePersist
     private void initializeUuid() {
         this.setUuid(UUID.randomUUID().toString());
@@ -30,6 +39,11 @@ public class UserAccount {
     public UserAccount(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    @PreUpdate
+    private void updateTimestamp() {
+        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
     public Long getId() {
@@ -62,6 +76,22 @@ public class UserAccount {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    public Timestamp getUpdatedTimestamp() {
+        return updatedTimestamp;
+    }
+
+    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
+        this.updatedTimestamp = updatedTimestamp;
     }
 
     @Override

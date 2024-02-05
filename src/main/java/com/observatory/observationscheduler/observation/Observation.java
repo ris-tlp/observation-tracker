@@ -6,7 +6,8 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+//import java.util.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
@@ -21,10 +22,10 @@ public class Observation {
     private String observationDescription;
 
     @CreationTimestamp
-    private Date createdTimestamp;
+    private Timestamp createdTimestamp;
 
     @UpdateTimestamp
-    private Date updatedTimestamp;
+    private Timestamp updatedTimestamp;
 
     @ManyToOne
     private UserAccount owner;
@@ -40,7 +41,7 @@ public class Observation {
 
     @PreUpdate
     private void updateTimestamp() {
-        this.setUpdatedTimestamp(new Date());
+        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
     public Observation() {
@@ -68,19 +69,19 @@ public class Observation {
         this.observationName = observationName;
     }
 
-    public Date getCreatedTimestamp() {
+    public Timestamp getCreatedTimestamp() {
         return createdTimestamp;
     }
 
-    public void setCreatedTimestamp(Date createdTimestamp) {
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
         this.createdTimestamp = createdTimestamp;
     }
 
-    public Date getUpdatedTimestamp() {
+    public Timestamp getUpdatedTimestamp() {
         return updatedTimestamp;
     }
 
-    public void setUpdatedTimestamp(Date updatedTimestamp) {
+    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
     }
 
