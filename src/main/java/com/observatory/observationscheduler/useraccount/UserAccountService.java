@@ -28,14 +28,6 @@ public class UserAccountService {
         this.assembler = assembler;
     }
 
-    public CollectionModel<EntityModel<UserAccount>> getAllUsers() {
-        CollectionModel<EntityModel<UserAccount>> assembledRequest = assembler.toCollectionModel(repository.findAll());
-        return CollectionModel.of(
-                assembledRequest,
-                linkTo(methodOn(UserAccountController.class).getAllUsers()).withSelfRel()
-        );
-    }
-
     public EntityModel<UserAccount> oneUserByUuid(String uuid) {
         UserAccount account = repository.findUserAccountByUuid(uuid).orElseThrow(() -> new UserNotFoundException(uuid));
         return assembler.toModel(account);

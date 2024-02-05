@@ -15,10 +15,6 @@ public class UserAccountController {
         this.service = service;
     }
 
-    @GetMapping("/v1/users")
-    public CollectionModel<EntityModel<UserAccount>> getAllUsers() {
-        return service.getAllUsers();
-    }
 
     @GetMapping("/v1/users/{uuid}")
     public EntityModel<UserAccount> getOneUserByUuid(@PathVariable String uuid) {
