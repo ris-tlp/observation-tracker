@@ -34,5 +34,10 @@ public class CelestialEventController {
         return celestialEventService.updateCelestialEventStatus();
     }
 
+    @PostMapping("/v1/celestial-events")
+    public EntityModel<CelestialEvent> createCelestialEvent(@RequestBody CelestialEvent celestialEvent){
+        return celestialEventService.createCelestialEvent(celestialEvent);
+    }
+
 
 }

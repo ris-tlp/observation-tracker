@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.celestialevent.exceptions;
 
+import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,4 +22,9 @@ public class CelestialEventAdvice {
     String celestialEventNotFoundHandler(CelestialEventStatusNotFoundException ex) {
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(IncorrectCelestialEventFormatException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String incorrectCelestialEventFormatHandler(IncorrectObservationFormatException ex) { return ex.getMessage(); }
 }

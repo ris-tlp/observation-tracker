@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.celestialevent;
 
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
+import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -59,6 +60,15 @@ public class CelestialEventService {
 
     public EntityModel<CelestialEvent> getCelestialEventByUuid(String celestialEventUuid) {
         return assembler.toModel(celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid)));
+    }
+
+    public EntityModel<CelestialEvent> createCelestialEvent(CelestialEvent celestialEvent) {
+        try {
+            CelestialEvent createdEvent = celestialEventRepository.save(celestialEvent);
+            return assembler.toModel(createdEvent);
+        } catch (RuntimeException e) {
+            throw new IncorrectCelestialEventFormatException();
+        }
     }
 }
 
