@@ -22,6 +22,10 @@ public class CelestialEventService {
     public CollectionModel<EntityModel<CelestialEvent>> getAllCelestialEvents() {
         return assembler.toCollectionModel(celestialEventRepository.findAll());
     }
+
+    public CollectionModel<EntityModel<CelestialEvent>> getCelestialEventsByStatus(CelestialEventStatus status) {
+        return assembler.toCollectionModel(celestialEventRepository.getCelestialEventByEventStatus(status).orElseThrow());
+    }
 }
 
 @Component
@@ -31,7 +35,7 @@ class CelestialEventAssembler implements RepresentationModelAssembler<CelestialE
     public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {
         return EntityModel.of(
                 celestialEvent,
-                linkTo(methodOn(CelestialEventController.class).getAllCelestialEvents()).withSelfRel()
+                linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(celestialEvent.getEventStatus())).withSelfRel()
         );
     }
 

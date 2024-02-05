@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
-import java.util.Objects;
+import java.sql.Date;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -23,31 +25,48 @@ public class CelestialEvent {
 
     private String celestialEventDescription;
 
-    private Date celestialEventTime;
+    private LocalDateTime celestialEventDateTime;
 
     @CreationTimestamp
-    private Date createdTimestamp;
+    private Timestamp createdTimestamp;
 
     @UpdateTimestamp
-    private Date updatedTimestamp;
+    private Timestamp updatedTimestamp;
+
+    @Enumerated(EnumType.STRING)
+    private CelestialEventStatus eventStatus;
+
 
     public CelestialEvent() {
     }
 
-    public CelestialEvent(String celestialEventName, String celestialEventDescription, Date celestialEventTime) {
+    public CelestialEvent(String celestialEventName, String celestialEventDescription, LocalDateTime celestialEventTime) {
         this.celestialEventName = celestialEventName;
         this.celestialEventDescription = celestialEventDescription;
-        this.celestialEventTime = celestialEventTime;
+        this.celestialEventDateTime = celestialEventTime;
     }
 
     @PrePersist
     private void initializeUuid() {
         this.setUuid(UUID.randomUUID().toString());
+        this.setEventStatus(CelestialEventStatus.UPCOMING);
     }
 
     @PreUpdate
     private void updateTimestamp() {
-        this.setUpdatedTimestamp(new Date());
+        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
+    }
+
+    /*
+     * Inefficient, used to change status of an event according to the current date.
+     */
+    @PostLoad
+    private void updateEventStatus() {
+        if (this.getCelestialEventDateTime().isBefore(LocalDateTime.now())) {
+            System.out.println("IN HERE");
+            this.setEventStatus(CelestialEventStatus.COMPLETED);
+        }
+
     }
 
     public Long getId() {
@@ -82,27 +101,35 @@ public class CelestialEvent {
         this.celestialEventDescription = celestialEventDescription;
     }
 
-    public Date getCelestialEventTime() {
-        return celestialEventTime;
+    public LocalDateTime getCelestialEventDateTime() {
+        return celestialEventDateTime;
     }
 
-    public void setCelestialEventTime(Date celestialEventTime) {
-        this.celestialEventTime = celestialEventTime;
+    public void setCelestialEventDateTime(LocalDateTime celestialEventTime) {
+        this.celestialEventDateTime = celestialEventTime;
     }
 
-    public Date getCreatedTimestamp() {
+    public Timestamp getCreatedTimestamp() {
         return createdTimestamp;
     }
 
-    public void setCreatedTimestamp(Date createdTimestamp) {
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
         this.createdTimestamp = createdTimestamp;
     }
 
-    public Date getUpdatedTimestamp() {
+    public Timestamp getUpdatedTimestamp() {
         return updatedTimestamp;
     }
 
-    public void setUpdatedTimestamp(Date updatedTimestamp) {
+    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
+    }
+
+    public CelestialEventStatus getEventStatus() {
+        return eventStatus;
+    }
+
+    public void setEventStatus(CelestialEventStatus eventStatus) {
+        this.eventStatus = eventStatus;
     }
 }
