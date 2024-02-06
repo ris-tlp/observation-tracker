@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/v1/celestial-events")
 public class CelestialEventController {
     public final CelestialEventService celestialEventService;
 
@@ -16,29 +17,33 @@ public class CelestialEventController {
         this.celestialEventService = celestialEventService;
     }
 
-    @GetMapping("/v1/celestial-events")
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEventsByStatus(@RequestParam(required = false) Optional<CelestialEventStatus> status) {
-        if (status.isPresent()) {
-            return celestialEventService.getCelestialEventsByStatus(status.get());
-        } else {
-            return celestialEventService.getAllCelestialEvents();
-        }
+    @GetMapping
+    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEvents() {
+        return celestialEventService.getAllCelestialEvents();
     }
 
-    @GetMapping("/v1/celestial-events/{celestialEventUuid}")
+    @PostMapping
+    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestBody CelestialEvent celestialEvent) {
+        return celestialEventService.createCelestialEvent(celestialEvent);
+    }
+
+    @GetMapping(params = "status")
+    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEventsByStatus(@RequestParam CelestialEventStatus status) {
+        return celestialEventService.getCelestialEventsByStatus(status);
+    }
+
+    @GetMapping("/{celestialEventUuid}")
     public ResponseEntity<EntityModel<CelestialEvent>> getCelestialEventByUuid(@PathVariable String celestialEventUuid) {
         return this.celestialEventService.getCelestialEventByUuid(celestialEventUuid);
     }
 
-    @PatchMapping("/v1/celestial-events/batch-status")
+    @DeleteMapping("/{celestialEventUuid}")
+    public ResponseEntity<?> deleteCelestialEvent(@PathVariable String celestialEventUuid) {
+        return celestialEventService.deleteCelestialEvent(celestialEventUuid);
+    }
+
+    @PatchMapping("/batch-status")
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> updateCelestialEventStatus() {
         return celestialEventService.updateCelestialEventStatus();
     }
-
-    @PostMapping("/v1/celestial-events")
-    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestBody CelestialEvent celestialEvent){
-        return celestialEventService.createCelestialEvent(celestialEvent);
-    }
-
-
 }

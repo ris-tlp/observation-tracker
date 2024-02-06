@@ -5,6 +5,7 @@ import com.observatory.observationscheduler.celestialevent.exceptions.CelestialE
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -22,26 +22,35 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
-    private final CelestialEventAssembler assembler;
+    private final SpecificCelestialEventAssembler assembler;
 
-    public CelestialEventService(CelestialEventRepository celestialEventRepository, CelestialEventAssembler assembler) {
+    public CelestialEventService(CelestialEventRepository celestialEventRepository, SpecificCelestialEventAssembler assembler
+    ) {
         this.celestialEventRepository = celestialEventRepository;
         this.assembler = assembler;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getAllCelestialEvents() {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                CollectionModel.of(
-                        assembler.toCollectionModel(celestialEventRepository.findAll()),
-                        linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withSelfRel().withType("GET"),
-                        linkTo(methodOn(CelestialEventController.class).createCelestialEvent(null)).withRel("create-celestial-events").withType("POST")));
+        List<CelestialEvent> allCelestialEvents = celestialEventRepository.findAll();
 
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CollectionModel.of(
+                        assembler.toCollectionModel(allCelestialEvents),
+                        linkTo(CelestialEventController.class).withSelfRel().withType("GET, POST"),
+                        linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withRel("filter-by-status").withType("GET")
+                ));
 
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEventsByStatus(CelestialEventStatus status) {
         List<CelestialEvent> events = celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(events));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                CollectionModel.of(
+                        assembler.toCollectionModel(events),
+                        linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withSelfRel().withType("GET"),
+                        linkTo(CelestialEventController.class).withRel("all").withType("GET, POST")
+                )
+        );
     }
 
     /*
@@ -68,26 +77,41 @@ public class CelestialEventService {
 
     public ResponseEntity<EntityModel<CelestialEvent>> getCelestialEventByUuid(String celestialEventUuid) {
         CelestialEvent event = celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(event));
+        Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
+        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(event).add(rootLink));
     }
 
     public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(CelestialEvent celestialEvent) {
         try {
             CelestialEvent createdEvent = celestialEventRepository.save(celestialEvent);
-            return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(createdEvent));
+            Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
+            return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(createdEvent).add(rootLink));
         } catch (RuntimeException e) {
             throw new IncorrectCelestialEventFormatException();
         }
     }
+
+    public ResponseEntity<?> deleteCelestialEvent(String celestialEventUuid) {
+        CelestialEvent celestialEvent = celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+
+        try {
+            celestialEventRepository.delete(celestialEvent);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("There was an error in deletion");
+        }
+
+
+    }
 }
 
 @Component
-class CelestialEventAssembler implements RepresentationModelAssembler<CelestialEvent, EntityModel<CelestialEvent>> {
+class SpecificCelestialEventAssembler implements RepresentationModelAssembler<CelestialEvent, EntityModel<CelestialEvent>> {
 
     @Override
     public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {
-        return EntityModel.of(celestialEvent, linkTo(methodOn(CelestialEventController.class).getCelestialEventByUuid(celestialEvent.getUuid())).withSelfRel().withType("GET"),
-                linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(Optional.empty())).withRel("get-celestial-events").withType("GET"));
+        return EntityModel.of(celestialEvent,
+                linkTo(CelestialEventController.class).slash(celestialEvent.getUuid()).withSelfRel().withType("GET, DELETE"));
     }
 
     @Override
