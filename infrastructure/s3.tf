@@ -11,7 +11,7 @@ resource "aws_s3_bucket_versioning" "audiophile-bucket-versioning" {
 }
 
 resource "aws_ssm_parameter" "s3_secret" {
-  name = "/production/blob/uri"
+  name = "/config/observation-tracker_dev/bucketname"
   type = "SecureString"
   value = aws_s3_bucket.observation-tracker-bucket.id
 }
