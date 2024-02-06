@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.celestialevent;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import org.hibernate.resource.beans.container.spi.BeanLifecycleStrategy;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -22,7 +23,7 @@ public class CelestialEventController {
         return celestialEventService.getAllCelestialEvents();
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestBody CelestialEvent celestialEvent) {
         return celestialEventService.createCelestialEvent(celestialEvent);
     }
@@ -34,7 +35,13 @@ public class CelestialEventController {
 
     @GetMapping("/{celestialEventUuid}")
     public ResponseEntity<EntityModel<CelestialEvent>> getCelestialEventByUuid(@PathVariable String celestialEventUuid) {
-        return this.celestialEventService.getCelestialEventByUuid(celestialEventUuid);
+        return celestialEventService.getCelestialEventByUuid(celestialEventUuid);
+    }
+
+    // @TODO: Figure out issue with dependency
+    @PatchMapping(path = "/{celestialEventUuid}", consumes = "application/json-patch+json")
+    public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(@PathVariable String celestialEventUuid, @RequestBody JsonPatch patch) {
+        return celestialEventService.updateCelestialEvent(celestialEventUuid, patch);
     }
 
     @DeleteMapping("/{celestialEventUuid}")

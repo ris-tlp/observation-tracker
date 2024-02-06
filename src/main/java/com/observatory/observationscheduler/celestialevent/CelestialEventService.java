@@ -1,8 +1,16 @@
 package com.observatory.observationscheduler.celestialevent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
+import com.observatory.observationscheduler.configuration.JacksonConfig;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -23,11 +31,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
     private final SpecificCelestialEventAssembler assembler;
+    private final JacksonConfig jacksonConfig;
 
-    public CelestialEventService(CelestialEventRepository celestialEventRepository, SpecificCelestialEventAssembler assembler
+    public CelestialEventService(CelestialEventRepository celestialEventRepository, SpecificCelestialEventAssembler assembler, JacksonConfig jacksonConfig
     ) {
         this.celestialEventRepository = celestialEventRepository;
         this.assembler = assembler;
+        this.jacksonConfig = jacksonConfig;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getAllCelestialEvents() {
@@ -102,6 +112,23 @@ public class CelestialEventService {
         }
 
 
+    }
+
+    public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(String celestialEventUuid, JsonPatch patch) {
+        try{
+            CelestialEvent celestialEvent = celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+            CelestialEvent updatedCelestialEvent = applyPatchToCelestialEvent(patch, celestialEvent);
+            celestialEventRepository.save(updatedCelestialEvent);
+            return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(updatedCelestialEvent));
+        } catch (JsonPatchException | JsonProcessingException exception) {
+            throw new IncorrectCelestialEventFormatException();
+        }
+    }
+
+    private CelestialEvent applyPatchToCelestialEvent(JsonPatch patch, CelestialEvent celestialEvent) throws JsonPatchException, JsonProcessingException {
+        ObjectMapper mapper = jacksonConfig.objectMapper();
+        JsonNode patched = patch.apply(mapper.convertValue(celestialEvent, JsonNode.class));
+        return mapper.treeToValue(patched, CelestialEvent.class);
     }
 }
 

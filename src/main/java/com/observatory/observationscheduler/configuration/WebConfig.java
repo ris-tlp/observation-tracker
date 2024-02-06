@@ -1,4 +1,4 @@
-package com.observatory.observationscheduler;
+package com.observatory.observationscheduler.configuration;
 
 import com.observatory.observationscheduler.celestialevent.StatusEnumConverter;
 import org.springframework.context.annotation.Configuration;
