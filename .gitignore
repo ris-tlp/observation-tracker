@@ -6,15 +6,11 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
-.idea/*
-.idea/**/
+.DS_Store
+.idea
 
-database/
+database
+api/database/
 
 # AWS User-specific
 .idea/**/aws.xml
@@ -154,9 +150,9 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
-.mvn/timing.properties
+api/.mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
+api/.mvn/wrapper/maven-wrapper.jar
 
 # Eclipse m2e generated files
 # Eclipse Core
@@ -167,7 +163,7 @@ buildNumber.properties
 ### Gradle ###
 .gradle
 **/build/
-!src/**/build/
+!api/src/**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
