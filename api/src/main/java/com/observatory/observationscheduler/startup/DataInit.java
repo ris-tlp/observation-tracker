@@ -35,7 +35,7 @@ public class DataInit implements CommandLineRunner {
 //        observationRepository.deleteAll();
 //        userRepo.deleteAll();
 //        eventRepository.deleteAll();
-
+//
 //        userRepo.saveAndFlush(new UserAccount("name", "emaila"));
 //        UserAccount user = new UserAccount("newName", "newEmail");
 //        userRepo.saveAndFlush(user);
