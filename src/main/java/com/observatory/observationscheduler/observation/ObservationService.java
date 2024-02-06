@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.observatory.observationscheduler.celestialevent.CelestialEventController;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.useraccount.UserAccount;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,21 +49,25 @@ public class ObservationService {
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
                         assembledRequest,
-                        linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(userUuid)).withSelfRel()
+                        linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(userUuid)).withSelfRel().withType("GET,  POST")
                 )
         );
     }
 
     public ResponseEntity<EntityModel<Observation>> getObservationByUuid(String observationUuid, String userUuid) {
         Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation));
+        Link rootLink = linkTo(ObservationController.class, observation.getOwner().getUuid()).withRel("all").withType("GET, POST");
+        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
     }
 
     public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid) {
         try {
             UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
             newObservation.setOwner(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(observationRepository.save(newObservation)));
+            Link rootLink = linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType("GET, POST");
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    assembler.toModel(observationRepository.save(newObservation)).add(rootLink));
         } catch (RuntimeException e) {
             throw new IncorrectObservationFormatException();
         }
@@ -101,9 +107,10 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
     public EntityModel<Observation> toModel(Observation observation) {
         return EntityModel.of(
                 observation,
-                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(), observation.getOwner().getUuid())).withSelfRel().withType("GET"),
-                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner().getUuid())).withRel("observations").withType("GET, POST"),
-                linkTo(methodOn(ObservationController.class).patchObservation(observation.getUuid(), null, observation.getOwner().getUuid())).withRel("observation").withType("GET, PATCH, DELETE")
+                linkTo(ObservationController.class, observation.getOwner().getUuid()).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, DELETE")
+//                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(), observation.getOwner().getUuid())).withSelfRel().withType("GET"),
+//                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner().getUuid())).withRel("observations").withType("GET, POST"),
+//                linkTo(methodOn(ObservationController.class).patchObservation(observation.getUuid(), null, observation.getOwner().getUuid())).withRel("observation").withType("GET, PATCH, DELETE")
         );
     }
 
