@@ -7,7 +7,7 @@
 
 # User-specific stuff
 .DS_Store
-.idea
+.idea/
 
 database
 api/database/
