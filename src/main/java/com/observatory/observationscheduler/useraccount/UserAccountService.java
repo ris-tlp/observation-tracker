@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -35,9 +37,7 @@ public class UserAccountService {
     public ResponseEntity<EntityModel<UserAccount>> createUser(UserAccount newAccount) {
         EntityModel<UserAccount> entityModel = assembler.toModel(repository.save(newAccount));
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(entityModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
     }
 
     public ResponseEntity<EntityModel<UserAccount>> patchUser(String uuid, JsonPatch patch) {
@@ -56,6 +56,11 @@ public class UserAccountService {
         JsonNode patched = patch.apply(mapper.convertValue(user, JsonNode.class));
         return mapper.treeToValue(patched, UserAccount.class);
     }
+
+    public ResponseEntity<CollectionModel<EntityModel<UserAccount>>> getAllUsers() {
+        List<UserAccount> allUserAccounts = repository.findAll();
+        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(allUserAccounts));
+    }
 }
 
 
@@ -63,10 +68,7 @@ public class UserAccountService {
 class UserModelAssembler implements RepresentationModelAssembler<UserAccount, EntityModel<UserAccount>> {
     @Override
     public EntityModel<UserAccount> toModel(UserAccount account) {
-        return EntityModel.of(
-                account,
-                linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel().withType("GET, PATCH"),
-                linkTo(methodOn(UserAccountController.class).createUser(null)).withRel("user").withType("POST"));
+        return EntityModel.of(account, linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel().withType("GET, PATCH"), linkTo(methodOn(UserAccountController.class).createUser(null)).withRel("user").withType("POST"));
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@RequestMapping("/v1/users")
 public class UserAccountController {
     private final UserAccountService service;
 
@@ -16,12 +17,12 @@ public class UserAccountController {
     }
 
 
-    @GetMapping("/v1/users/{uuid}")
+    @GetMapping("/{uuid}")
     public EntityModel<UserAccount> getOneUserByUuid(@PathVariable String uuid) {
         return service.oneUserByUuid(uuid);
     }
 
-    @PostMapping("/v1/users")
+    @PostMapping(consumes = "application/json")
     public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
         return service.createUser(newAccount);
     }
@@ -29,8 +30,14 @@ public class UserAccountController {
     /*
     * Uses JSON Patch RFC 6902 for the patch format
     * */
-    @PatchMapping("/v1/users/{uuid}")
+    @PatchMapping(value = "/{uuid}", consumes = "application/json-patch+json")
     public ResponseEntity<EntityModel<UserAccount>> patchUser(@PathVariable String uuid, @RequestBody JsonPatch patch) {
         return service.patchUser(uuid, patch);
+    }
+
+
+    @GetMapping
+    public ResponseEntity<CollectionModel<EntityModel<UserAccount>>> getAllUsers() {
+        return service.getAllUsers();
     }
 }
