@@ -138,7 +138,7 @@ class SpecificCelestialEventAssembler implements RepresentationModelAssembler<Ce
     @Override
     public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {
         return EntityModel.of(celestialEvent,
-                linkTo(CelestialEventController.class).slash(celestialEvent.getUuid()).withSelfRel().withType("GET, DELETE"));
+                linkTo(CelestialEventController.class).slash(celestialEvent.getUuid()).withSelfRel().withType("GET, PATCH, DELETE"));
     }
 
     @Override
