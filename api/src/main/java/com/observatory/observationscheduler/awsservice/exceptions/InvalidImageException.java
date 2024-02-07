@@ -1,7 +1,5 @@
 package com.observatory.observationscheduler.awsservice.exceptions;
 
-import com.observatory.observationscheduler.celestialevent.CelestialEventStatus;
-
 import java.io.IOException;
 
 public class InvalidImageException extends IOException {

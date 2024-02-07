@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class S3Service {
@@ -22,8 +23,7 @@ public class S3Service {
     @Value("${s3.bucket.name}")
     private String bucketName;
 
-    // @TODO images are being locally saved, make sure to delete them
-    public String uploadImage(MultipartFile image)  {
+    public String uploadImage(MultipartFile image) {
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
         try {
             File convertedImage = convertMultipartFileToFile(image);

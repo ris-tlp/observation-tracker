@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
+// @TODO: add observation time
 @Entity
 //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Observation {
@@ -25,8 +26,6 @@ public class Observation {
     private String observationName;
 
     private String observationDescription;
-
-//    private List<String> observationImage;
 
     @CreationTimestamp
     private Timestamp createdTimestamp;

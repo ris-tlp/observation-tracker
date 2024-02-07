@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.awsservice.S3Service;
+import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.observation.models.Observation;
@@ -67,18 +68,16 @@ public class ObservationService {
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
     }
 
-    // @TODO Need to change image url upload to be a list of images. This includes changing the observation entity to have multiple images as well
+    // @TODO: May need to be changed according to react frontend request test, check DTOs out
     public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid, List<MultipartFile> images) {
         try {
             UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+
             List<String> imageUrls = images.stream().map(s3Service::uploadImage).toList();
             List<ObservationImage> observationImages = newObservation.convertImageToObservationImage(imageUrls);
 
-            System.out.println(imageUrls);
-
             newObservation.setOwner(user);
             newObservation.setImages(observationImages);
-
             Link rootLink = linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType("GET, POST");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(

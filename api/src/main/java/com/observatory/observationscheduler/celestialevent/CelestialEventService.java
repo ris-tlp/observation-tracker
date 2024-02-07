@@ -3,13 +3,14 @@ package com.observatory.observationscheduler.celestialevent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.observatory.observationscheduler.awsservice.S3Service;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEventImage;
 import com.observatory.observationscheduler.configuration.JacksonConfig;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,12 +34,14 @@ public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
     private final SpecificCelestialEventAssembler assembler;
     private final JacksonConfig jacksonConfig;
+    private final S3Service s3Service;
 
-    public CelestialEventService(CelestialEventRepository celestialEventRepository, SpecificCelestialEventAssembler assembler, JacksonConfig jacksonConfig
+    public CelestialEventService(CelestialEventRepository celestialEventRepository, SpecificCelestialEventAssembler assembler, JacksonConfig jacksonConfig, S3Service s3Service
     ) {
         this.celestialEventRepository = celestialEventRepository;
         this.assembler = assembler;
         this.jacksonConfig = jacksonConfig;
+        this.s3Service = s3Service;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getAllCelestialEvents() {
@@ -91,8 +95,12 @@ public class CelestialEventService {
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(event).add(rootLink));
     }
 
-    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(CelestialEvent celestialEvent) {
+    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(CelestialEvent celestialEvent, List<MultipartFile> images) {
         try {
+            List<String> imageUrls = images.stream().map(s3Service::uploadImage).toList();
+            List<CelestialEventImage> celestialEventImages = celestialEvent.convertImageToCelestialEventImage(imageUrls);
+            celestialEvent.setImages(celestialEventImages);
+
             CelestialEvent createdEvent = celestialEventRepository.save(celestialEvent);
             Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
             return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(createdEvent).add(rootLink));

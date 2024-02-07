@@ -1,13 +1,15 @@
 package com.observatory.observationscheduler.celestialevent;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import org.hibernate.resource.beans.container.spi.BeanLifecycleStrategy;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/celestial-events")
@@ -23,9 +25,9 @@ public class CelestialEventController {
         return celestialEventService.getAllCelestialEvents();
     }
 
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestBody CelestialEvent celestialEvent) {
-        return celestialEventService.createCelestialEvent(celestialEvent);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestPart(value = "celestialEvent") CelestialEvent celestialEvent, @RequestPart("images") List<MultipartFile> images) {
+        return celestialEventService.createCelestialEvent(celestialEvent, images);
     }
 
     @GetMapping(params = "status")
@@ -38,7 +40,6 @@ public class CelestialEventController {
         return celestialEventService.getCelestialEventByUuid(celestialEventUuid);
     }
 
-    // @TODO: Figure out issue with dependency
     @PatchMapping(path = "/{celestialEventUuid}", consumes = "application/json-patch+json")
     public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(@PathVariable String celestialEventUuid, @RequestBody JsonPatch patch) {
         return celestialEventService.updateCelestialEvent(celestialEventUuid, patch);
