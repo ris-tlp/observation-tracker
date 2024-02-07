@@ -10,8 +10,23 @@ resource "aws_s3_bucket_versioning" "audiophile-bucket-versioning" {
   }
 }
 
+resource "aws_s3_bucket_acl" "s3_acl" {
+  bucket = aws_s3_bucket.observation-tracker-bucket.id
+  acl = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.s3_bucket_acl_ownership]
+
+}
+
+resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
+  bucket = aws_s3_bucket.observation-tracker-bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_ssm_parameter" "s3_secret" {
-  name = "/config/observation-tracker_dev/bucketname"
+  name = "/config/observation-tracker_dev/s3.bucket.name"
   type = "SecureString"
   value = aws_s3_bucket.observation-tracker-bucket.id
 }
+
