@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.observatory.observationscheduler.awsservice.S3Service;
 import com.observatory.observationscheduler.celestialevent.CelestialEventController;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,13 +35,15 @@ public class ObservationService {
     private final ObservationRepository observationRepository;
     private final UserAccountRepository userRepository;
     private final ObservationAssembler assembler;
+    private final S3Service s3Service;
     private static final Logger log = LoggerFactory.getLogger(ObservationService.class);
 
 
-    public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository, ObservationAssembler assembler) {
+    public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository, ObservationAssembler assembler, S3Service s3Service) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
+        this.s3Service = s3Service;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservations(String userUuid) {
@@ -60,10 +64,14 @@ public class ObservationService {
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
     }
 
-    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid) {
+    // @TODO Need to change image url uplaod to be a list of images. This includes changing the observation entity to have multiple images as well
+    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid, MultipartFile[] observationImage) {
         try {
+//            System.out.println(s3Service.uploadImage(image));
+//            String imageUrl = s3Service.uploadImage(observationImage);
             UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
             newObservation.setOwner(user);
+//            newObservation.setObservationImage(imageUrl);
             Link rootLink = linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType("GET, POST");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(

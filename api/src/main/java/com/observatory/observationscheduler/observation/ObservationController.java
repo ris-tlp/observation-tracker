@@ -6,8 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/v1/users/{userUuid}/observations")
@@ -23,9 +25,9 @@ public class ObservationController {
         return service.getAllObservations(userUuid);
     }
 
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestBody Observation newObservation) {
-        return service.createObservation(newObservation, userUuid);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart("newObservation") Observation newObservation, @RequestPart("observationImage") MultipartFile[] image) {
+        return service.createObservation(newObservation, userUuid, image);
     }
 
     @GetMapping("/{observationUuid}")

@@ -21,6 +21,8 @@ public class Observation {
 
     private String observationDescription;
 
+    private String observationImage;
+
     @CreationTimestamp
     private Timestamp createdTimestamp;
 
@@ -47,10 +49,11 @@ public class Observation {
     public Observation() {
     }
 
-    public Observation(String observationName, String observationDescription, UserAccount owner) {
+    public Observation(String observationName, String observationDescription, String observationImage, UserAccount owner) {
         this.observationName = observationName;
         this.observationDescription = observationDescription;
         this.owner = owner;
+        this.observationImage = observationImage;
     }
 
     public Long getId() {
@@ -99,6 +102,14 @@ public class Observation {
 
     public void setObservationDescription(String observationDescription) {
         this.observationDescription = observationDescription;
+    }
+
+    public String getObservationImage() {
+        return observationImage;
+    }
+
+    public void setObservationImage(String observationImage) {
+        this.observationImage = observationImage;
     }
 
     public String getUuid() {
