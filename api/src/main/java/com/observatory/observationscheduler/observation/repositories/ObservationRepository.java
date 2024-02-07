@@ -1,9 +1,8 @@
-package com.observatory.observationscheduler.observation;
+package com.observatory.observationscheduler.observation.repositories;
 
-import com.observatory.observationscheduler.useraccount.UserAccount;
+import com.observatory.observationscheduler.observation.models.Observation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 

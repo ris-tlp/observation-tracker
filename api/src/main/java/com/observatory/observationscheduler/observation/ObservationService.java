@@ -6,13 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.awsservice.S3Service;
-import com.observatory.observationscheduler.celestialevent.CelestialEventController;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
+import com.observatory.observationscheduler.observation.models.Observation;
+import com.observatory.observationscheduler.observation.models.ObservationImage;
+import com.observatory.observationscheduler.observation.repositories.ObservationImageRepository;
+import com.observatory.observationscheduler.observation.repositories.ObservationRepository;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;
 import com.observatory.observationscheduler.useraccount.exceptions.UserNotFoundException;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
@@ -34,16 +36,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ObservationService {
     private final ObservationRepository observationRepository;
     private final UserAccountRepository userRepository;
+    private final ObservationImageRepository observationImageRepository;
     private final ObservationAssembler assembler;
     private final S3Service s3Service;
-    private static final Logger log = LoggerFactory.getLogger(ObservationService.class);
 
 
-    public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository, ObservationAssembler assembler, S3Service s3Service) {
+    public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository, ObservationAssembler assembler, S3Service s3Service, ObservationImageRepository observationImageRepository) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
         this.s3Service = s3Service;
+        this.observationImageRepository = observationImageRepository;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservations(String userUuid) {
@@ -64,14 +67,18 @@ public class ObservationService {
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
     }
 
-    // @TODO Need to change image url uplaod to be a list of images. This includes changing the observation entity to have multiple images as well
-    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid, MultipartFile[] observationImage) {
+    // @TODO Need to change image url upload to be a list of images. This includes changing the observation entity to have multiple images as well
+    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid, List<MultipartFile> images) {
         try {
-//            System.out.println(s3Service.uploadImage(image));
-//            String imageUrl = s3Service.uploadImage(observationImage);
             UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+            List<String> imageUrls = images.stream().map(s3Service::uploadImage).toList();
+            List<ObservationImage> observationImages = newObservation.convertImageToObservationImage(imageUrls);
+
+            System.out.println(imageUrls);
+
             newObservation.setOwner(user);
-//            newObservation.setObservationImage(imageUrl);
+            newObservation.setImages(observationImages);
+
             Link rootLink = linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType("GET, POST");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(

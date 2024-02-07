@@ -1,27 +1,32 @@
-package com.observatory.observationscheduler.observation;
+package com.observatory.observationscheduler.observation.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 //import java.util.Date;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Observation {
     @Id
     @GeneratedValue
-    private Long id;
+    @JsonIgnore
+    @Column(name = "observation_id")
+    private Long observationId;
 
     @Column(nullable = false)
     private String observationName;
 
     private String observationDescription;
 
-    private String observationImage;
+//    private List<String> observationImage;
 
     @CreationTimestamp
     private Timestamp createdTimestamp;
@@ -31,6 +36,10 @@ public class Observation {
 
     @ManyToOne
     private UserAccount owner;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "observation", cascade = CascadeType.ALL)
+    private List<ObservationImage> images;
 
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, updatable = false, nullable = false)
@@ -49,19 +58,23 @@ public class Observation {
     public Observation() {
     }
 
-    public Observation(String observationName, String observationDescription, String observationImage, UserAccount owner) {
+    public Observation(String observationName, String observationDescription, UserAccount owner) {
         this.observationName = observationName;
         this.observationDescription = observationDescription;
         this.owner = owner;
-        this.observationImage = observationImage;
+//        this.observationImage = observationImage;
     }
 
-    public Long getId() {
-        return id;
+    public List<ObservationImage> convertImageToObservationImage(List<String> imageUrls) {
+        return imageUrls.stream().map(url -> new ObservationImage(this, url)).toList();
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getObservationId() {
+        return observationId;
+    }
+
+    public void setObservationId(Long id) {
+        this.observationId = id;
     }
 
     public String getObservationName() {
@@ -104,12 +117,12 @@ public class Observation {
         this.observationDescription = observationDescription;
     }
 
-    public String getObservationImage() {
-        return observationImage;
+    public List<ObservationImage> getImages() {
+        return images;
     }
 
-    public void setObservationImage(String observationImage) {
-        this.observationImage = observationImage;
+    public void setImages(List<ObservationImage> images) {
+        this.images = images;
     }
 
     public String getUuid() {
@@ -123,7 +136,7 @@ public class Observation {
     @Override
     public String toString() {
         return "Observation{" +
-                "id=" + id +
+                "id=" + observationId +
                 ", observationName='" + observationName + '\'' +
                 ", observationDescription='" + observationDescription + '\'' +
                 ", createdTimestamp=" + createdTimestamp +

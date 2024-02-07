@@ -26,13 +26,15 @@ public class S3Service {
     public String uploadImage(MultipartFile image)  {
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
         try {
+            File convertedImage = convertMultipartFileToFile(image);
             PutObjectRequest request = new PutObjectRequest(
-                    this.bucketName, image.getOriginalFilename(), convertMultipartFileToFile(image)
+                    this.bucketName, image.getOriginalFilename(), convertedImage
             );
             request.setCannedAcl(CannedAccessControlList.PublicRead);
             String url = String.valueOf(s3Client.getUrl(bucketName, image.getOriginalFilename()));
 
             s3Client.putObject(request);
+            convertedImage.delete();
 
             return url;
 

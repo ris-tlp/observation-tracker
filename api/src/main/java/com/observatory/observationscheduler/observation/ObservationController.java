@@ -1,15 +1,15 @@
 package com.observatory.observationscheduler.observation;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.observatory.observationscheduler.startup.DataInit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.observatory.observationscheduler.observation.models.Observation;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/users/{userUuid}/observations")
@@ -26,8 +26,8 @@ public class ObservationController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart("newObservation") Observation newObservation, @RequestPart("observationImage") MultipartFile[] image) {
-        return service.createObservation(newObservation, userUuid, image);
+    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart("newObservation") Observation newObservation, @RequestPart("observationImage") List<MultipartFile> images) {
+        return service.createObservation(newObservation, userUuid, images);
     }
 
     @GetMapping("/{observationUuid}")
