@@ -26,7 +26,7 @@ public class ObservationController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart("newObservation") Observation newObservation, @RequestPart("observationImage") List<MultipartFile> images) {
+    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart("newObservation") Observation newObservation, @RequestPart("images") List<MultipartFile> images) {
         return service.createObservation(newObservation, userUuid, images);
     }
 

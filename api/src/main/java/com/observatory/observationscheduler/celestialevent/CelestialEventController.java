@@ -26,8 +26,8 @@ public class CelestialEventController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestPart(value = "celestialEvent") CelestialEvent celestialEvent, @RequestPart("images") List<MultipartFile> images) {
-        return celestialEventService.createCelestialEvent(celestialEvent, images);
+    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestPart(value = "newCelestialEvent") CelestialEvent newCelestialEvent, @RequestPart("images") List<MultipartFile> images) {
+        return celestialEventService.createCelestialEvent(newCelestialEvent, images);
     }
 
     @GetMapping(params = "status")
