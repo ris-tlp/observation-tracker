@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.awsservice.S3Service;
+import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
@@ -97,7 +98,14 @@ public class CelestialEventService {
 
     public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(CelestialEvent celestialEvent, List<MultipartFile> images) {
         try {
-            List<String> imageUrls = images.stream().map(s3Service::uploadImage).toList();
+            List<String> imageUrls = images.stream().map(image -> {
+                try {
+                    return s3Service.uploadImage(image);
+                } catch (InvalidImageException e) {
+                    return null;
+                }
+            }).toList();
+
             List<CelestialEventImage> celestialEventImages = celestialEvent.convertImageToCelestialEventImage(imageUrls);
             celestialEvent.setImages(celestialEventImages);
 

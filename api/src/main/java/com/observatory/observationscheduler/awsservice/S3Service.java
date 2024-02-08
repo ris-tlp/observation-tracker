@@ -16,8 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
-// @TODO delete image and integrate with observation and celestial event
 // @TODO Better error handling
 @Service
 public class S3Service {
@@ -27,7 +27,7 @@ public class S3Service {
     @Value("${s3.bucket.name}")
     private String bucketName;
 
-    public String uploadImage(MultipartFile image) {
+    public String uploadImage(MultipartFile image) throws InvalidImageException {
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
         try {
             File convertedImage = convertMultipartFileToFile(image);
@@ -37,14 +37,12 @@ public class S3Service {
             );
             request.setCannedAcl(CannedAccessControlList.PublicRead);
             String url = String.valueOf(s3Client.getUrl(bucketName, uploadedFileName));
-
             s3Client.putObject(request);
             convertedImage.delete();
 
             return url;
-
         } catch (IOException e) {
-            return null;
+            throw new InvalidImageException();
         }
     }
 
@@ -52,11 +50,7 @@ public class S3Service {
     public void deleteImage(String imageUrl) {
         AmazonS3URI uri = new AmazonS3URI(imageUrl);
         AmazonS3 s3client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
-        try {
-            s3client.deleteObject(this.bucketName, uri.getKey());
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
-        }
+        s3client.deleteObject(this.bucketName, uri.getKey());
     }
 
     private File convertMultipartFileToFile(MultipartFile image) throws IOException {

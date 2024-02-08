@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -72,8 +74,13 @@ public class ObservationService {
     public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid, List<MultipartFile> images) {
         try {
             UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
-
-            List<String> imageUrls = images.stream().map(s3Service::uploadImage).toList();
+            List<String> imageUrls = images.stream().map(image -> {
+                try {
+                    return s3Service.uploadImage(image);
+                } catch (InvalidImageException e) {
+                    return null;
+                }
+            }).toList();
             List<ObservationImage> observationImages = newObservation.convertImageToObservationImage(imageUrls);
 
             newObservation.setOwner(user);

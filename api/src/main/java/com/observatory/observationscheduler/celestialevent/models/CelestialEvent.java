@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -81,7 +82,7 @@ public class CelestialEvent {
 //    }
 
     public List<CelestialEventImage> convertImageToCelestialEventImage(List<String> imageUrls) {
-        return imageUrls.stream().map(url -> new CelestialEventImage(this, url)).toList();
+        return imageUrls.stream().filter(Objects::nonNull).map(url -> new CelestialEventImage(this, url)).toList();
     }
 
     public Long getCelestialEventId() {
