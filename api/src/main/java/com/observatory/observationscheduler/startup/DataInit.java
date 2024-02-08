@@ -1,6 +1,6 @@
 package com.observatory.observationscheduler.startup;
 
-import com.observatory.observationscheduler.celestialevent.CelestialEventRepository;
+import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationscheduler.observation.repositories.ObservationImageRepository;
 import com.observatory.observationscheduler.observation.repositories.ObservationRepository;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;

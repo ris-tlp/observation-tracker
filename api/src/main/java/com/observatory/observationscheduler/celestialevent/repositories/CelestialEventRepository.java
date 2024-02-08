@@ -1,5 +1,6 @@
-package com.observatory.observationscheduler.celestialevent;
+package com.observatory.observationscheduler.celestialevent.repositories;
 
+import com.observatory.observationscheduler.celestialevent.CelestialEventStatus;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 

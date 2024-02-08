@@ -12,6 +12,8 @@ import com.observatory.observationscheduler.celestialevent.exceptions.CelestialE
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventImage;
+import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventImageRepository;
+import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationscheduler.configuration.JacksonConfig;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -33,16 +35,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
-    private final SpecificCelestialEventAssembler assembler;
+    private final CelestialEventImageRepository celestialEventImageRepository;
+    private final CelestialEventAssembler assembler;
     private final JacksonConfig jacksonConfig;
     private final S3Service s3Service;
 
-    public CelestialEventService(CelestialEventRepository celestialEventRepository, SpecificCelestialEventAssembler assembler, JacksonConfig jacksonConfig, S3Service s3Service
+    public CelestialEventService(CelestialEventRepository celestialEventRepository, CelestialEventAssembler assembler, JacksonConfig jacksonConfig, S3Service s3Service, CelestialEventImageRepository celestialEventImageRepository
     ) {
         this.celestialEventRepository = celestialEventRepository;
         this.assembler = assembler;
         this.jacksonConfig = jacksonConfig;
         this.s3Service = s3Service;
+        this.celestialEventImageRepository = celestialEventImageRepository;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getAllCelestialEvents() {
@@ -150,7 +154,7 @@ public class CelestialEventService {
 }
 
 @Component
-class SpecificCelestialEventAssembler implements RepresentationModelAssembler<CelestialEvent, EntityModel<CelestialEvent>> {
+class CelestialEventAssembler implements RepresentationModelAssembler<CelestialEvent, EntityModel<CelestialEvent>> {
 
     @Override
     public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {

@@ -21,6 +21,10 @@ public class CelestialEventImage {
 
     private String url;
 
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(unique = true, updatable = false, nullable = false)
+    private String uuid;
+
     @CreationTimestamp
     private Timestamp createdTimestamp;
 
@@ -32,7 +36,8 @@ public class CelestialEventImage {
         this.url = url;
     }
 
-    public CelestialEventImage() {}
+    public CelestialEventImage() {
+    }
 
     public long getCelestialEventImageId() {
         return celestialEventImageId;
@@ -74,7 +79,11 @@ public class CelestialEventImage {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    ;
+    public String getUuid() {
+        return uuid;
+    }
 
-
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 }
