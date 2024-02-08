@@ -12,9 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
+//. @TODO delete image and integrate with observation and celestial event
 @Service
 public class S3Service {
     @Value("${region}")
@@ -27,11 +29,12 @@ public class S3Service {
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
         try {
             File convertedImage = convertMultipartFileToFile(image);
+            String uploadedFileName = generateFilename(image.getOriginalFilename());
             PutObjectRequest request = new PutObjectRequest(
-                    this.bucketName, image.getOriginalFilename(), convertedImage
+                    this.bucketName, uploadedFileName, convertedImage
             );
             request.setCannedAcl(CannedAccessControlList.PublicRead);
-            String url = String.valueOf(s3Client.getUrl(bucketName, image.getOriginalFilename()));
+            String url = String.valueOf(s3Client.getUrl(bucketName, uploadedFileName));
 
             s3Client.putObject(request);
             convertedImage.delete();
@@ -50,5 +53,13 @@ public class S3Service {
         stream.close();
 
         return convertedImage;
+    }
+
+    private String generateFilename(String originalName) {
+        return String.format(
+                "%s-%s",
+                new Date().getTime(),
+                originalName.replace(" ", "_")
+        );
     }
 }

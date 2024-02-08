@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.observation.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.observatory.observationscheduler.useraccount.UserAccount;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 //import java.util.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +28,9 @@ public class Observation {
     private String observationName;
 
     private String observationDescription;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime observationDateTime;
 
     @CreationTimestamp
     private Timestamp createdTimestamp;
@@ -57,10 +62,11 @@ public class Observation {
     public Observation() {
     }
 
-    public Observation(String observationName, String observationDescription, UserAccount owner) {
+    public Observation(String observationName, String observationDescription, UserAccount owner, LocalDateTime observationDateTime) {
         this.observationName = observationName;
         this.observationDescription = observationDescription;
         this.owner = owner;
+        this.observationDateTime = observationDateTime;
 //        this.observationImage = observationImage;
     }
 
@@ -130,6 +136,14 @@ public class Observation {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public LocalDateTime getObservationDateTime() {
+        return observationDateTime;
+    }
+
+    public void setObservationDateTime(LocalDateTime observationDateTime) {
+        this.observationDateTime = observationDateTime;
     }
 
     @Override
