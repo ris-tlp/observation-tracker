@@ -106,11 +106,16 @@ public class ObservationService {
     }
 
 
-    public ResponseEntity<?> deleteObservation(String userUuid, String observationUuid) {
+    public ResponseEntity<Void> deleteObservation(String userUuid, String observationUuid) {
         Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
-        observationRepository.delete(observation);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        try {
+            observationRepository.delete(observation);
+            observation.getImages().forEach(observationImage -> s3Service.deleteImage(observationImage.getUrl()));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("There was an error in deletion");
+        }
     }
 }
 

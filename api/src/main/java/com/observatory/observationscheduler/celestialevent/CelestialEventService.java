@@ -109,7 +109,7 @@ public class CelestialEventService {
         }
     }
 
-    public ResponseEntity<?> deleteCelestialEvent(String celestialEventUuid) {
+    public ResponseEntity<Void> deleteCelestialEvent(String celestialEventUuid) {
         CelestialEvent celestialEvent = celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
 
         try {

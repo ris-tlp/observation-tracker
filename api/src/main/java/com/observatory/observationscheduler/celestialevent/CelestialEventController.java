@@ -46,7 +46,7 @@ public class CelestialEventController {
     }
 
     @DeleteMapping("/{celestialEventUuid}")
-    public ResponseEntity<?> deleteCelestialEvent(@PathVariable String celestialEventUuid) {
+    public ResponseEntity<Void> deleteCelestialEvent(@PathVariable String celestialEventUuid) {
         return celestialEventService.deleteCelestialEvent(celestialEventUuid);
     }
 

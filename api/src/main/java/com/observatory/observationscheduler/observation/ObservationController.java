@@ -41,7 +41,7 @@ public class ObservationController {
     }
 
     @DeleteMapping("/{observationUuid}")
-    public ResponseEntity<?> deleteObservation(@PathVariable String userUuid, @PathVariable String observationUuid) {
+    public ResponseEntity<Void> deleteObservation(@PathVariable String userUuid, @PathVariable String observationUuid) {
         return service.deleteObservation(userUuid, observationUuid);
     }
 }
