@@ -1,7 +1,9 @@
 package com.observatory.observationscheduler.awsservice;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Optional;
 
-//. @TODO delete image and integrate with observation and celestial event
+// @TODO delete image and integrate with observation and celestial event
+// @TODO Better error handling
 @Service
 public class S3Service {
     @Value("${region}")
@@ -43,6 +45,17 @@ public class S3Service {
 
         } catch (IOException e) {
             return null;
+        }
+    }
+
+    // @TODO Better error handling
+    public void deleteImage(String imageUrl) {
+        AmazonS3URI uri = new AmazonS3URI(imageUrl);
+        AmazonS3 s3client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
+        try {
+            s3client.deleteObject(this.bucketName, uri.getKey());
+        } catch (AmazonServiceException e) {
+            e.printStackTrace();
         }
     }
 

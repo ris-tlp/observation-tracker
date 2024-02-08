@@ -114,6 +114,7 @@ public class CelestialEventService {
 
         try {
             celestialEventRepository.delete(celestialEvent);
+            celestialEvent.getImages().forEach(celestialEventImage -> s3Service.deleteImage(celestialEventImage.getUrl()));
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             throw new RuntimeException("There was an error in deletion");
@@ -123,7 +124,7 @@ public class CelestialEventService {
     }
 
     public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(String celestialEventUuid, JsonPatch patch) {
-        try{
+        try {
             CelestialEvent celestialEvent = celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
             CelestialEvent updatedCelestialEvent = applyPatchToCelestialEvent(patch, celestialEvent);
             celestialEventRepository.save(updatedCelestialEvent);
