@@ -19,7 +19,7 @@ public class ObservationImage {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name ="observation_id", nullable = false)
+    @JoinColumn(name = "observation_id", nullable = false)
     private Observation observation;
 
     private String url;
@@ -30,7 +30,8 @@ public class ObservationImage {
     @UpdateTimestamp
     private Timestamp updatedTimestamp;
 
-    public ObservationImage() {}
+    public ObservationImage() {
+    }
 
     public ObservationImage(Observation observation, String url) {
         this.observation = observation;

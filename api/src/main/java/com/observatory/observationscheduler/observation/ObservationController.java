@@ -26,17 +26,21 @@ public class ObservationController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart("newObservation") Observation newObservation, @RequestPart("images") List<MultipartFile> images) {
+    public ResponseEntity<EntityModel<Observation>> createObservation(@PathVariable String userUuid, @RequestPart(
+            "newObservation") Observation newObservation, @RequestPart("images") List<MultipartFile> images) {
         return service.createObservation(newObservation, userUuid, images);
     }
 
     @GetMapping("/{observationUuid}")
-    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(@PathVariable String observationUuid, @PathVariable String userUuid) {
+    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(@PathVariable String observationUuid,
+                                                                         @PathVariable String userUuid) {
         return service.getObservationByUuid(observationUuid, userUuid);
     }
 
     @PatchMapping(path = "/{observationUuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observationUuid, @RequestBody JsonPatch patch, @PathVariable String userUuid) {
+    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observationUuid,
+                                                                     @RequestBody JsonPatch patch,
+                                                                     @PathVariable String userUuid) {
         return service.patchObservation(observationUuid, patch);
     }
 

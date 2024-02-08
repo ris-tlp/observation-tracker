@@ -42,7 +42,8 @@ public class UserAccountService {
 
     public ResponseEntity<EntityModel<UserAccount>> patchUser(String uuid, JsonPatch patch) {
         try {
-            UserAccount user = repository.findUserAccountByUuid(uuid).orElseThrow(() -> new UserNotFoundException(uuid));
+            UserAccount user =
+                    repository.findUserAccountByUuid(uuid).orElseThrow(() -> new UserNotFoundException(uuid));
             UserAccount userPatched = applyPatchToUser(patch, user);
             repository.save(userPatched);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(userPatched));
@@ -51,7 +52,8 @@ public class UserAccountService {
         }
     }
 
-    private UserAccount applyPatchToUser(JsonPatch patch, UserAccount user) throws JsonPatchException, JsonProcessingException {
+    private UserAccount applyPatchToUser(JsonPatch patch, UserAccount user) throws JsonPatchException,
+            JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode patched = patch.apply(mapper.convertValue(user, JsonNode.class));
         return mapper.treeToValue(patched, UserAccount.class);
@@ -68,7 +70,8 @@ public class UserAccountService {
 class UserModelAssembler implements RepresentationModelAssembler<UserAccount, EntityModel<UserAccount>> {
     @Override
     public EntityModel<UserAccount> toModel(UserAccount account) {
-        return EntityModel.of(account, linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel().withType("GET, PATCH"), linkTo(methodOn(UserAccountController.class).createUser(null)).withRel("user").withType("POST"));
+        return EntityModel.of(account,
+                linkTo(methodOn(UserAccountController.class).getOneUserByUuid(account.getUuid())).withSelfRel().withType("GET, PATCH"), linkTo(methodOn(UserAccountController.class).createUser(null)).withRel("user").withType("POST"));
     }
 
     @Override

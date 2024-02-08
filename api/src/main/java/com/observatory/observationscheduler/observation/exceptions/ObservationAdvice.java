@@ -21,7 +21,9 @@ public class ObservationAdvice {
     @ResponseBody
     @ExceptionHandler(IncorrectObservationFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String incorrectObservationFormatHandler(IncorrectObservationFormatException ex) { return ex.getMessage(); }
+    String incorrectObservationFormatHandler(IncorrectObservationFormatException ex) {
+        return ex.getMessage();
+    }
 }
 
 

@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Primary;
 
 
 /*
-* Adding support for LocalDateTime JSON parsing in Hibernate entities and creating a single
-* global ObjectMapper
-*/
+ * Adding support for LocalDateTime JSON parsing in Hibernate entities and creating a single
+ * global ObjectMapper
+ */
 @Configuration
 public class JacksonConfig {
     @Bean

@@ -62,7 +62,8 @@ public class Observation {
     public Observation() {
     }
 
-    public Observation(String observationName, String observationDescription, UserAccount owner, LocalDateTime observationDateTime) {
+    public Observation(String observationName, String observationDescription, UserAccount owner,
+                       LocalDateTime observationDateTime) {
         this.observationName = observationName;
         this.observationDescription = observationDescription;
         this.owner = owner;

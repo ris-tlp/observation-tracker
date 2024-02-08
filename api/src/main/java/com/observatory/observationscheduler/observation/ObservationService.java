@@ -44,7 +44,9 @@ public class ObservationService {
     private final S3Service s3Service;
 
 
-    public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository, ObservationAssembler assembler, S3Service s3Service, ObservationImageRepository observationImageRepository) {
+    public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
+                              ObservationAssembler assembler, S3Service s3Service,
+                              ObservationImageRepository observationImageRepository) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
@@ -53,7 +55,8 @@ public class ObservationService {
     }
 
     public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservations(String userUuid) {
-        List<Observation> observations = observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+        List<Observation> observations =
+                observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
         CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
 
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -65,15 +68,20 @@ public class ObservationService {
     }
 
     public ResponseEntity<EntityModel<Observation>> getObservationByUuid(String observationUuid, String userUuid) {
-        Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
-        Link rootLink = linkTo(ObservationController.class, observation.getOwner().getUuid()).withRel("all").withType("GET, POST");
+        Observation observation =
+                observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+        Link rootLink =
+                linkTo(ObservationController.class, observation.getOwner().getUuid()).withRel("all").withType("GET, " +
+                        "POST");
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
     }
 
     // @TODO: May need to be changed according to react frontend request test, check DTOs out
-    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid, List<MultipartFile> images) {
+    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid,
+                                                                      List<MultipartFile> images) {
         try {
-            UserAccount user = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+            UserAccount user =
+                    userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
             List<String> imageUrls = images.stream().map(image -> {
                 try {
                     return s3Service.uploadImage(image);
@@ -85,7 +93,9 @@ public class ObservationService {
 
             newObservation.setOwner(user);
             newObservation.setImages(observationImages);
-            Link rootLink = linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType("GET, POST");
+            Link rootLink =
+                    linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType(
+                            "GET, POST");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     assembler.toModel(observationRepository.save(newObservation)).add(rootLink));
@@ -97,7 +107,8 @@ public class ObservationService {
     // Used to patch specific fields of a PATCH request
     public ResponseEntity<EntityModel<Observation>> patchObservation(String uuid, JsonPatch patch) {
         try {
-            Observation observation = observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
+            Observation observation =
+                    observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
             observationRepository.save(updatedObservation);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(updatedObservation));
@@ -114,7 +125,8 @@ public class ObservationService {
 
 
     public ResponseEntity<Void> deleteObservation(String userUuid, String observationUuid) {
-        Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+        Observation observation =
+                observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
 
         try {
             observationRepository.delete(observation);
@@ -134,9 +146,12 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
         return EntityModel.of(
                 observation,
                 linkTo(ObservationController.class, observation.getOwner().getUuid()).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, DELETE")
-//                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(), observation.getOwner().getUuid())).withSelfRel().withType("GET"),
-//                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner().getUuid())).withRel("observations").withType("GET, POST"),
-//                linkTo(methodOn(ObservationController.class).patchObservation(observation.getUuid(), null, observation.getOwner().getUuid())).withRel("observation").withType("GET, PATCH, DELETE")
+//                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(),
+//                observation.getOwner().getUuid())).withSelfRel().withType("GET"),
+//                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner()
+//                .getUuid())).withRel("observations").withType("GET, POST"),
+//                linkTo(methodOn(ObservationController.class).patchObservation(observation.getUuid(), null,
+//                observation.getOwner().getUuid())).withRel("observation").withType("GET, PATCH, DELETE")
         );
     }
 

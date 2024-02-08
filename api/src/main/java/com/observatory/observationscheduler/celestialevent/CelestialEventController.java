@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.celestialevent;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
@@ -41,7 +42,8 @@ public class CelestialEventController {
     }
 
     @PatchMapping(path = "/{celestialEventUuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(@PathVariable String celestialEventUuid, @RequestBody JsonPatch patch) {
+    public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(@PathVariable String celestialEventUuid,
+                                                                            @RequestBody JsonPatch patch) {
         return celestialEventService.updateCelestialEvent(celestialEventUuid, patch);
     }
 

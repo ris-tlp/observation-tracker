@@ -26,5 +26,7 @@ public class CelestialEventAdvice {
     @ResponseBody
     @ExceptionHandler(IncorrectCelestialEventFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String incorrectCelestialEventFormatHandler(IncorrectObservationFormatException ex) { return ex.getMessage(); }
+    String incorrectCelestialEventFormatHandler(IncorrectObservationFormatException ex) {
+        return ex.getMessage();
+    }
 }

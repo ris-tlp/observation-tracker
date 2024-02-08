@@ -3,8 +3,6 @@ package com.observatory.observationscheduler.celestialevent.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.observatory.observationscheduler.celestialevent.CelestialEventStatus;
-import com.observatory.observationscheduler.observation.models.ObservationImage;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -52,7 +50,8 @@ public class CelestialEvent {
     public CelestialEvent() {
     }
 
-    public CelestialEvent(String celestialEventName, String celestialEventDescription, LocalDateTime celestialEventTime) {
+    public CelestialEvent(String celestialEventName, String celestialEventDescription,
+                          LocalDateTime celestialEventTime) {
         this.celestialEventName = celestialEventName;
         this.celestialEventDescription = celestialEventDescription;
         this.celestialEventDateTime = celestialEventTime;
@@ -74,7 +73,8 @@ public class CelestialEvent {
      */
 //    @PostLoad
 //    private void updateEventStatus() {
-//        if (this.getCelestialEventDateTime().isBefore(LocalDateTime.now()) && this.getEventStatus() == CelestialEventStatus.UPCOMING) {
+//        if (this.getCelestialEventDateTime().isBefore(LocalDateTime.now()) && this.getEventStatus() ==
+//        CelestialEventStatus.UPCOMING) {
 //            System.out.println("IN HERE");
 //            this.setEventStatus(CelestialEventStatus.COMPLETED);
 //        }

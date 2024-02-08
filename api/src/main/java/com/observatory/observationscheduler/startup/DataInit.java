@@ -17,7 +17,8 @@ public class DataInit implements CommandLineRunner {
     private final CelestialEventRepository eventRepository;
     private final ObservationImageRepository imageRepo;
 
-    public DataInit(UserAccountRepository userRepo, ObservationRepository observationRepository, CelestialEventRepository eventRepository, ObservationImageRepository imageRepo) {
+    public DataInit(UserAccountRepository userRepo, ObservationRepository observationRepository,
+                    CelestialEventRepository eventRepository, ObservationImageRepository imageRepo) {
         this.observationRepository = observationRepository;
         this.userRepo = userRepo;
         this.eventRepository = eventRepository;
@@ -39,11 +40,12 @@ public class DataInit implements CommandLineRunner {
 //        observationRepository.saveAndFlush(new Observation("new new","ultra new" , user));
 //
 //
-//        eventRepository.saveAndFlush(new CelestialEvent("Event name", "Event Description", LocalDateTime.of(LocalDate.of(1999, 11, 11), LocalTime.now())));
-//        eventRepository.saveAndFlush(new CelestialEvent("Event name numbah 2", "Event Description numbah 2", LocalDateTime.of(LocalDate.of(2055, 11, 11), LocalTime.now())));
-//        eventRepository.saveAndFlush(new CelestialEvent("PAST Event name numbah 2", "Event Description numbah 2", LocalDateTime.of(LocalDate.of(2076, 11, 11), LocalTime.now())));
-
-
+//        eventRepository.saveAndFlush(new CelestialEvent("Event name", "Event Description", LocalDateTime.of
+//        (LocalDate.of(1999, 11, 11), LocalTime.now())));
+//        eventRepository.saveAndFlush(new CelestialEvent("Event name numbah 2", "Event Description numbah 2",
+//        LocalDateTime.of(LocalDate.of(2055, 11, 11), LocalTime.now())));
+//        eventRepository.saveAndFlush(new CelestialEvent("PAST Event name numbah 2", "Event Description numbah 2",
+//        LocalDateTime.of(LocalDate.of(2076, 11, 11), LocalTime.now())));
 
 
     }

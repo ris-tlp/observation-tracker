@@ -28,8 +28,8 @@ public class UserAccountController {
     }
 
     /*
-    * Uses JSON Patch RFC 6902 for the patch format
-    * */
+     * Uses JSON Patch RFC 6902 for the patch format
+     * */
     @PatchMapping(value = "/{uuid}", consumes = "application/json-patch+json")
     public ResponseEntity<EntityModel<UserAccount>> patchUser(@PathVariable String uuid, @RequestBody JsonPatch patch) {
         return service.patchUser(uuid, patch);
