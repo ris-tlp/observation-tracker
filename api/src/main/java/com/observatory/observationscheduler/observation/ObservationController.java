@@ -59,9 +59,8 @@ public class ObservationController {
     }
 
     // @TODO bruh
-//    @GetMapping(params = "isPublished")
-//    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedObservations(@RequestParam Boolean isPublished) {
-//        return service.getPublishedCourses(isPublished);
-//
-//    }
+    @GetMapping(params = "isPublished")
+    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedObservations(@RequestParam Boolean isPublished) {
+        return service.getPublishedCourses(isPublished);
+    }
 }

@@ -137,20 +137,20 @@ public class ObservationService {
         }
     }
 
-//    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedCourses(Boolean isPublished) {
-//        List<Observation> observations =
-//                observationRepository.findObservationsByPublished(isPublished).orElseThrow(() -> new ObservationNotFoundException(String.valueOf(isPublished)));
-//
-//        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                CollectionModel.of(
-//                        assembledRequest,
-//                        linkTo(methodOn(ObservationController.class).getPublishedObservations(null)).withSelfRel()
-////                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
-//                )
-//        );
-//    }
+    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedCourses(Boolean isPublished) {
+        List<Observation> observations =
+                observationRepository.findObservationsByIsPublished(isPublished).orElseThrow();
+
+        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                CollectionModel.of(
+                        assembledRequest,
+                        linkTo(methodOn(ObservationController.class).getPublishedObservations(isPublished)).withSelfRel()
+//                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
+                )
+        );
+    }
 }
 
 @Component
