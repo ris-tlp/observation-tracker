@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface ObservationRepository extends JpaRepository<Observation, Long> {
     Optional<Observation> findObservationByUuid(String uuid);
-    Optional<List<Observation>> findObservationsByIsPublished(Boolean isPublished);
+    Optional<List<Observation>> findObservationsByIsPublishedIsTrue();
     Optional<List<Observation>> findByOwnerUuid(String uuid);
 }

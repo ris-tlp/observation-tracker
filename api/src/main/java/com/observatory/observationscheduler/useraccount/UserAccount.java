@@ -1,10 +1,12 @@
 package com.observatory.observationscheduler.useraccount;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
+import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.List;
 import java.util.UUID;
 import java.sql.Timestamp;
 
@@ -12,7 +14,8 @@ import java.sql.Timestamp;
 public class UserAccount {
     @Id
     @GeneratedValue
-    @JsonIgnore
+//    @JsonIgnore
+    @Column(name = "user_id")
     private Long id;
 
     private String name;
@@ -29,6 +32,11 @@ public class UserAccount {
 
     @UpdateTimestamp
     private Timestamp updatedTimestamp;
+
+//    @JsonIgnore
+    @OneToMany(mappedBy = "owner")
+    @JsonIgnoreProperties("owner")
+    private List<Observation> observations;
 
     @PrePersist
     private void initializeUuid() {
@@ -94,6 +102,14 @@ public class UserAccount {
 
     public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
+    }
+
+    public List<Observation> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<Observation> observations) {
+        this.observations = observations;
     }
 
     @Override

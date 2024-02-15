@@ -7,6 +7,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.awsservice.S3Service;
 import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
+import com.observatory.observationscheduler.configuration.JacksonConfig;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.observation.models.Observation;
@@ -42,16 +43,18 @@ public class ObservationService {
     private final ObservationImageRepository observationImageRepository;
     private final ObservationAssembler assembler;
     private final S3Service s3Service;
+    private final JacksonConfig jacksonConfig;
 
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
                               ObservationAssembler assembler, S3Service s3Service,
-                              ObservationImageRepository observationImageRepository) {
+                              ObservationImageRepository observationImageRepository, JacksonConfig jacksonConfig) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
         this.s3Service = s3Service;
         this.observationImageRepository = observationImageRepository;
+        this.jacksonConfig = jacksonConfig;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservations(String userUuid) {
@@ -113,12 +116,13 @@ public class ObservationService {
             observationRepository.save(updatedObservation);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(updatedObservation));
         } catch (JsonPatchException | JsonProcessingException exception) {
+            System.out.println(exception);
             throw new IncorrectObservationFormatException();
         }
     }
 
     private Observation applyPatchToObservation(JsonPatch patch, Observation targetObservation) throws JsonPatchException, JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = jacksonConfig.objectMapper();
         JsonNode patched = patch.apply(mapper.convertValue(targetObservation, JsonNode.class));
         return mapper.treeToValue(patched, Observation.class);
     }
@@ -137,16 +141,16 @@ public class ObservationService {
         }
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedCourses(Boolean isPublished) {
+    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedCourses() {
         List<Observation> observations =
-                observationRepository.findObservationsByIsPublished(isPublished).orElseThrow();
+                observationRepository.findObservationsByIsPublishedIsTrue().orElseThrow();
 
         CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
                         assembledRequest,
-                        linkTo(methodOn(ObservationController.class).getPublishedObservations(isPublished)).withSelfRel()
+                        linkTo(methodOn(ObservationController.class).getPublishedObservations()).withSelfRel()
 //                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
                 )
         );
@@ -160,7 +164,8 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
     public EntityModel<Observation> toModel(Observation observation) {
         return EntityModel.of(
                 observation,
-                linkTo(ObservationController.class).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, DELETE")
+                linkTo(ObservationController.class).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, " +
+                        "DELETE")
 //                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(),
 //                observation.getOwner().getUuid())).withSelfRel().withType("GET"),
 //                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner()

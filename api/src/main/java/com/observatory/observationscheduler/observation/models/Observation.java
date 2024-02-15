@@ -1,10 +1,9 @@
 package com.observatory.observationscheduler.observation.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,11 +15,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Observation {
     @Id
     @GeneratedValue
-    @JsonIgnore
     @Column(name = "observation_id")
     private Long observationId;
 
@@ -42,6 +39,8 @@ public class Observation {
     private Timestamp updatedTimestamp;
 
     @ManyToOne
+    @JsonIgnoreProperties("observations")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserAccount owner;
 
     @JsonManagedReference
@@ -149,11 +148,11 @@ public class Observation {
         this.observationDateTime = observationDateTime;
     }
 
-    public Boolean getPublished() {
+    public Boolean getIsPublished() {
         return isPublished;
     }
 
-    public void setPublished(Boolean published) {
+    public void setIsPublished(Boolean published) {
         isPublished = published;
     }
 

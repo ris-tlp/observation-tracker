@@ -59,8 +59,10 @@ public class ObservationController {
     }
 
     // @TODO bruh
-    @GetMapping(params = "isPublished")
-    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedObservations(@RequestParam Boolean isPublished) {
-        return service.getPublishedCourses(isPublished);
+    // bro if the guy just passes in false then private observations are available lmao
+    // remove choice of true or false
+    @GetMapping
+    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedObservations() {
+        return service.getPublishedCourses();
     }
 }
