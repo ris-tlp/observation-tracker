@@ -18,7 +18,6 @@ public class CelestialEvent {
     @Id
     @GeneratedValue
     @Column(name = "celestial_event_id")
-    @JsonIgnore
     private Long celestialEventId;
 
     @GeneratedValue(strategy = GenerationType.UUID)
