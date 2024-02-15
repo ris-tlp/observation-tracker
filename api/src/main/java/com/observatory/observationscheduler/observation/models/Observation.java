@@ -29,6 +29,9 @@ public class Observation {
 
     private String observationDescription;
 
+    @Column(nullable = false)
+    private Boolean isPublished = false;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime observationDateTime;
 
@@ -68,7 +71,6 @@ public class Observation {
         this.observationDescription = observationDescription;
         this.owner = owner;
         this.observationDateTime = observationDateTime;
-//        this.observationImage = observationImage;
     }
 
     public List<ObservationImage> convertImageToObservationImage(List<String> imageUrls) {
@@ -145,6 +147,14 @@ public class Observation {
 
     public void setObservationDateTime(LocalDateTime observationDateTime) {
         this.observationDateTime = observationDateTime;
+    }
+
+    public Boolean getPublished() {
+        return isPublished;
+    }
+
+    public void setPublished(Boolean published) {
+        isPublished = published;
     }
 
     @Override

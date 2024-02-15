@@ -67,7 +67,7 @@ public class ObservationService {
         );
     }
 
-    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(String observationUuid, String userUuid) {
+    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(String observationUuid) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
         Link rootLink =
@@ -124,7 +124,7 @@ public class ObservationService {
     }
 
 
-    public ResponseEntity<Void> deleteObservation(String userUuid, String observationUuid) {
+    public ResponseEntity<Void> deleteObservation(String observationUuid) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
 
@@ -136,6 +136,21 @@ public class ObservationService {
             throw new RuntimeException("There was an error in deletion");
         }
     }
+
+//    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedCourses(Boolean isPublished) {
+//        List<Observation> observations =
+//                observationRepository.findObservationsByPublished(isPublished).orElseThrow(() -> new ObservationNotFoundException(String.valueOf(isPublished)));
+//
+//        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                CollectionModel.of(
+//                        assembledRequest,
+//                        linkTo(methodOn(ObservationController.class).getPublishedObservations(null)).withSelfRel()
+////                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
+//                )
+//        );
+//    }
 }
 
 @Component
@@ -145,7 +160,7 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
     public EntityModel<Observation> toModel(Observation observation) {
         return EntityModel.of(
                 observation,
-                linkTo(ObservationController.class, observation.getOwner().getUuid()).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, DELETE")
+                linkTo(ObservationController.class).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, DELETE")
 //                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(),
 //                observation.getOwner().getUuid())).withSelfRel().withType("GET"),
 //                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner()
