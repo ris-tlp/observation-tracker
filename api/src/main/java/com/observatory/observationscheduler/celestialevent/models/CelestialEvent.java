@@ -1,8 +1,9 @@
 package com.observatory.observationscheduler.celestialevent.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -28,6 +29,10 @@ public class CelestialEvent {
     private String celestialEventName;
 
     private String celestialEventDescription;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
+    private List<Observation> associatedObservations;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
@@ -154,5 +159,13 @@ public class CelestialEvent {
 
     public void setImages(List<CelestialEventImage> images) {
         this.images = images;
+    }
+
+    public List<Observation> getAssociatedObservations() {
+        return associatedObservations;
+    }
+
+    public void setAssociatedObservations(List<Observation> observations) {
+        this.associatedObservations = observations;
     }
 }

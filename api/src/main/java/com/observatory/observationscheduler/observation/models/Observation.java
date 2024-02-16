@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.observation.models;
 
 import com.fasterxml.jackson.annotation.*;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
@@ -38,8 +39,15 @@ public class Observation {
     @UpdateTimestamp
     private Timestamp updatedTimestamp;
 
+    @JsonIgnoreProperties("associatedObservations")
+    @JsonManagedReference
     @ManyToOne
+    @JoinColumn(name = "celestial_event_id", nullable = false)
+    private CelestialEvent celestialEvent;
+
     @JsonIgnoreProperties("observations")
+    @JsonManagedReference
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserAccount owner;
 
@@ -65,11 +73,12 @@ public class Observation {
     }
 
     public Observation(String observationName, String observationDescription, UserAccount owner,
-                       LocalDateTime observationDateTime) {
+                       LocalDateTime observationDateTime, CelestialEvent celestialEvent) {
         this.observationName = observationName;
         this.observationDescription = observationDescription;
         this.owner = owner;
         this.observationDateTime = observationDateTime;
+        this.celestialEvent = celestialEvent;
     }
 
     public List<ObservationImage> convertImageToObservationImage(List<String> imageUrls) {
@@ -154,6 +163,14 @@ public class Observation {
 
     public void setIsPublished(Boolean published) {
         isPublished = published;
+    }
+
+    public CelestialEvent getCelestialEvent() {
+        return celestialEvent;
+    }
+
+    public void setCelestialEvent(CelestialEvent celestialEvent) {
+        this.celestialEvent = celestialEvent;
     }
 
     @Override

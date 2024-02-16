@@ -13,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 // @TODO have to link observation to a celestial event lmao
-// @TODO publish or unpublish observations
-// @TODO comments
 @RestController
 @RequestMapping(path = "/v1/observations")
 public class ObservationController {
@@ -24,15 +22,12 @@ public class ObservationController {
         this.service = service;
     }
 
-    //  @GetMapping("/v1/users/{userUuid}/observations")
     @GetMapping(params = "userUuid")
     public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservationsOfUser(@RequestParam String userUuid) {
         return service.getAllObservations(userUuid);
     }
 
 
-    // Users
-//    @PostMapping(path = "/v1/users/{userUuid}/observations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PostMapping(params = "userUuid", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EntityModel<Observation>> createObservation(@RequestParam String userUuid, @RequestPart(
             "newObservation") Observation newObservation, @RequestPart("images") List<MultipartFile> images) {
@@ -58,9 +53,6 @@ public class ObservationController {
         return service.deleteObservation(observationUuid);
     }
 
-    // @TODO bruh
-    // bro if the guy just passes in false then private observations are available lmao
-    // remove choice of true or false
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedObservations() {
         return service.getPublishedCourses();

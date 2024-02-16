@@ -36,6 +36,7 @@ public class UserAccount {
 //    @JsonIgnore
     @OneToMany(mappedBy = "owner")
     @JsonIgnoreProperties("owner")
+    @JsonBackReference
     private List<Observation> observations;
 
     @PrePersist
