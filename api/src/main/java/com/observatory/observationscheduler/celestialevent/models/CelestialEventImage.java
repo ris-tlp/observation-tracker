@@ -15,15 +15,15 @@ public class CelestialEventImage {
     private long celestialEventImageId;
 
     @ManyToOne
-//    @JsonBackReference
+    @JsonBackReference
     @JoinColumn(name = "celestial_event_id", nullable = false)
     private CelestialEvent celestialEvent;
 
     private String url;
 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false, nullable = false)
-    private String uuid;
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    @Column(unique = true, updatable = false, nullable = false)
+//    private String uuid;
 
     @CreationTimestamp
     private Timestamp createdTimestamp;
@@ -79,11 +79,18 @@ public class CelestialEventImage {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
+//    public String getUuid() {
+//        return uuid;
+//    }
+//
+//    public void setUuid(String uuid) {
+//        this.uuid = uuid;
+//    }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    @Override
+    public String toString() {
+        return "CelestialEventImage{" +
+                "url='" + url + '\'' +
+                '}';
     }
 }

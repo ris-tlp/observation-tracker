@@ -3,6 +3,7 @@ package com.observatory.observationscheduler.celestialevent.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,6 +19,9 @@ public class GetCelestialEventDto {
 
     private List<GetCelestialEventImageDto> images;
 
+    private Timestamp createdTimestamp;
+
+    private Timestamp updatedTimestamp;
 
     private CelestialEventStatus eventStatus;
 
@@ -67,5 +71,21 @@ public class GetCelestialEventDto {
 
     public void setEventStatus(CelestialEventStatus eventStatus) {
         this.eventStatus = eventStatus;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    public Timestamp getUpdatedTimestamp() {
+        return updatedTimestamp;
+    }
+
+    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
+        this.updatedTimestamp = updatedTimestamp;
     }
 }

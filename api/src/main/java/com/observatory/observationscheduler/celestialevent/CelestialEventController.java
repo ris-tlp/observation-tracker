@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.celestialevent;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationscheduler.celestialevent.dto.CreateCelestialEventDto;
 import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
@@ -27,8 +28,8 @@ public class CelestialEventController {
         return celestialEventService.getAllCelestialEvents();
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(@RequestPart(value = "newCelestialEvent") CelestialEvent newCelestialEvent, @RequestPart("images") List<MultipartFile> images) {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> createCelestialEvent(@RequestPart(value = "newCelestialEvent") CreateCelestialEventDto newCelestialEvent, @RequestPart("images") List<MultipartFile> images) {
         return celestialEventService.createCelestialEvent(newCelestialEvent, images);
     }
 

@@ -1,11 +1,14 @@
 package com.observatory.observationscheduler.celestialevent.dto;
 
+import java.sql.Timestamp;
+
 public class GetCelestialEventImageDto {
 
     private String url;
 
-    private String uuid;
+    private Timestamp createdTimestamp;
 
+    private Timestamp updatedTimestamp;
 
     public String getUrl() {
         return url;
@@ -15,12 +18,19 @@ public class GetCelestialEventImageDto {
         this.url = url;
     }
 
-    public String getUuid() {
-        return uuid;
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
     }
 
+    public Timestamp getUpdatedTimestamp() {
+        return updatedTimestamp;
+    }
+
+    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
+        this.updatedTimestamp = updatedTimestamp;
+    }
 }

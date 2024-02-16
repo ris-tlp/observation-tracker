@@ -31,14 +31,9 @@ public class CelestialEvent {
 
     private String celestialEventDescription;
 
-//    @JsonManagedReference
-//    @JsonIgnoreProperties("celestialEvent")
-//    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
-//    private List<Observation> associatedObservations;
-
-//    @JsonManagedReference
-//    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
-//    private List<CelestialEventImage> images;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
+    private List<CelestialEventImage> images;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
@@ -74,18 +69,6 @@ public class CelestialEvent {
         this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
-    /*
-     * Inefficient, used to change status of an event according to the current date.
-     */
-//    @PostLoad
-//    private void updateEventStatus() {
-//        if (this.getCelestialEventDateTime().isBefore(LocalDateTime.now()) && this.getEventStatus() ==
-//        CelestialEventStatus.UPCOMING) {
-//            System.out.println("IN HERE");
-//            this.setEventStatus(CelestialEventStatus.COMPLETED);
-//        }
-//
-//    }
 
     public List<CelestialEventImage> convertImageToCelestialEventImage(List<String> imageUrls) {
         return imageUrls.stream().filter(Objects::nonNull).map(url -> new CelestialEventImage(this, url)).toList();
@@ -155,19 +138,22 @@ public class CelestialEvent {
         this.eventStatus = eventStatus;
     }
 
-//    public List<CelestialEventImage> getImages() {
-//        return images;
-//    }
-//
-//    public void setImages(List<CelestialEventImage> images) {
-//        this.images = images;
-//    }
+    public List<CelestialEventImage> getImages() {
+        return images;
+    }
 
-//    public List<Observation> getAssociatedObservations() {
-//        return associatedObservations;
-//    }
-//
-//    public void setAssociatedObservations(List<Observation> observations) {
-//        this.associatedObservations = observations;
-//    }
+    public void setImages(List<CelestialEventImage> images) {
+        this.images = images;
+    }
+
+    @Override
+    public String toString() {
+        return "CelestialEvent{" +
+                "uuid='" + uuid + '\'' +
+                ", celestialEventName='" + celestialEventName + '\'' +
+                ", celestialEventDescription='" + celestialEventDescription + '\'' +
+                ", images=" + images +
+                ", eventStatus=" + eventStatus +
+                '}';
+    }
 }
