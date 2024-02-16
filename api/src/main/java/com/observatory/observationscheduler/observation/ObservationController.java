@@ -3,6 +3,7 @@ package com.observatory.observationscheduler.observation;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.websocket.server.PathParam;
+import org.h2.util.json.JSONObject;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
@@ -28,13 +29,23 @@ public class ObservationController {
     }
 
 
-    @PostMapping(params = "userUuid", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<Observation>> createObservation(@RequestParam String userUuid, @RequestPart(
-            "newObservation") Observation newObservation, @RequestPart("images") List<MultipartFile> images) {
+    //    @PostMapping(params = "userUuid", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType
+    //    .APPLICATION_JSON_VALUE})
+//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(params = {"userUuid", "celestialEventUuid"})
+    public ResponseEntity<EntityModel<Observation>> createObservation(
+            @RequestParam String userUuid,
+            @RequestParam String celestialEventUuid,
+@RequestPart(value = "newObservation") JSONObject newObservation,
+//            @RequestPart(value = "newObservation") Observation newObservation,
+            @RequestPart(value = "images") List<MultipartFile> images) {
         System.out.println(userUuid);
+        System.out.println(celestialEventUuid);
+        System.out.println(newObservation);
         System.out.println(newObservation);
         System.out.println(images);
-        return service.createObservation(newObservation, userUuid, images);
+        System.out.println("here");
+        return service.createObservation(null, null, null, images);
     }
 
     @GetMapping("/{observationUuid}")

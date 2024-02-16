@@ -7,6 +7,9 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.awsservice.S3Service;
 import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
+import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
+import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationscheduler.configuration.JacksonConfig;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
@@ -40,6 +43,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ObservationService {
     private final ObservationRepository observationRepository;
     private final UserAccountRepository userRepository;
+    private final CelestialEventRepository celestialEventRepository;
     private final ObservationImageRepository observationImageRepository;
     private final ObservationAssembler assembler;
     private final S3Service s3Service;
@@ -48,12 +52,15 @@ public class ObservationService {
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
                               ObservationAssembler assembler, S3Service s3Service,
-                              ObservationImageRepository observationImageRepository, JacksonConfig jacksonConfig) {
+                              ObservationImageRepository observationImageRepository,
+                              CelestialEventRepository celestialEventRepository,
+                              JacksonConfig jacksonConfig) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
         this.s3Service = s3Service;
         this.observationImageRepository = observationImageRepository;
+        this.celestialEventRepository = celestialEventRepository;
         this.jacksonConfig = jacksonConfig;
     }
 
@@ -81,10 +88,17 @@ public class ObservationService {
 
     // @TODO: May need to be changed according to react frontend request test, check DTOs out
     public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid,
+                                                                      String celestialEventUuid,
                                                                       List<MultipartFile> images) {
         try {
             UserAccount user =
                     userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+
+            CelestialEvent event =
+                    celestialEventRepository
+                            .findCelestialEventByUuid(celestialEventUuid)
+                            .orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+
             List<String> imageUrls = images.stream().map(image -> {
                 try {
                     return s3Service.uploadImage(image);
@@ -95,6 +109,7 @@ public class ObservationService {
             List<ObservationImage> observationImages = newObservation.convertImageToObservationImage(imageUrls);
 
             newObservation.setOwner(user);
+            newObservation.setCelestialEvent(event);
             newObservation.setImages(observationImages);
             Link rootLink =
                     linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType(

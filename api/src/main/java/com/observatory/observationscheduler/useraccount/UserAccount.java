@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import java.sql.Timestamp;
 
+// @TODO separate into DTO and Entity, getting way too hard to maintain
 @Entity
 public class UserAccount {
     @Id
