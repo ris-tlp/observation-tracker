@@ -90,17 +90,15 @@ public class CelestialEventService {
     /*
      * Temporary way to batch update all celestial events that have already expired or completed
      */
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> updateCelestialEventStatus() {
+    public ResponseEntity<Void> updateCelestialEventStatus() {
         List<CelestialEvent> events =
                 celestialEventRepository.findCelestialEventByEventStatus(CelestialEventStatus.UPCOMING).orElseThrow(() -> new CelestialEventStatusNotFoundException(CelestialEventStatus.UPCOMING));
         List<CelestialEvent> updatedEvents =
                 events.stream().map(this::updateEventStatus).filter(Objects::nonNull).toList();
 
-//        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(
-//                updatedEvents
-//        ));
+        return ResponseEntity.status(HttpStatus.OK).build();
 
-        return null;
+//        return null;
     }
 
     /*

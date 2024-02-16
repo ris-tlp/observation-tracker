@@ -55,7 +55,7 @@ public class CelestialEventController {
     }
 
     @PatchMapping("/batch-status")
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> updateCelestialEventStatus() {
+    public ResponseEntity<Void> updateCelestialEventStatus() {
         return celestialEventService.updateCelestialEventStatus();
     }
 }
