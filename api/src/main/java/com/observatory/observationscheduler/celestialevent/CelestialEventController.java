@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.celestialevent;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 import org.springframework.hateoas.CollectionModel;
@@ -22,7 +23,7 @@ public class CelestialEventController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEvents() {
+    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getCelestialEvents() {
         return celestialEventService.getAllCelestialEvents();
     }
 
@@ -32,17 +33,17 @@ public class CelestialEventController {
     }
 
     @GetMapping(params = "status")
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEventsByStatus(@RequestParam CelestialEventStatus status) {
+    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getCelestialEventsByStatus(@RequestParam CelestialEventStatus status) {
         return celestialEventService.getCelestialEventsByStatus(status);
     }
 
     @GetMapping("/{celestialEventUuid}")
-    public ResponseEntity<EntityModel<CelestialEvent>> getCelestialEventByUuid(@PathVariable String celestialEventUuid) {
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> getCelestialEventByUuid(@PathVariable String celestialEventUuid) {
         return celestialEventService.getCelestialEventByUuid(celestialEventUuid);
     }
 
     @PatchMapping(path = "/{celestialEventUuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(@PathVariable String celestialEventUuid,
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> updateCelestialEvent(@PathVariable String celestialEventUuid,
                                                                             @RequestBody JsonPatch patch) {
         return celestialEventService.updateCelestialEvent(celestialEventUuid, patch);
     }

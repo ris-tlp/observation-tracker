@@ -15,7 +15,7 @@ public class CelestialEventImage {
     private long celestialEventImageId;
 
     @ManyToOne
-    @JsonBackReference
+//    @JsonBackReference
     @JoinColumn(name = "celestial_event_id", nullable = false)
     private CelestialEvent celestialEvent;
 

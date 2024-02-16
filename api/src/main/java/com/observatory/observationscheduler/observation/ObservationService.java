@@ -13,6 +13,7 @@ import com.observatory.observationscheduler.celestialevent.repositories.Celestia
 import com.observatory.observationscheduler.configuration.JacksonConfig;
 import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
 import com.observatory.observationscheduler.observation.dto.GetObservationDto;
+import com.observatory.observationscheduler.observation.dto.GetObservationImageDto;
 import com.observatory.observationscheduler.observation.dto.ObservationDtoMapper;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -70,6 +72,11 @@ public class ObservationService {
     public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getAllObservations(String userUuid) {
         List<Observation> observations =
                 observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+
+        for (Observation observation: observations) {
+            System.out.println(observation);
+        }
+
         List<GetObservationDto> observationDtos = dtoMapper.observationListToGetDtoList(observations);
         CollectionModel<EntityModel<GetObservationDto>> assembledRequest = assembler.toCollectionModel(observationDtos);
 
@@ -118,11 +125,27 @@ public class ObservationService {
             Observation newObservationEntity = dtoMapper.createDtoToObservation(newObservation);
             List<ObservationImage> observationImages = newObservationEntity.convertImageToObservationImage(imageUrls);
 
+            // Create observation with nested entities first
             newObservationEntity.setOwner(user);
             newObservationEntity.setCelestialEvent(event);
             newObservationEntity.setImages(observationImages);
-            observationRepository.save(newObservationEntity);
-            GetObservationDto observationDto = dtoMapper.observationToGetDto(newObservationEntity);
+
+            Observation createdObservationEntity = observationRepository.save(newObservationEntity);
+
+            System.out.println(createdObservationEntity);
+
+            // Use created observation as foreign key for images
+//            List<ObservationImage> observationImages =
+//                    imageUrls.stream()
+//                            .filter(Objects::nonNull)
+//                            .map(url -> new ObservationImage(createdObservationEntity, url))
+//                            .map(observationImageRepository::save)
+//                            .toList();
+
+            // Prepare response DTO with nested entities
+            GetObservationDto observationDto = dtoMapper.observationToGetDto(createdObservationEntity);
+//            List<GetObservationImageDto> observationImageDtos = dtoMapper.observationImageListToGetDtoList(observationImages);
+//            observationDto.setImages(observationImageDtos);
 
             Link rootLink =
                     linkTo(ObservationController.class, newObservationEntity.getOwner().getUuid()).withRel("all").withType(
@@ -141,6 +164,8 @@ public class ObservationService {
             Observation observation =
                     observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
+
+            System.out.println(updatedObservation);
 
             observationRepository.save(updatedObservation);
             GetObservationDto observationDto = dtoMapper.observationToGetDto(updatedObservation);
@@ -167,7 +192,7 @@ public class ObservationService {
 
         try {
             observationRepository.delete(observation);
-            observation.getImages().forEach(observationImage -> s3Service.deleteImage(observationImage.getUrl()));
+//            observation.getImages().forEach(observationImage -> s3Service.deleteImage(observationImage.getUrl()));
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             throw new RuntimeException("There was an error in deletion");

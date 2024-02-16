@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 public class ObservationImage {
     @Id
     @GeneratedValue
-    @JsonIgnore
     @Column(name = "observation_image_id")
     private long observationImageId;
 
@@ -75,5 +74,13 @@ public class ObservationImage {
 
     public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "ObservationImage{" +
+                "observationImageId=" + observationImageId +
+                ", url='" + url + '\'' +
+                '}';
     }
 }

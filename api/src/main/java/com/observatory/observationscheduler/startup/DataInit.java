@@ -44,7 +44,7 @@ public class DataInit implements CommandLineRunner {
 //        UserAccount user = new UserAccount("newName", "newEmail");
 //        userRepo.saveAndFlush(user);
 //
-//
+////
 //        CelestialEvent event = new CelestialEvent("Event name", "Event Description", LocalDateTime.of
 //                (LocalDate.of(1999, 11, 11), LocalTime.now()));
 //        eventRepository.saveAndFlush(event);
@@ -53,7 +53,7 @@ public class DataInit implements CommandLineRunner {
 //        eventRepository.saveAndFlush(new CelestialEvent("PAST Event name numbah 2", "Event Description numbah 2",
 //                LocalDateTime.of(LocalDate.of(2076, 11, 11), LocalTime.now())));
 //
-//        observationRepository.saveAndFlush(
+//        observationRepository.save(
 //                new Observation(
 //                        "new observation",
 //                        "new description",
@@ -62,7 +62,7 @@ public class DataInit implements CommandLineRunner {
 //                        event
 //                )
 //        );
-//
+
 //        observationRepository.saveAndFlush(
 //                new Observation(
 //                        "new new",

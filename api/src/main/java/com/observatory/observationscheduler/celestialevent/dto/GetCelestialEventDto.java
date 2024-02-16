@@ -18,6 +18,7 @@ public class GetCelestialEventDto {
 
     private List<GetCelestialEventImageDto> images;
 
+
     private CelestialEventStatus eventStatus;
 
     public String getCelestialEventName() {

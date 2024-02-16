@@ -7,6 +7,8 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.aws.S3Service;
 import com.observatory.observationscheduler.aws.exceptions.InvalidImageException;
+import com.observatory.observationscheduler.celestialevent.dto.CelestialEventDtoMapper;
+import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
@@ -38,11 +40,14 @@ public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
     private final CelestialEventImageRepository celestialEventImageRepository;
     private final CelestialEventAssembler assembler;
+
     private final JacksonConfig jacksonConfig;
     private final S3Service s3Service;
+    private final CelestialEventDtoMapper celestialEventDtoMapper;
 
     public CelestialEventService(CelestialEventRepository celestialEventRepository, CelestialEventAssembler assembler
             , JacksonConfig jacksonConfig, S3Service s3Service,
+                                 CelestialEventDtoMapper celestialEventDtoMapper,
                                  CelestialEventImageRepository celestialEventImageRepository
     ) {
         this.celestialEventRepository = celestialEventRepository;
@@ -50,14 +55,16 @@ public class CelestialEventService {
         this.jacksonConfig = jacksonConfig;
         this.s3Service = s3Service;
         this.celestialEventImageRepository = celestialEventImageRepository;
+        this.celestialEventDtoMapper = celestialEventDtoMapper;
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getAllCelestialEvents() {
+    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getAllCelestialEvents() {
         List<CelestialEvent> allCelestialEvents = celestialEventRepository.findAll();
+        List<GetCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToGetDtoList(allCelestialEvents);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CollectionModel.of(
-                        assembler.toCollectionModel(allCelestialEvents),
+                        assembler.toCollectionModel(celestialEventDtos),
                         linkTo(CelestialEventController.class).withSelfRel().withType("GET, POST"),
                         linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withRel(
                                 "filter-by-status").withType("GET")
@@ -65,12 +72,13 @@ public class CelestialEventService {
 
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<CelestialEvent>>> getCelestialEventsByStatus(CelestialEventStatus status) {
+    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
         List<CelestialEvent> events =
                 celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
+        List<GetCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToGetDtoList(events);
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
-                        assembler.toCollectionModel(events),
+                        assembler.toCollectionModel(celestialEventDtos),
                         linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withSelfRel().withType("GET"),
                         linkTo(CelestialEventController.class).withRel("all").withType("GET, POST")
                 )
@@ -86,7 +94,11 @@ public class CelestialEventService {
         List<CelestialEvent> updatedEvents =
                 events.stream().map(this::updateEventStatus).filter(Objects::nonNull).toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(updatedEvents));
+//        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(
+//                updatedEvents
+//        ));
+
+        return null;
     }
 
     /*
@@ -102,11 +114,14 @@ public class CelestialEventService {
         return null;
     }
 
-    public ResponseEntity<EntityModel<CelestialEvent>> getCelestialEventByUuid(String celestialEventUuid) {
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> getCelestialEventByUuid(String celestialEventUuid) {
         CelestialEvent event =
                 celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+
+        GetCelestialEventDto celestialEventDto = celestialEventDtoMapper.celestialEventToGetDto(event);
         Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(event).add(rootLink));
+
+        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(celestialEventDto).add(rootLink));
     }
 
     public ResponseEntity<EntityModel<CelestialEvent>> createCelestialEvent(CelestialEvent celestialEvent,
@@ -120,13 +135,14 @@ public class CelestialEventService {
                 }
             }).toList();
 
-            List<CelestialEventImage> celestialEventImages =
-                    celestialEvent.convertImageToCelestialEventImage(imageUrls);
-            celestialEvent.setImages(celestialEventImages);
+//            List<CelestialEventImage> celestialEventImages =
+//                    celestialEvent.convertImageToCelestialEventImage(imageUrls);
+//            celestialEvent.setImages(celestialEventImages);
 
             CelestialEvent createdEvent = celestialEventRepository.save(celestialEvent);
             Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
-            return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(createdEvent).add(rootLink));
+//            return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(createdEvent).add(rootLink));
+            return null;
         } catch (RuntimeException e) {
             throw new IncorrectCelestialEventFormatException();
         }
@@ -138,7 +154,7 @@ public class CelestialEventService {
 
         try {
             celestialEventRepository.delete(celestialEvent);
-            celestialEvent.getImages().forEach(celestialEventImage -> s3Service.deleteImage(celestialEventImage.getUrl()));
+//            celestialEvent.getImages().forEach(celestialEventImage -> s3Service.deleteImage(celestialEventImage.getUrl()));
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             throw new RuntimeException("There was an error in deletion");
@@ -147,15 +163,20 @@ public class CelestialEventService {
 
     }
 
-    public ResponseEntity<EntityModel<CelestialEvent>> updateCelestialEvent(String celestialEventUuid,
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> updateCelestialEvent(String celestialEventUuid,
                                                                             JsonPatch patch) {
         try {
             CelestialEvent celestialEvent =
                     celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
             CelestialEvent updatedCelestialEvent = applyPatchToCelestialEvent(patch, celestialEvent);
+            System.out.println("here 3");
             celestialEventRepository.save(updatedCelestialEvent);
-            return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(updatedCelestialEvent));
+
+            GetCelestialEventDto celestialEventDto = celestialEventDtoMapper.celestialEventToGetDto(updatedCelestialEvent);
+
+            return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(celestialEventDto));
         } catch (JsonPatchException | JsonProcessingException exception) {
+            System.out.println(exception.getMessage());
             throw new IncorrectCelestialEventFormatException();
         }
     }
@@ -168,17 +189,17 @@ public class CelestialEventService {
 }
 
 @Component
-class CelestialEventAssembler implements RepresentationModelAssembler<CelestialEvent, EntityModel<CelestialEvent>> {
+class CelestialEventAssembler implements RepresentationModelAssembler<GetCelestialEventDto, EntityModel<GetCelestialEventDto>> {
 
     @Override
-    public EntityModel<CelestialEvent> toModel(CelestialEvent celestialEvent) {
+    public EntityModel<GetCelestialEventDto> toModel(GetCelestialEventDto celestialEvent) {
         return EntityModel.of(celestialEvent,
                 linkTo(CelestialEventController.class).slash(celestialEvent.getUuid()).withSelfRel().withType("GET, " +
                         "PATCH, DELETE"));
     }
 
     @Override
-    public CollectionModel<EntityModel<CelestialEvent>> toCollectionModel(Iterable<? extends CelestialEvent> entities) {
+    public CollectionModel<EntityModel<GetCelestialEventDto>> toCollectionModel(Iterable<? extends GetCelestialEventDto> entities) {
         return RepresentationModelAssembler.super.toCollectionModel(entities);
     }
 }

@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.celestialevent.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.persistence.*;
@@ -30,13 +31,14 @@ public class CelestialEvent {
 
     private String celestialEventDescription;
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
-    private List<Observation> associatedObservations;
+//    @JsonManagedReference
+//    @JsonIgnoreProperties("celestialEvent")
+//    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
+//    private List<Observation> associatedObservations;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
-    private List<CelestialEventImage> images;
+//    @JsonManagedReference
+//    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
+//    private List<CelestialEventImage> images;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
@@ -153,19 +155,19 @@ public class CelestialEvent {
         this.eventStatus = eventStatus;
     }
 
-    public List<CelestialEventImage> getImages() {
-        return images;
-    }
+//    public List<CelestialEventImage> getImages() {
+//        return images;
+//    }
+//
+//    public void setImages(List<CelestialEventImage> images) {
+//        this.images = images;
+//    }
 
-    public void setImages(List<CelestialEventImage> images) {
-        this.images = images;
-    }
-
-    public List<Observation> getAssociatedObservations() {
-        return associatedObservations;
-    }
-
-    public void setAssociatedObservations(List<Observation> observations) {
-        this.associatedObservations = observations;
-    }
+//    public List<Observation> getAssociatedObservations() {
+//        return associatedObservations;
+//    }
+//
+//    public void setAssociatedObservations(List<Observation> observations) {
+//        this.associatedObservations = observations;
+//    }
 }

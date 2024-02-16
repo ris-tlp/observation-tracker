@@ -39,20 +39,21 @@ public class Observation {
     @UpdateTimestamp
     private Timestamp updatedTimestamp;
 
-    @JsonIgnoreProperties("associatedObservations")
-    @JsonManagedReference
+//    @JsonIgnoreProperties("associatedObservations")
+//    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "celestial_event_id", nullable = false)
     private CelestialEvent celestialEvent;
 
-    @JsonIgnoreProperties("observations")
-    @JsonManagedReference
+//    @JsonIgnoreProperties("observations")
+//    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserAccount owner;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "observation", cascade = CascadeType.ALL)
+//    @JsonIgnoreProperties("observation")
     private List<ObservationImage> images;
 
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -133,13 +134,13 @@ public class Observation {
         this.observationDescription = observationDescription;
     }
 
-    public List<ObservationImage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<ObservationImage> images) {
-        this.images = images;
-    }
+//    public List<ObservationImage> getImages() {
+//        return images;
+//    }
+//
+//    public void setImages(List<ObservationImage> images) {
+//        this.images = images;
+//    }
 
     public String getUuid() {
         return uuid;
@@ -173,15 +174,23 @@ public class Observation {
         this.celestialEvent = celestialEvent;
     }
 
+    public List<ObservationImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ObservationImage> images) {
+        this.images = images;
+    }
+
     @Override
     public String toString() {
         return "Observation{" +
-                "id=" + observationId +
-                ", observationName='" + observationName + '\'' +
+                "observationName='" + observationName + '\'' +
                 ", observationDescription='" + observationDescription + '\'' +
-                ", createdTimestamp=" + createdTimestamp +
-                ", updatedTimestamp=" + updatedTimestamp +
+                ", isPublished=" + isPublished +
+                ", celestialEvent=" + celestialEvent +
                 ", owner=" + owner +
+                ", images=" + images +
                 ", uuid='" + uuid + '\'' +
                 '}';
     }
