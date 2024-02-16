@@ -1,6 +1,8 @@
 package com.observatory.observationscheduler.observation;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
+import com.observatory.observationscheduler.observation.dto.GetObservationDto;
 import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.websocket.server.PathParam;
 import org.h2.util.json.JSONObject;
@@ -24,28 +26,19 @@ public class ObservationController {
     }
 
     @GetMapping(params = "userUuid")
-    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservationsOfUser(@RequestParam String userUuid) {
+    public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getAllObservationsOfUser(@RequestParam String userUuid) {
         return service.getAllObservations(userUuid);
     }
 
-
-    //    @PostMapping(params = "userUuid", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType
-    //    .APPLICATION_JSON_VALUE})
-//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PostMapping(params = {"userUuid", "celestialEventUuid"})
-    public ResponseEntity<EntityModel<Observation>> createObservation(
+    @PostMapping(params = {"userUuid", "celestialEventUuid"},
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<EntityModel<GetObservationDto>> createObservation(
             @RequestParam String userUuid,
             @RequestParam String celestialEventUuid,
-@RequestPart(value = "newObservation") JSONObject newObservation,
-//            @RequestPart(value = "newObservation") Observation newObservation,
-            @RequestPart(value = "images") List<MultipartFile> images) {
-        System.out.println(userUuid);
-        System.out.println(celestialEventUuid);
-        System.out.println(newObservation);
-        System.out.println(newObservation);
-        System.out.println(images);
-        System.out.println("here");
-        return service.createObservation(null, null, null, images);
+            @RequestPart(value = "newObservation") CreateObservationDto newObservation,
+            @RequestPart(value = "images") List<MultipartFile> images
+    ) {
+        return service.createObservation(newObservation, userUuid, celestialEventUuid, images);
     }
 
     @GetMapping("/{observationUuid}")

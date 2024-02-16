@@ -1,46 +1,24 @@
 package com.observatory.observationscheduler.celestialevent.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class CelestialEventDto {
-    @JsonProperty("celestial_event_id")
-    private Long celestialEventId;
-
+public class GetCelestialEventDto {
     private String celestialEventName;
 
     private String celestialEventDescription;
 
     private String uuid;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
 
-    private List<CelestialEventImageDto> images;
+    private List<GetCelestialEventImageDto> images;
 
     private CelestialEventStatus eventStatus;
-
-    public CelestialEventDto(Long celestialEventId, String celestialEventName, String celestialEventDescription,
-                             String uuid, LocalDateTime celestialEventDateTime, List<CelestialEventImageDto> images,
-                             CelestialEventStatus eventStatus) {
-        this.celestialEventId = celestialEventId;
-        this.celestialEventName = celestialEventName;
-        this.celestialEventDescription = celestialEventDescription;
-        this.uuid = uuid;
-        this.celestialEventDateTime = celestialEventDateTime;
-        this.images = images;
-        this.eventStatus = eventStatus;
-    }
-
-    public Long getCelestialEventId() {
-        return celestialEventId;
-    }
-
-    public void setCelestialEventId(Long celestialEventId) {
-        this.celestialEventId = celestialEventId;
-    }
 
     public String getCelestialEventName() {
         return celestialEventName;
@@ -74,11 +52,11 @@ public class CelestialEventDto {
         this.celestialEventDateTime = celestialEventDateTime;
     }
 
-    public List<CelestialEventImageDto> getImages() {
+    public List<GetCelestialEventImageDto> getImages() {
         return images;
     }
 
-    public void setImages(List<CelestialEventImageDto> images) {
+    public void setImages(List<GetCelestialEventImageDto> images) {
         this.images = images;
     }
 

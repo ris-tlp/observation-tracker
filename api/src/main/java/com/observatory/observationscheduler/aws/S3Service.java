@@ -1,11 +1,10 @@
-package com.observatory.observationscheduler.awsservice;
+package com.observatory.observationscheduler.aws;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
+import com.observatory.observationscheduler.aws.exceptions.InvalidImageException;
 import org.springframework.beans.factory.annotation.Value;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Optional;
 
 // @TODO Better error handling
 @Service

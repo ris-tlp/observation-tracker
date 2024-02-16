@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.observatory.observationscheduler.awsservice.S3Service;
-import com.observatory.observationscheduler.awsservice.exceptions.InvalidImageException;
+import com.observatory.observationscheduler.aws.S3Service;
+import com.observatory.observationscheduler.aws.exceptions.InvalidImageException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationscheduler.configuration.JacksonConfig;
+import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
+import com.observatory.observationscheduler.observation.dto.GetObservationDto;
+import com.observatory.observationscheduler.observation.dto.MapStructMapper;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.observation.models.Observation;
@@ -20,8 +23,6 @@ import com.observatory.observationscheduler.observation.repositories.Observation
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import com.observatory.observationscheduler.useraccount.UserAccountRepository;
 import com.observatory.observationscheduler.useraccount.exceptions.UserNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -32,9 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -46,15 +45,18 @@ public class ObservationService {
     private final CelestialEventRepository celestialEventRepository;
     private final ObservationImageRepository observationImageRepository;
     private final ObservationAssembler assembler;
+
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
+    private final MapStructMapper dtoMapper;
 
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
                               ObservationAssembler assembler, S3Service s3Service,
                               ObservationImageRepository observationImageRepository,
                               CelestialEventRepository celestialEventRepository,
-                              JacksonConfig jacksonConfig) {
+                              JacksonConfig jacksonConfig,
+                              MapStructMapper dtoMapper) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
@@ -62,12 +64,14 @@ public class ObservationService {
         this.observationImageRepository = observationImageRepository;
         this.celestialEventRepository = celestialEventRepository;
         this.jacksonConfig = jacksonConfig;
+        this.dtoMapper = dtoMapper;
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getAllObservations(String userUuid) {
+    public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getAllObservations(String userUuid) {
         List<Observation> observations =
                 observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
-        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
+        List<GetObservationDto> observationDtos = dtoMapper.observationListToGetDtoList(observations);
+        CollectionModel<EntityModel<GetObservationDto>> assembledRequest = assembler.toCollectionModel(observationDtos);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
@@ -83,11 +87,12 @@ public class ObservationService {
         Link rootLink =
                 linkTo(ObservationController.class, observation.getOwner().getUuid()).withRel("all").withType("GET, " +
                         "POST");
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
+        return null;
+//                ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
     }
 
     // @TODO: May need to be changed according to react frontend request test, check DTOs out
-    public ResponseEntity<EntityModel<Observation>> createObservation(Observation newObservation, String userUuid,
+    public ResponseEntity<EntityModel<GetObservationDto>> createObservation(CreateObservationDto newObservation, String userUuid,
                                                                       String celestialEventUuid,
                                                                       List<MultipartFile> images) {
         try {
@@ -106,17 +111,22 @@ public class ObservationService {
                     return null;
                 }
             }).toList();
-            List<ObservationImage> observationImages = newObservation.convertImageToObservationImage(imageUrls);
 
-            newObservation.setOwner(user);
-            newObservation.setCelestialEvent(event);
-            newObservation.setImages(observationImages);
+            Observation newObservationEntity = dtoMapper.createDtoToObservation(newObservation);
+            List<ObservationImage> observationImages = newObservationEntity.convertImageToObservationImage(imageUrls);
+
+            newObservationEntity.setOwner(user);
+            newObservationEntity.setCelestialEvent(event);
+            newObservationEntity.setImages(observationImages);
+            observationRepository.save(newObservationEntity);
+            GetObservationDto observationDto = dtoMapper.observationToGetDto(newObservationEntity);
+
             Link rootLink =
-                    linkTo(ObservationController.class, newObservation.getOwner().getUuid()).withRel("all").withType(
+                    linkTo(ObservationController.class, newObservationEntity.getOwner().getUuid()).withRel("all").withType(
                             "GET, POST");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(
-                    assembler.toModel(observationRepository.save(newObservation)).add(rootLink));
+                    assembler.toModel(observationDto).add(rootLink));
         } catch (RuntimeException e) {
             throw new IncorrectObservationFormatException();
         }
@@ -129,7 +139,10 @@ public class ObservationService {
                     observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
             observationRepository.save(updatedObservation);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(assembler.toModel(updatedObservation));
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                    null
+//                    assembler.toModel(updatedObservation)
+            );
         } catch (JsonPatchException | JsonProcessingException exception) {
             System.out.println(exception);
             throw new IncorrectObservationFormatException();
@@ -160,11 +173,12 @@ public class ObservationService {
         List<Observation> observations =
                 observationRepository.findObservationsByIsPublishedIsTrue().orElseThrow();
 
-        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
+//        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
-                        assembledRequest,
+                        null,
+//                        assembledRequest,
                         linkTo(methodOn(ObservationController.class).getPublishedObservations()).withSelfRel()
 //                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
                 )
@@ -173,10 +187,10 @@ public class ObservationService {
 }
 
 @Component
-class ObservationAssembler implements RepresentationModelAssembler<Observation, EntityModel<Observation>> {
+class ObservationAssembler implements RepresentationModelAssembler<GetObservationDto, EntityModel<GetObservationDto>> {
 
     @Override
-    public EntityModel<Observation> toModel(Observation observation) {
+    public EntityModel<GetObservationDto> toModel(GetObservationDto observation) {
         return EntityModel.of(
                 observation,
                 linkTo(ObservationController.class).slash(observation.getUuid()).withSelfRel().withType("GET, PATCH, " +
@@ -191,7 +205,7 @@ class ObservationAssembler implements RepresentationModelAssembler<Observation, 
     }
 
     @Override
-    public CollectionModel<EntityModel<Observation>> toCollectionModel(Iterable<? extends Observation> entities) {
+    public CollectionModel<EntityModel<GetObservationDto>> toCollectionModel(Iterable<? extends GetObservationDto> entities) {
         return RepresentationModelAssembler.super.toCollectionModel(entities);
     }
 }

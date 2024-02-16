@@ -1,4 +1,4 @@
-package com.observatory.observationscheduler.awsservice.exceptions;
+package com.observatory.observationscheduler.aws.exceptions;
 
 import com.amazonaws.services.ecr.model.ImageNotFoundException;
 import org.springframework.http.HttpStatus;

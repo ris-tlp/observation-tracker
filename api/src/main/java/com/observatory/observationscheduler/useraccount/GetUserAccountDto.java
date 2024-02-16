@@ -1,24 +1,11 @@
 package com.observatory.observationscheduler.useraccount;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class UserAccountDto {
-    @JsonProperty("user_id")
-    private Long userId;
-
+public class GetUserAccountDto {
     private String name;
 
     private String email;
 
     private String uuid;
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public String getName() {
         return name;
