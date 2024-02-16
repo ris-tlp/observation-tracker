@@ -125,27 +125,13 @@ public class ObservationService {
             Observation newObservationEntity = dtoMapper.createDtoToObservation(newObservation);
             List<ObservationImage> observationImages = newObservationEntity.convertImageToObservationImage(imageUrls);
 
-            // Create observation with nested entities first
+            // Set detached entities
             newObservationEntity.setOwner(user);
             newObservationEntity.setCelestialEvent(event);
             newObservationEntity.setImages(observationImages);
 
             Observation createdObservationEntity = observationRepository.save(newObservationEntity);
-
-            System.out.println(createdObservationEntity);
-
-            // Use created observation as foreign key for images
-//            List<ObservationImage> observationImages =
-//                    imageUrls.stream()
-//                            .filter(Objects::nonNull)
-//                            .map(url -> new ObservationImage(createdObservationEntity, url))
-//                            .map(observationImageRepository::save)
-//                            .toList();
-
-            // Prepare response DTO with nested entities
             GetObservationDto observationDto = dtoMapper.observationToGetDto(createdObservationEntity);
-//            List<GetObservationImageDto> observationImageDtos = dtoMapper.observationImageListToGetDtoList(observationImages);
-//            observationDto.setImages(observationImageDtos);
 
             Link rootLink =
                     linkTo(ObservationController.class, newObservationEntity.getOwner().getUuid()).withRel("all").withType(
