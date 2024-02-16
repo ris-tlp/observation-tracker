@@ -13,7 +13,6 @@ public class GetObservationDto {
 
     private String observationDescription;
 
-    //@TODO change fix ispublished because showing null
     private Boolean isPublished;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -47,12 +46,12 @@ public class GetObservationDto {
         this.observationDescription = observationDescription;
     }
 
-    public Boolean getPublished() {
+    public Boolean getIsPublished() {
         return isPublished;
     }
 
-    public void setPublished(Boolean published) {
-        isPublished = published;
+    public void setIsPublished(Boolean isPublished) {
+        this.isPublished = isPublished;
     }
 
     public LocalDateTime getObservationDateTime() {

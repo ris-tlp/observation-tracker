@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface MapStructMapper {
+public interface ObservationDtoMapper {
     Observation createDtoToObservation(CreateObservationDto createObservationDto);
 
     GetObservationDto observationToGetDto(Observation observation);

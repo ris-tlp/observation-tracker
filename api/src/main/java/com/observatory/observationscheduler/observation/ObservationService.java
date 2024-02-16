@@ -13,7 +13,7 @@ import com.observatory.observationscheduler.celestialevent.repositories.Celestia
 import com.observatory.observationscheduler.configuration.JacksonConfig;
 import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
 import com.observatory.observationscheduler.observation.dto.GetObservationDto;
-import com.observatory.observationscheduler.observation.dto.MapStructMapper;
+import com.observatory.observationscheduler.observation.dto.ObservationDtoMapper;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.observation.models.Observation;
@@ -48,7 +48,7 @@ public class ObservationService {
 
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
-    private final MapStructMapper dtoMapper;
+    private final ObservationDtoMapper dtoMapper;
 
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
@@ -56,7 +56,7 @@ public class ObservationService {
                               ObservationImageRepository observationImageRepository,
                               CelestialEventRepository celestialEventRepository,
                               JacksonConfig jacksonConfig,
-                              MapStructMapper dtoMapper) {
+                              ObservationDtoMapper dtoMapper) {
         this.assembler = assembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
