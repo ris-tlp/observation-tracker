@@ -42,12 +42,12 @@ public class ObservationController {
     }
 
     @GetMapping("/{observationUuid}")
-    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(@PathVariable String observationUuid) {
+    public ResponseEntity<EntityModel<GetObservationDto>> getObservationByUuid(@PathVariable String observationUuid) {
         return service.getObservationByUuid(observationUuid);
     }
 
     @PatchMapping(path = "/{observationUuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<Observation>> patchObservation(@PathVariable String observationUuid,
+    public ResponseEntity<EntityModel<GetObservationDto>> patchObservation(@PathVariable String observationUuid,
                                                                      @RequestBody JsonPatch patch) {
         return service.patchObservation(observationUuid, patch);
     }
@@ -58,7 +58,7 @@ public class ObservationController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedObservations() {
+    public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getPublishedObservations() {
         return service.getPublishedCourses();
     }
 }

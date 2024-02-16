@@ -13,6 +13,7 @@ public class GetObservationDto {
 
     private String observationDescription;
 
+    //@TODO change fix ispublished because showing null
     private Boolean isPublished;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

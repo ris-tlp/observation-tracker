@@ -81,20 +81,23 @@ public class ObservationService {
         );
     }
 
-    public ResponseEntity<EntityModel<Observation>> getObservationByUuid(String observationUuid) {
+    public ResponseEntity<EntityModel<GetObservationDto>> getObservationByUuid(String observationUuid) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+
+        GetObservationDto observationDto = dtoMapper.observationToGetDto(observation);
         Link rootLink =
                 linkTo(ObservationController.class, observation.getOwner().getUuid()).withRel("all").withType("GET, " +
                         "POST");
-        return null;
-//                ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observation).add(rootLink));
+
+        return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(observationDto).add(rootLink));
     }
 
     // @TODO: May need to be changed according to react frontend request test, check DTOs out
-    public ResponseEntity<EntityModel<GetObservationDto>> createObservation(CreateObservationDto newObservation, String userUuid,
-                                                                      String celestialEventUuid,
-                                                                      List<MultipartFile> images) {
+    public ResponseEntity<EntityModel<GetObservationDto>> createObservation(CreateObservationDto newObservation,
+                                                                            String userUuid,
+                                                                            String celestialEventUuid,
+                                                                            List<MultipartFile> images) {
         try {
             UserAccount user =
                     userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
@@ -133,15 +136,17 @@ public class ObservationService {
     }
 
     // Used to patch specific fields of a PATCH request
-    public ResponseEntity<EntityModel<Observation>> patchObservation(String uuid, JsonPatch patch) {
+    public ResponseEntity<EntityModel<GetObservationDto>> patchObservation(String uuid, JsonPatch patch) {
         try {
             Observation observation =
                     observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
+
             observationRepository.save(updatedObservation);
+            GetObservationDto observationDto = dtoMapper.observationToGetDto(updatedObservation);
+
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                    null
-//                    assembler.toModel(updatedObservation)
+                    assembler.toModel(observationDto)
             );
         } catch (JsonPatchException | JsonProcessingException exception) {
             System.out.println(exception);
@@ -169,16 +174,17 @@ public class ObservationService {
         }
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<Observation>>> getPublishedCourses() {
+    public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getPublishedCourses() {
         List<Observation> observations =
                 observationRepository.findObservationsByIsPublishedIsTrue().orElseThrow();
 
-//        CollectionModel<EntityModel<Observation>> assembledRequest = assembler.toCollectionModel(observations);
+        List<GetObservationDto> observationDtos = dtoMapper.observationListToGetDtoList(observations);
+
+        CollectionModel<EntityModel<GetObservationDto>> assembledRequest = assembler.toCollectionModel(observationDtos);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
-                        null,
-//                        assembledRequest,
+                        assembledRequest,
                         linkTo(methodOn(ObservationController.class).getPublishedObservations()).withSelfRel()
 //                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
                 )
