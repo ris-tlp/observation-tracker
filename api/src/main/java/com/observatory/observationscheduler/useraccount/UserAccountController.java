@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.useraccount;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationscheduler.useraccount.dto.GetUserAccountDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,12 @@ public class UserAccountController {
 
 
     @GetMapping("/{uuid}")
-    public EntityModel<UserAccount> getOneUserByUuid(@PathVariable String uuid) {
+    public EntityModel<GetUserAccountDto> getOneUserByUuid(@PathVariable String uuid) {
         return service.oneUserByUuid(uuid);
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<EntityModel<UserAccount>> createUser(@RequestBody UserAccount newAccount) {
+    public ResponseEntity<EntityModel<GetUserAccountDto>> createUser(@RequestBody UserAccount newAccount) {
         return service.createUser(newAccount);
     }
 
@@ -31,13 +32,13 @@ public class UserAccountController {
      * Uses JSON Patch RFC 6902 for the patch format
      * */
     @PatchMapping(value = "/{uuid}", consumes = "application/json-patch+json")
-    public ResponseEntity<EntityModel<UserAccount>> patchUser(@PathVariable String uuid, @RequestBody JsonPatch patch) {
+    public ResponseEntity<EntityModel<GetUserAccountDto>> patchUser(@PathVariable String uuid, @RequestBody JsonPatch patch) {
         return service.patchUser(uuid, patch);
     }
 
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<UserAccount>>> getAllUsers() {
+    public ResponseEntity<CollectionModel<EntityModel<GetUserAccountDto>>> getAllUsers() {
         return service.getAllUsers();
     }
 }

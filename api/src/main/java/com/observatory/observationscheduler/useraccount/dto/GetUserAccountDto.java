@@ -1,4 +1,4 @@
-package com.observatory.observationscheduler.useraccount;
+package com.observatory.observationscheduler.useraccount.dto;
 
 public class GetUserAccountDto {
     private String name;

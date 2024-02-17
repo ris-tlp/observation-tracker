@@ -2,7 +2,7 @@ package com.observatory.observationscheduler.observation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
-import com.observatory.observationscheduler.useraccount.GetUserAccountDto;
+import com.observatory.observationscheduler.useraccount.dto.GetUserAccountDto;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
