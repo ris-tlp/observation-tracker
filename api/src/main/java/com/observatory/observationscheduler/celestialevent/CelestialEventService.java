@@ -203,12 +203,14 @@ public class CelestialEventService {
                                                                             CreateCelestialEventCommentDto newComment) {
         CelestialEvent celestialEvent =
                 celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
-        UserAccount userAccount =
+        UserAccount author =
                 userAccountRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(userUuid));
 
         CelestialEventComment celestialEventComment =
                 celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
 
+        celestialEventComment.setAuthor(author);
+        celestialEventComment.setCelestialEvent(celestialEvent);
         celestialEventCommentRepository.save(celestialEventComment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(celestialEventComment);
@@ -231,7 +233,7 @@ public class CelestialEventService {
 
         celestialEventReply.setParentComment(parentComment);
         celestialEventReply.setAuthor(author);
-        
+
         // Maintaining bidirectional relationship
         celestialEventReply.setCelestialEvent(celestialEvent);
         parentComment.getReplies().add(celestialEventReply);
