@@ -3,7 +3,6 @@ package com.observatory.observationscheduler.celestialevent;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationscheduler.celestialevent.dto.CreateCelestialEventCommentDto;
 import com.observatory.observationscheduler.celestialevent.dto.CreateCelestialEventDto;
-import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventCommentDto;
 import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventComment;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
@@ -62,6 +61,22 @@ public class CelestialEventController {
         return celestialEventService.updateCelestialEventStatus();
     }
 
+//    @PostMapping(value = "/{celestialEventUuid}/comments", params = "userUuid", consumes =
+//            MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<CelestialEventComment> addCommentToCelestialEvent(@PathVariable String celestialEventUuid,
+//                                                                            @RequestBody CreateCelestialEventCommentDto newComment,
+//                                                                            @RequestParam String userUuid) {
+//        return celestialEventService.addCommentToCelestialEvent(celestialEventUuid, userUuid, newComment);
+//    }
+//
+//    @PostMapping(value = "/{celestialEventUuid}/comments", params = {"userUuid", "parentCommentUuid"}, consumes =
+//            MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<GetCelestialEventCommentDto> addReplyToCelestialEventComment(@PathVariable String celestialEventUuid,
+//                                                                                       @RequestBody CreateCelestialEventCommentDto newComment, @RequestParam String userUuid, @RequestParam String parentCommentUuid) {
+//        return celestialEventService.addReplyToCelestialEventComment(celestialEventUuid, userUuid, parentCommentUuid,
+//                newComment);
+//    }
+
     @PostMapping(value = "/{celestialEventUuid}/comments", params = "userUuid", consumes =
             MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CelestialEventComment> addCommentToCelestialEvent(@PathVariable String celestialEventUuid,
@@ -72,7 +87,7 @@ public class CelestialEventController {
 
     @PostMapping(value = "/{celestialEventUuid}/comments", params = {"userUuid", "parentCommentUuid"}, consumes =
             MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetCelestialEventCommentDto> addReplyToCelestialEventComment(@PathVariable String celestialEventUuid,
+    public ResponseEntity<List<CelestialEventComment>> addReplyToCelestialEventComment(@PathVariable String celestialEventUuid,
                                                                                        @RequestBody CreateCelestialEventCommentDto newComment, @RequestParam String userUuid, @RequestParam String parentCommentUuid) {
         return celestialEventService.addReplyToCelestialEventComment(celestialEventUuid, userUuid, parentCommentUuid,
                 newComment);

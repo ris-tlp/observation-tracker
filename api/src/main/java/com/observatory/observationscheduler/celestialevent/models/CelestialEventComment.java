@@ -3,21 +3,21 @@ package com.observatory.observationscheduler.celestialevent.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class CelestialEventComment {
     @Id
     @GeneratedValue
     @Column(name = "celestial_event_comment_id")
-    private long celestialEventCommentId;
+    private Long celestialEventCommentId;
 
-    @Column(nullable = false)
     private String content;
 
     @ManyToOne
@@ -26,14 +26,15 @@ public class CelestialEventComment {
     @ManyToOne
     private CelestialEvent celestialEvent;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private CelestialEventComment parent;
+    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    private CelestialEventComment parentComment;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent", cascade = CascadeType.ALL)
-    private Set<CelestialEventComment> children;
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    private List<CelestialEventComment> replies;
 
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false)
+    @Column(unique = true, updatable = false, nullable = false)
     private String uuid;
 
     @CreationTimestamp
@@ -47,19 +48,34 @@ public class CelestialEventComment {
         this.setUuid(UUID.randomUUID().toString());
     }
 
-    public void addReply(CelestialEventComment reply) {
-        if (this.children == null)
-            this.children = new HashSet<>();
-
-        this.children.add(reply);
+    @PreUpdate
+    private void updateTimestamp() {
+        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
+//    public void addReply(CelestialEventComment reply) {
+//        if (replies == null) {
+//            replies = new ArrayList<>();
+//        }
+//        replies.add(reply);
+//    }
 
-    public long getCelestialEventCommentId() {
+    public CelestialEventComment() {
+    }
+
+    public CelestialEvent getCelestialEvent() {
+        return celestialEvent;
+    }
+
+    public void setCelestialEvent(CelestialEvent celestialEvent) {
+        this.celestialEvent = celestialEvent;
+    }
+
+    public Long getCelestialEventCommentId() {
         return celestialEventCommentId;
     }
 
-    public void setCelestialEventCommentId(long celestialEventCommentId) {
+    public void setCelestialEventCommentId(Long celestialEventCommentId) {
         this.celestialEventCommentId = celestialEventCommentId;
     }
 
@@ -71,20 +87,20 @@ public class CelestialEventComment {
         this.content = content;
     }
 
-    public UserAccount getAuthor() {
-        return author;
+    public CelestialEventComment getParentComment() {
+        return parentComment;
     }
 
-    public void setAuthor(UserAccount author) {
-        this.author = author;
+    public void setParentComment(CelestialEventComment parentComment) {
+        this.parentComment = parentComment;
     }
 
-    public CelestialEvent getCelestialEvent() {
-        return celestialEvent;
+    public List<CelestialEventComment> getReplies() {
+        return replies;
     }
 
-    public void setCelestialEvent(CelestialEvent celestialEvent) {
-        this.celestialEvent = celestialEvent;
+    public void setReplies(List<CelestialEventComment> replies) {
+        this.replies = replies;
     }
 
     public String getUuid() {
@@ -111,20 +127,12 @@ public class CelestialEventComment {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public CelestialEventComment getParent() {
-        return parent;
+    public UserAccount getAuthor() {
+        return author;
     }
 
-    public void setParent(CelestialEventComment parent) {
-        this.parent = parent;
-    }
-
-    public Set<CelestialEventComment> getChildren() {
-        return children;
-    }
-
-    public void setChildren(Set<CelestialEventComment> children) {
-        this.children = children;
+    public void setAuthor(UserAccount author) {
+        this.author = author;
     }
 
     @Override
@@ -132,7 +140,9 @@ public class CelestialEventComment {
         return "CelestialEventComment{" +
                 "celestialEventCommentId=" + celestialEventCommentId +
                 ", content='" + content + '\'' +
-                ", author=" + author +
+                ", parentComment=" + parentComment +
+                ", replies=" + replies +
+                ", uuid='" + uuid + '\'' +
                 '}';
     }
 }
