@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-// @TODO have to link observation to a celestial event lmao
 @RestController
 @RequestMapping(path = "/v1/observations")
 public class ObservationController {

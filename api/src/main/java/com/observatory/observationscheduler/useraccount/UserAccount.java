@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 import java.sql.Timestamp;
 
-// @TODO BRO BIDIRECTIONAL IS NOT NEEDED DUMBASS
 @Entity
 public class UserAccount {
     @Id

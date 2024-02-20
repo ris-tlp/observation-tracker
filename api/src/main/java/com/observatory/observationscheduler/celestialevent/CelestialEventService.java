@@ -7,18 +7,18 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.aws.S3Service;
 import com.observatory.observationscheduler.aws.exceptions.InvalidImageException;
-import com.observatory.observationscheduler.celestialevent.dto.CelestialEventDtoMapper;
-import com.observatory.observationscheduler.celestialevent.dto.CreateCelestialEventDto;
-import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
+import com.observatory.observationscheduler.celestialevent.dto.*;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
-import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
-import com.observatory.observationscheduler.celestialevent.models.CelestialEventImage;
-import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
+import com.observatory.observationscheduler.celestialevent.models.*;
+import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventCommentRepository;
 import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventImageRepository;
 import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationscheduler.configuration.JacksonConfig;
+import com.observatory.observationscheduler.useraccount.UserAccount;
+import com.observatory.observationscheduler.useraccount.UserAccountRepository;
+import com.observatory.observationscheduler.useraccount.exceptions.UserNotFoundException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -41,6 +41,8 @@ public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
     private final CelestialEventImageRepository celestialEventImageRepository;
     private final CelestialEventAssembler assembler;
+    private final UserAccountRepository userAccountRepository;
+    private final CelestialEventCommentRepository celestialEventCommentRepository;
 
     private final JacksonConfig jacksonConfig;
     private final S3Service s3Service;
@@ -49,7 +51,9 @@ public class CelestialEventService {
     public CelestialEventService(CelestialEventRepository celestialEventRepository, CelestialEventAssembler assembler
             , JacksonConfig jacksonConfig, S3Service s3Service,
                                  CelestialEventDtoMapper celestialEventDtoMapper,
-                                 CelestialEventImageRepository celestialEventImageRepository
+                                 CelestialEventImageRepository celestialEventImageRepository,
+                                 UserAccountRepository userAccountRepository,
+                                 CelestialEventCommentRepository celestialEventCommentRepository
     ) {
         this.celestialEventRepository = celestialEventRepository;
         this.assembler = assembler;
@@ -57,6 +61,8 @@ public class CelestialEventService {
         this.s3Service = s3Service;
         this.celestialEventImageRepository = celestialEventImageRepository;
         this.celestialEventDtoMapper = celestialEventDtoMapper;
+        this.userAccountRepository = userAccountRepository;
+        this.celestialEventCommentRepository = celestialEventCommentRepository;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getAllCelestialEvents() {
@@ -151,6 +157,29 @@ public class CelestialEventService {
         }
     }
 
+    public ResponseEntity<CelestialEventComment> addCommentToCelestialEvent(String celestialEventUuid,
+                                                                            String userUuid,
+                                                                            CreateCelestialEventCommentDto comment) {
+        CelestialEvent celestialEvent =
+                celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+
+        UserAccount author =
+                userAccountRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+
+        CelestialEventComment commentEntity = celestialEventDtoMapper.createCommentDtoToCelestialEventComment(comment);
+        commentEntity.setAuthor(author);
+        commentEntity.setCelestialEvent(celestialEvent);
+
+        commentEntity = celestialEventCommentRepository.save(commentEntity);
+
+        System.out.println(commentEntity);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                commentEntity
+        );
+    }
+
+
     public ResponseEntity<Void> deleteCelestialEvent(String celestialEventUuid) {
         CelestialEvent celestialEvent =
                 celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
@@ -190,6 +219,70 @@ public class CelestialEventService {
         JsonNode patched = patch.apply(mapper.convertValue(celestialEvent, JsonNode.class));
         return mapper.treeToValue(patched, CelestialEvent.class);
     }
+
+    public ResponseEntity<GetCelestialEventCommentDto> addReplyToCelestialEventComment(String celestialEventUuid,
+                                                                                 String userUuid,
+                                                                                 String parentCommentUuid,
+                                                                                 CreateCelestialEventCommentDto newComment) {
+        CelestialEvent celestialEvent =
+                celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+        UserAccount author =
+                userAccountRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+
+        // @TODO change throw exception to custom exception
+        CelestialEventComment parentComment =
+                celestialEventCommentRepository.findCelestialEventCommentByUuid(parentCommentUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(parentCommentUuid));
+
+        CelestialEventComment newReplyEntity = celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
+        newReplyEntity.setAuthor(author);
+        newReplyEntity.setCelestialEvent(celestialEvent);
+        newReplyEntity.setParent(parentComment);
+
+        System.out.println(newReplyEntity);
+        parentComment.addReply(newReplyEntity);
+
+       CelestialEventComment c = celestialEventCommentRepository.save(parentComment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                celestialEventDtoMapper.celestialEventCommentToGetDto(parentComment)
+        );
+    }
+
+
+//    public ResponseEntity<GetCelestialEventCommentDto> addReplyToCelestialEventComment(String celestialEventUuid,
+//                                                                                 String userUuid,
+//                                                                                 String parentCommentUuid,
+//                                                                                 CreateCommentDto newComment) {
+//        CelestialEvent celestialEvent =
+//                celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new
+//                CelestialEventUuidNotFoundException(celestialEventUuid));
+//        UserAccount author =
+//                userAccountRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException
+//                (userUuid));
+//        // @TODO change throw exception to custom exception
+//        CelestialEventComment parentComment =
+//                celestialEventCommentRepository.findCelestialEventCommentByUuid(parentCommentUuid).orElseThrow(()
+//                -> new CelestialEventUuidNotFoundException(parentCommentUuid));
+//
+//        CelestialEventComment newCommentEntity =
+//                celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
+////        newCommentEntity.setAuthor(author);
+////        newCommentEntity.setCelestialEvent(celestialEvent);
+////        parentComment.addCommentReplies(newCommentEntity);
+////        newCommentEntity.setParentComment(parentComment);
+////        celestialEventCommentRepository.save(parentComment);
+////        System.out.println(parentComment);
+//
+//        newCommentEntity.setAuthor(author);
+//        newCommentEntity.setCelestialEvent(celestialEvent);
+//        newCommentEntity.setParentComment(parentComment);
+////        newCommentEntity = celestialEventCommentRepository.save(newCommentEntity);
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(
+//                        celestialEventDtoMapper.celestialEventCommentToGetDto(newCommentEntity)
+//
+//        );
+//    }
 }
 
 @Component

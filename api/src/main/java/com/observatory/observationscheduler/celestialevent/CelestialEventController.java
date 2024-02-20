@@ -1,9 +1,11 @@
 package com.observatory.observationscheduler.celestialevent;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationscheduler.celestialevent.dto.CreateCelestialEventCommentDto;
 import com.observatory.observationscheduler.celestialevent.dto.CreateCelestialEventDto;
+import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventCommentDto;
 import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
-import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEventComment;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -29,7 +31,8 @@ public class CelestialEventController {
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<EntityModel<GetCelestialEventDto>> createCelestialEvent(@RequestPart(value = "newCelestialEvent") CreateCelestialEventDto newCelestialEvent, @RequestPart("images") List<MultipartFile> images) {
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> createCelestialEvent(@RequestPart(value =
+            "newCelestialEvent") CreateCelestialEventDto newCelestialEvent, @RequestPart("images") List<MultipartFile> images) {
         return celestialEventService.createCelestialEvent(newCelestialEvent, images);
     }
 
@@ -45,7 +48,7 @@ public class CelestialEventController {
 
     @PatchMapping(path = "/{celestialEventUuid}", consumes = "application/json-patch+json")
     public ResponseEntity<EntityModel<GetCelestialEventDto>> updateCelestialEvent(@PathVariable String celestialEventUuid,
-                                                                            @RequestBody JsonPatch patch) {
+                                                                                  @RequestBody JsonPatch patch) {
         return celestialEventService.updateCelestialEvent(celestialEventUuid, patch);
     }
 
@@ -57,5 +60,21 @@ public class CelestialEventController {
     @PatchMapping("/batch-status")
     public ResponseEntity<Void> updateCelestialEventStatus() {
         return celestialEventService.updateCelestialEventStatus();
+    }
+
+    @PostMapping(value = "/{celestialEventUuid}/comments", params = "userUuid", consumes =
+            MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CelestialEventComment> addCommentToCelestialEvent(@PathVariable String celestialEventUuid,
+                                                                            @RequestBody CreateCelestialEventCommentDto newComment,
+                                                                            @RequestParam String userUuid) {
+        return celestialEventService.addCommentToCelestialEvent(celestialEventUuid, userUuid, newComment);
+    }
+
+    @PostMapping(value = "/{celestialEventUuid}/comments", params = {"userUuid", "parentCommentUuid"}, consumes =
+            MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetCelestialEventCommentDto> addReplyToCelestialEventComment(@PathVariable String celestialEventUuid,
+                                                                                       @RequestBody CreateCelestialEventCommentDto newComment, @RequestParam String userUuid, @RequestParam String parentCommentUuid) {
+        return celestialEventService.addReplyToCelestialEventComment(celestialEventUuid, userUuid, parentCommentUuid,
+                newComment);
     }
 }
