@@ -226,7 +226,7 @@ public class CelestialEventService {
         );
     }
 
-    public ResponseEntity<GetSlimCelestialEventDto> addReplyToCelestialEventComment(String celestialEventUuid,
+    public ResponseEntity<GetSlimCelestialEventCommentDto> addReplyToCelestialEventComment(String celestialEventUuid,
                                                                                     String userUuid,
                                                                                     String parentCommentUuid,
                                                                                     CreateCelestialEventCommentDto newComment) {
@@ -251,7 +251,7 @@ public class CelestialEventService {
         celestialEventCommentRepository.save(celestialEventReply);
         celestialEventCommentRepository.save(parentComment);
 
-        GetSlimCelestialEventDto returnDto =
+        GetSlimCelestialEventCommentDto returnDto =
                 celestialEventDtoMapper.celestialEventReplyToGetSlimCelestialEventCommentDto(celestialEventReply);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);

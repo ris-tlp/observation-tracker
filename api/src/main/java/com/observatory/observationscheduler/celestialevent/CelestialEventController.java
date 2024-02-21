@@ -72,7 +72,7 @@ public class CelestialEventController {
 
     @PostMapping(value = "/{celestialEventUuid}/comments", params = {"userUuid", "parentCommentUuid"}, consumes =
             MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetSlimCelestialEventDto> addReplyToCelestialEventComment(@PathVariable String celestialEventUuid,
+    public ResponseEntity<GetSlimCelestialEventCommentDto> addReplyToCelestialEventComment(@PathVariable String celestialEventUuid,
                                                                                     @RequestBody CreateCelestialEventCommentDto newComment, @RequestParam String userUuid, @RequestParam String parentCommentUuid) {
         return celestialEventService.addReplyToCelestialEventComment(celestialEventUuid, userUuid, parentCommentUuid,
                 newComment);

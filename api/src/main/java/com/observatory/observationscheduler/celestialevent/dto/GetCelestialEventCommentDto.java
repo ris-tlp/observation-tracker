@@ -11,7 +11,7 @@ public class GetCelestialEventCommentDto {
     private GetUserAccountDto author;
     private Timestamp createdTimestamp;
     private Timestamp updatedTimestamp;
-    private List<GetSlimCelestialEventDto> replies;
+    private List<GetCelestialEventCommentDto> replies;
 
 
     public String getContent() {
@@ -54,11 +54,11 @@ public class GetCelestialEventCommentDto {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public List<GetSlimCelestialEventDto> getReplies() {
+    public List<GetCelestialEventCommentDto> getReplies() {
         return replies;
     }
 
-    public void setReplies(List<GetSlimCelestialEventDto> replies) {
+    public void setReplies(List<GetCelestialEventCommentDto> replies) {
         this.replies = replies;
     }
 }

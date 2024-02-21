@@ -21,9 +21,11 @@ public interface CelestialEventDtoMapper {
 
     CelestialEventComment createCommentDtoToCelestialEventComment(CreateCelestialEventCommentDto createCelestialEventCommentDto);
 
-    GetSlimCelestialEventDto celestialEventReplyToGetSlimCelestialEventCommentDto(CelestialEventComment comment);
+    GetSlimCelestialEventCommentDto celestialEventReplyToGetSlimCelestialEventCommentDto(CelestialEventComment comment);
 
     GetCelestialEventCommentDto celestialEventCommentToGetCelestialEventCommentDto(CelestialEventComment comment);
+
+    List<GetCelestialEventCommentDto> celestialEventCommentsToGetCelestialEventCommentDtos(List<CelestialEventComment> comments);
 
 
 }

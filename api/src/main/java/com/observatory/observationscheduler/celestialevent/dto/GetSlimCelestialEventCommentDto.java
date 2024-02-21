@@ -4,7 +4,9 @@ import com.observatory.observationscheduler.useraccount.dto.GetUserAccountDto;
 
 import java.sql.Timestamp;
 
-public class GetSlimCelestialEventDto {
+
+// Primarily used to return a reply once created
+public class GetSlimCelestialEventCommentDto {
     private String content;
     private GetUserAccountDto author;
     private Timestamp createdTimestamp;
