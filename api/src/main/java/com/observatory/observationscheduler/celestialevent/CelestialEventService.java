@@ -198,7 +198,7 @@ public class CelestialEventService {
     }
 
 
-    public ResponseEntity<CelestialEvent> addCommentToCelestialEvent(String celestialEventUuid,
+    public ResponseEntity<GetCelestialEventCommentDto> addCommentToCelestialEvent(String celestialEventUuid,
                                                                                   String userUuid,
                                                                                   CreateCelestialEventCommentDto newComment) {
         CelestialEvent celestialEvent =
@@ -218,14 +218,11 @@ public class CelestialEventService {
         celestialEventCommentRepository.save(celestialEventComment);
         celestialEventRepository.save(celestialEvent);
 
-
-
-//        GetCelestialEventCommentDto returnDto =
-//                celestialEventDtoMapper.celestialEventCommentToGetCelestialEventCommentDto(celestialEventComment);
+        GetCelestialEventCommentDto returnDto =
+                celestialEventDtoMapper.celestialEventCommentToGetCelestialEventCommentDto(celestialEventComment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
-//                returnDto
-                celestialEvent
+                returnDto
         );
     }
 

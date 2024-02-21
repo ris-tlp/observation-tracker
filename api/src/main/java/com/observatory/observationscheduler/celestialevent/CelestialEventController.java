@@ -14,9 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-// @TODO: link celestialevent to comment
-// @TODO: Return Comments along with Celestial Event
 // @TODO: make superclass entity and everything
+// @TODO: Fix dtos to return comments in celestial event
 @RestController
 @RequestMapping("/v1/celestial-events")
 public class CelestialEventController {
@@ -65,7 +64,7 @@ public class CelestialEventController {
 
     @PostMapping(value = "/{celestialEventUuid}/comments", params = "userUuid", consumes =
             MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CelestialEvent> addCommentToCelestialEvent(@PathVariable String celestialEventUuid,
+    public ResponseEntity<GetCelestialEventCommentDto> addCommentToCelestialEvent(@PathVariable String celestialEventUuid,
                                                                      @RequestBody CreateCelestialEventCommentDto newComment,
                                                                      @RequestParam String userUuid) {
         return celestialEventService.addCommentToCelestialEvent(celestialEventUuid, userUuid, newComment);
