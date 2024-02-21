@@ -179,7 +179,6 @@ public class CelestialEventService {
             CelestialEvent celestialEvent =
                     celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
             CelestialEvent updatedCelestialEvent = applyPatchToCelestialEvent(patch, celestialEvent);
-            System.out.println("here 3");
             celestialEventRepository.save(updatedCelestialEvent);
 
             GetCelestialEventDto celestialEventDto =
@@ -199,9 +198,9 @@ public class CelestialEventService {
     }
 
 
-    public ResponseEntity<CelestialEventComment> addCommentToCelestialEvent(String celestialEventUuid,
-                                                                            String userUuid,
-                                                                            CreateCelestialEventCommentDto newComment) {
+    public ResponseEntity<CelestialEvent> addCommentToCelestialEvent(String celestialEventUuid,
+                                                                                  String userUuid,
+                                                                                  CreateCelestialEventCommentDto newComment) {
         CelestialEvent celestialEvent =
                 celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
         UserAccount author =
@@ -211,16 +210,29 @@ public class CelestialEventService {
                 celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
 
         celestialEventComment.setAuthor(author);
-        celestialEventComment.setCelestialEvent(celestialEvent);
-        celestialEventCommentRepository.save(celestialEventComment);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(celestialEventComment);
+        // Maintaining bidirectional relationship according to JPA spec
+        celestialEventComment.setCelestialEvent(celestialEvent);
+        celestialEvent.getComments().add(celestialEventComment);
+
+        celestialEventCommentRepository.save(celestialEventComment);
+        celestialEventRepository.save(celestialEvent);
+
+
+
+//        GetCelestialEventCommentDto returnDto =
+//                celestialEventDtoMapper.celestialEventCommentToGetCelestialEventCommentDto(celestialEventComment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+//                returnDto
+                celestialEvent
+        );
     }
 
-    public ResponseEntity<List<CelestialEventComment>> addReplyToCelestialEventComment(String celestialEventUuid,
-                                                                                       String userUuid,
-                                                                                       String parentCommentUuid,
-                                                                                       CreateCelestialEventCommentDto newComment) {
+    public ResponseEntity<GetSlimCelestialEventDto> addReplyToCelestialEventComment(String celestialEventUuid,
+                                                                                    String userUuid,
+                                                                                    String parentCommentUuid,
+                                                                                    CreateCelestialEventCommentDto newComment) {
         // custom exception
         CelestialEventComment parentComment =
                 celestialEventCommentRepository.findCelestialEventCommentByUuid(parentCommentUuid).orElseThrow(() -> new CelestialEventCommentNotFoundException(parentCommentUuid));
@@ -232,33 +244,38 @@ public class CelestialEventService {
         CelestialEventComment celestialEventReply =
                 celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
 
-        celestialEventReply.setParentComment(parentComment);
         celestialEventReply.setAuthor(author);
-
-        // Maintaining bidirectional relationship
         celestialEventReply.setCelestialEvent(celestialEvent);
+
+        // Maintaining bidirectional relationship according to JPA spec
+        celestialEventReply.setParentComment(parentComment);
         parentComment.getReplies().add(celestialEventReply);
 
+        celestialEventCommentRepository.save(celestialEventReply);
         celestialEventCommentRepository.save(parentComment);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(celestialEventCommentRepository.findByParentCommentIsNull());
+        GetSlimCelestialEventDto returnDto =
+                celestialEventDtoMapper.celestialEventReplyToGetSlimCelestialEventCommentDto(celestialEventReply);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }
 }
 
 @Component
 class CelestialEventAssembler implements RepresentationModelAssembler<GetCelestialEventDto,
         EntityModel<GetCelestialEventDto>> {
-
     @Override
     public EntityModel<GetCelestialEventDto> toModel(GetCelestialEventDto celestialEvent) {
         return EntityModel.of(celestialEvent,
-                linkTo(CelestialEventController.class).slash(celestialEvent.getUuid()).withSelfRel().withType("GET, " +
-                        "PATCH, DELETE"));
+                linkTo(CelestialEventController.class).slash(celestialEvent.getUuid()).withSelfRel().withType(
+                        "GET, " +
+                                "PATCH, DELETE"));
+
     }
 
     @Override
     public CollectionModel<EntityModel<GetCelestialEventDto>> toCollectionModel(Iterable<?
-            extends GetCelestialEventDto> entities) {
-        return RepresentationModelAssembler.super.toCollectionModel(entities);
+            extends GetCelestialEventDto> celestialEvents) {
+        return RepresentationModelAssembler.super.toCollectionModel(celestialEvents);
     }
 }

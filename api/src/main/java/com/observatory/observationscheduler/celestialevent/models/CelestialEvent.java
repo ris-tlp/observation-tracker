@@ -38,7 +38,7 @@ public class CelestialEvent {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
 
-    @OneToMany(mappedBy = "celestialEvent")
+    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CelestialEventComment> comments;
 
     @CreationTimestamp
@@ -147,6 +147,14 @@ public class CelestialEvent {
 
     public void setImages(List<CelestialEventImage> images) {
         this.images = images;
+    }
+
+    public List<CelestialEventComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CelestialEventComment> comments) {
+        this.comments = comments;
     }
 
     @Override

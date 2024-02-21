@@ -17,6 +17,8 @@ public class GetCelestialEventDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
 
+    private List<GetCelestialEventCommentDto> comments;
+
     private List<GetCelestialEventImageDto> images;
 
     private Timestamp createdTimestamp;
@@ -87,5 +89,13 @@ public class GetCelestialEventDto {
 
     public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
+    }
+
+    public List<GetCelestialEventCommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<GetCelestialEventCommentDto> comments) {
+        this.comments = comments;
     }
 }

@@ -31,7 +31,7 @@ public class CelestialEventComment {
     @ManyToOne(cascade = CascadeType.ALL)
     private CelestialEventComment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<CelestialEventComment> replies;
 
     @GeneratedValue(strategy = GenerationType.UUID)
