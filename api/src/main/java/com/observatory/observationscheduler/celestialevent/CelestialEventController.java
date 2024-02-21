@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 // @TODO: make superclass entity and everything
-// @TODO: Fix dtos to return comments in celestial event
+// @TODO: slim celestial event for batch searches
 @RestController
 @RequestMapping("/v1/celestial-events")
 public class CelestialEventController {
@@ -26,7 +26,7 @@ public class CelestialEventController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getCelestialEvents() {
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEvents() {
         return celestialEventService.getAllCelestialEvents();
     }
 

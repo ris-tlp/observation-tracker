@@ -11,7 +11,13 @@ import java.util.List;
 public interface CelestialEventDtoMapper {
     GetCelestialEventDto celestialEventToGetDto(CelestialEvent celestialEvent);
 
+//    GetSlimCelestialEventDto celestialEventToSlimDto(CelestialEvent celestialEvent);
+
+
     List<GetCelestialEventDto> celestialEventListToGetDtoList(List<CelestialEvent> celestialEvents);
+
+
+    List<GetSlimCelestialEventDto> celestialEventListToSlimDtoList(List<CelestialEvent> celestialEvents);
 
     GetCelestialEventImageDto celestialEventImageToGetDto(CelestialEventImage celestialEventImage);
 

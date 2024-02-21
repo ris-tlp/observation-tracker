@@ -1,31 +1,28 @@
 package com.observatory.observationscheduler.celestialevent.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class GetCelestialEventDto extends GetSlimCelestialEventDto{
-    private String celestialEventName;
-
-    private String celestialEventDescription;
-
+public class GetSlimCelestialEventDto {
     private String uuid;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime celestialEventDateTime;
-
-    private List<GetCelestialEventCommentDto> comments;
-
+    private String celestialEventName;
+    private String celestialEventDescription;
     private List<GetCelestialEventImageDto> images;
-
+    private LocalDateTime celestialEventDateTime;
     private Timestamp createdTimestamp;
-
     private Timestamp updatedTimestamp;
-
     private CelestialEventStatus eventStatus;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getCelestialEventName() {
         return celestialEventName;
@@ -43,22 +40,6 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
         this.celestialEventDescription = celestialEventDescription;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public LocalDateTime getCelestialEventDateTime() {
-        return celestialEventDateTime;
-    }
-
-    public void setCelestialEventDateTime(LocalDateTime celestialEventDateTime) {
-        this.celestialEventDateTime = celestialEventDateTime;
-    }
-
     public List<GetCelestialEventImageDto> getImages() {
         return images;
     }
@@ -67,12 +48,12 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
         this.images = images;
     }
 
-    public CelestialEventStatus getEventStatus() {
-        return eventStatus;
+    public LocalDateTime getCelestialEventDateTime() {
+        return celestialEventDateTime;
     }
 
-    public void setEventStatus(CelestialEventStatus eventStatus) {
-        this.eventStatus = eventStatus;
+    public void setCelestialEventDateTime(LocalDateTime celestialEventDateTime) {
+        this.celestialEventDateTime = celestialEventDateTime;
     }
 
     public Timestamp getCreatedTimestamp() {
@@ -91,11 +72,11 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public List<GetCelestialEventCommentDto> getComments() {
-        return comments;
+    public CelestialEventStatus getEventStatus() {
+        return eventStatus;
     }
 
-    public void setComments(List<GetCelestialEventCommentDto> comments) {
-        this.comments = comments;
+    public void setEventStatus(CelestialEventStatus eventStatus) {
+        this.eventStatus = eventStatus;
     }
 }
