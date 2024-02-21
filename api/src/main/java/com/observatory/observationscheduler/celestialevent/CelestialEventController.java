@@ -37,7 +37,7 @@ public class CelestialEventController {
     }
 
     @GetMapping(params = "status")
-    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getCelestialEventsByStatus(@RequestParam CelestialEventStatus status) {
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(@RequestParam CelestialEventStatus status) {
         return celestialEventService.getCelestialEventsByStatus(status);
     }
 

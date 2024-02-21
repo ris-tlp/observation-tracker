@@ -81,13 +81,13 @@ public class CelestialEventService {
 
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<GetCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
         List<CelestialEvent> events =
                 celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
         List<GetCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToGetDtoList(events);
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
-                        dtoAssembler.toCollectionModel(celestialEventDtos),
+                        slimDtoAssembler.toCollectionModel(celestialEventDtos),
                         linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withSelfRel().withType("GET"),
                         linkTo(CelestialEventController.class).withRel("all").withType("GET, POST")
                 )
