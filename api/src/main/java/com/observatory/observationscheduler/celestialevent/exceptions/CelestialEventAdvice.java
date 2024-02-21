@@ -29,4 +29,11 @@ public class CelestialEventAdvice {
     String incorrectCelestialEventFormatHandler(IncorrectObservationFormatException ex) {
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(CelestialEventCommentNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String celestialEventCommentNotFoundHandler(CelestialEventCommentNotFoundException ex) {
+        return ex.getMessage();
+    }
 }

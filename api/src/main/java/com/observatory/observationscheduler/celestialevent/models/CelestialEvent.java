@@ -38,6 +38,9 @@ public class CelestialEvent {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
 
+    @OneToMany(mappedBy = "celestialEvent")
+    private List<CelestialEventComment> comments;
+
     @CreationTimestamp
     private Timestamp createdTimestamp;
 

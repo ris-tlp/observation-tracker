@@ -23,6 +23,7 @@ public class CelestialEventComment {
     @ManyToOne
     private UserAccount author;
 
+    @JsonBackReference
     @ManyToOne
     private CelestialEvent celestialEvent;
 

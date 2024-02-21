@@ -8,6 +8,7 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.aws.S3Service;
 import com.observatory.observationscheduler.aws.exceptions.InvalidImageException;
 import com.observatory.observationscheduler.celestialevent.dto.*;
+import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventCommentNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.celestialevent.exceptions.IncorrectCelestialEventFormatException;
@@ -222,7 +223,7 @@ public class CelestialEventService {
                                                                                        CreateCelestialEventCommentDto newComment) {
         // custom exception
         CelestialEventComment parentComment =
-                celestialEventCommentRepository.findCelestialEventCommentByUuid(parentCommentUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(parentCommentUuid));
+                celestialEventCommentRepository.findCelestialEventCommentByUuid(parentCommentUuid).orElseThrow(() -> new CelestialEventCommentNotFoundException(parentCommentUuid));
         CelestialEvent celestialEvent =
                 celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
         UserAccount author =
@@ -239,7 +240,6 @@ public class CelestialEventService {
         parentComment.getReplies().add(celestialEventReply);
 
         celestialEventCommentRepository.save(parentComment);
-
 
         return ResponseEntity.status(HttpStatus.CREATED).body(celestialEventCommentRepository.findByParentCommentIsNull());
     }
