@@ -35,6 +35,8 @@ import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+
+// @TODO all fetch showign replies
 @Service
 public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
@@ -69,7 +71,7 @@ public class CelestialEventService {
     public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getAllCelestialEvents() {
         List<CelestialEvent> allCelestialEvents = celestialEventRepository.findAll();
         List<GetSlimCelestialEventDto> celestialEventDtos =
-                celestialEventDtoMapper.celestialEventListToSlimDtoList(allCelestialEvents);
+                celestialEventDtoMapper.celestialEventListToGetSlimDtoList(allCelestialEvents);
 
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -85,7 +87,7 @@ public class CelestialEventService {
     public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
         List<CelestialEvent> events =
                 celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
-        List<GetSlimCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToSlimDtoList(events);
+        List<GetSlimCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToGetSlimDtoList(events);
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
                         slimDtoAssembler.toCollectionModel(celestialEventDtos),
@@ -123,8 +125,7 @@ public class CelestialEventService {
     }
 
     public ResponseEntity<EntityModel<GetCelestialEventDto>> getCelestialEventByUuid(String celestialEventUuid) {
-        CelestialEvent event =
-                celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+        CelestialEvent event = celestialEventRepository.findByNullParentComment(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
 
         GetCelestialEventDto celestialEventDto = celestialEventDtoMapper.celestialEventToGetDto(event);
         Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
@@ -208,7 +209,7 @@ public class CelestialEventService {
                 userAccountRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(userUuid));
 
         CelestialEventComment celestialEventComment =
-                celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
+                celestialEventDtoMapper.createDtoToCelestialEventComment(newComment);
 
         celestialEventComment.setAuthor(author);
 
@@ -220,7 +221,7 @@ public class CelestialEventService {
         celestialEventRepository.save(celestialEvent);
 
         GetCelestialEventCommentDto returnDto =
-                celestialEventDtoMapper.celestialEventCommentToGetCelestialEventCommentDto(celestialEventComment);
+                celestialEventDtoMapper.celestialEventCommentToGetDto(celestialEventComment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 returnDto
@@ -240,7 +241,7 @@ public class CelestialEventService {
                 userAccountRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(userUuid));
 
         CelestialEventComment celestialEventReply =
-                celestialEventDtoMapper.createCommentDtoToCelestialEventComment(newComment);
+                celestialEventDtoMapper.createDtoToCelestialEventComment(newComment);
 
         celestialEventReply.setAuthor(author);
         celestialEventReply.setCelestialEvent(celestialEvent);
@@ -253,7 +254,7 @@ public class CelestialEventService {
         celestialEventCommentRepository.save(parentComment);
 
         GetSlimCelestialEventCommentDto returnDto =
-                celestialEventDtoMapper.celestialEventReplyToGetSlimCelestialEventCommentDto(celestialEventReply);
+                celestialEventDtoMapper.celestialEventReplyToGetSlimDto(celestialEventReply);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }

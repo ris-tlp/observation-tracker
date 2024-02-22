@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.observation.models;
 
 import com.fasterxml.jackson.annotation.*;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
+import com.observatory.observationscheduler.celestialevent.models.CelestialEventComment;
 import com.observatory.observationscheduler.useraccount.UserAccount;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
@@ -39,22 +40,21 @@ public class Observation {
     @UpdateTimestamp
     private Timestamp updatedTimestamp;
 
-//    @JsonIgnoreProperties("associatedObservations")
-//    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "celestial_event_id", nullable = false)
     private CelestialEvent celestialEvent;
 
-//    @JsonIgnoreProperties("observations")
-//    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserAccount owner;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "observation", cascade = CascadeType.ALL)
-//    @JsonIgnoreProperties("observation")
     private List<ObservationImage> images;
+
+
+    @OneToMany(mappedBy = "observation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ObservationComment> comments;
 
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, updatable = false, nullable = false)
@@ -134,14 +134,6 @@ public class Observation {
         this.observationDescription = observationDescription;
     }
 
-//    public List<ObservationImage> getImages() {
-//        return images;
-//    }
-//
-//    public void setImages(List<ObservationImage> images) {
-//        this.images = images;
-//    }
-
     public String getUuid() {
         return uuid;
     }
@@ -180,6 +172,14 @@ public class Observation {
 
     public void setImages(List<ObservationImage> images) {
         this.images = images;
+    }
+
+    public List<ObservationComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<ObservationComment> comments) {
+        this.comments = comments;
     }
 
     @Override

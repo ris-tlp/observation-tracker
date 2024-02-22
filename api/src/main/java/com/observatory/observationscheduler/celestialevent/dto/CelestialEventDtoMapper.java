@@ -16,13 +16,10 @@ public interface CelestialEventDtoMapper {
 
 
     @Named("toSlimDto")
-    GetSlimCelestialEventDto celestialEventToSlimDto(CelestialEvent celestialEvent);
+    GetSlimCelestialEventDto celestialEventToGetSlimDto(CelestialEvent celestialEvent);
 
     @IterableMapping(qualifiedByName = "toSlimDto")
-    List<GetSlimCelestialEventDto> celestialEventListToSlimDtoList(List<CelestialEvent> celestialEvents);
-
-    List<GetCelestialEventDto> celestialEventListToGetDtoList(List<CelestialEvent> celestialEvents);
-
+    List<GetSlimCelestialEventDto> celestialEventListToGetSlimDtoList(List<CelestialEvent> celestialEvents);
 
     GetCelestialEventImageDto celestialEventImageToGetDto(CelestialEventImage celestialEventImage);
 
@@ -30,13 +27,13 @@ public interface CelestialEventDtoMapper {
 
     CelestialEvent createDtoToCelestialEvent(CreateCelestialEventDto createCelestialEventDto);
 
-    CelestialEventComment createCommentDtoToCelestialEventComment(CreateCelestialEventCommentDto createCelestialEventCommentDto);
+    CelestialEventComment createDtoToCelestialEventComment(CreateCelestialEventCommentDto createCelestialEventCommentDto);
 
-    GetSlimCelestialEventCommentDto celestialEventReplyToGetSlimCelestialEventCommentDto(CelestialEventComment comment);
+    GetSlimCelestialEventCommentDto celestialEventReplyToGetSlimDto(CelestialEventComment comment);
 
-    GetCelestialEventCommentDto celestialEventCommentToGetCelestialEventCommentDto(CelestialEventComment comment);
+    GetCelestialEventCommentDto celestialEventCommentToGetDto(CelestialEventComment comment);
 
-    List<GetCelestialEventCommentDto> celestialEventCommentsToGetCelestialEventCommentDtos(List<CelestialEventComment> comments);
+    List<GetCelestialEventCommentDto> celestialEventCommentListToGetListDto(List<CelestialEventComment> comments);
 
 
 }
