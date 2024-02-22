@@ -70,7 +70,6 @@ public class CelestialEventService {
         List<CelestialEvent> allCelestialEvents = celestialEventRepository.findAll();
         List<GetSlimCelestialEventDto> celestialEventDtos =
                 celestialEventDtoMapper.celestialEventListToSlimDtoList(allCelestialEvents);
-//        allCelestialEvents.stream().map(celestialEventDtoMapper::celestialEventToSlimDto).toList();
 
 
         return ResponseEntity.status(HttpStatus.OK)
