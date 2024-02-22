@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.celestialevent.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventStatus;
 
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ public class GetSlimCelestialEventDto {
     private String celestialEventName;
     private String celestialEventDescription;
     private List<GetCelestialEventImageDto> images;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
     private Timestamp createdTimestamp;
     private Timestamp updatedTimestamp;
@@ -78,5 +80,19 @@ public class GetSlimCelestialEventDto {
 
     public void setEventStatus(CelestialEventStatus eventStatus) {
         this.eventStatus = eventStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "GetSlimCelestialEventDto{" +
+                "uuid='" + uuid + '\'' +
+                ", celestialEventName='" + celestialEventName + '\'' +
+                ", celestialEventDescription='" + celestialEventDescription + '\'' +
+                ", images=" + images +
+                ", celestialEventDateTime=" + celestialEventDateTime +
+//                ", createdTimestamp=" + createdTimestamp +
+//                ", updatedTimestamp=" + updatedTimestamp +
+                ", eventStatus=" + eventStatus +
+                '}';
     }
 }

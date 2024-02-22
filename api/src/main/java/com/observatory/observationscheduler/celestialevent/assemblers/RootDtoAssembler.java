@@ -8,7 +8,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class RootDtoAssembler<T> {
     public EntityModel<T> toModel(T celestialEvent, String uuid) {
-        System.out.println("In here");
         return EntityModel.of(
                 celestialEvent,
                 linkTo(methodOn(CelestialEventController.class).getCelestialEventByUuid(uuid)).withSelfRel().withType("GET, PATCH, DELETE")

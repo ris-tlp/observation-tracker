@@ -70,6 +70,8 @@ public class CelestialEventService {
         List<CelestialEvent> allCelestialEvents = celestialEventRepository.findAll();
         List<GetSlimCelestialEventDto> celestialEventDtos =
                 celestialEventDtoMapper.celestialEventListToSlimDtoList(allCelestialEvents);
+//        allCelestialEvents.stream().map(celestialEventDtoMapper::celestialEventToSlimDto).toList();
+
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CollectionModel.of(
@@ -84,7 +86,7 @@ public class CelestialEventService {
     public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
         List<CelestialEvent> events =
                 celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
-        List<GetCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToGetDtoList(events);
+        List<GetSlimCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToSlimDtoList(events);
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
                         slimDtoAssembler.toCollectionModel(celestialEventDtos),

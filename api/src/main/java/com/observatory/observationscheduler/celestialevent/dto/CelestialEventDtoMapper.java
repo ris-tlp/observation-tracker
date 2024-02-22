@@ -3,7 +3,10 @@ package com.observatory.observationscheduler.celestialevent.dto;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventComment;
 import com.observatory.observationscheduler.celestialevent.models.CelestialEventImage;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -11,13 +14,15 @@ import java.util.List;
 public interface CelestialEventDtoMapper {
     GetCelestialEventDto celestialEventToGetDto(CelestialEvent celestialEvent);
 
-//    GetSlimCelestialEventDto celestialEventToSlimDto(CelestialEvent celestialEvent);
 
+    @Named("toSlimDto")
+    GetSlimCelestialEventDto celestialEventToSlimDto(CelestialEvent celestialEvent);
+
+    @IterableMapping(qualifiedByName = "toSlimDto")
+    List<GetSlimCelestialEventDto> celestialEventListToSlimDtoList(List<CelestialEvent> celestialEvents);
 
     List<GetCelestialEventDto> celestialEventListToGetDtoList(List<CelestialEvent> celestialEvents);
 
-
-    List<GetSlimCelestialEventDto> celestialEventListToSlimDtoList(List<CelestialEvent> celestialEvents);
 
     GetCelestialEventImageDto celestialEventImageToGetDto(CelestialEventImage celestialEventImage);
 
