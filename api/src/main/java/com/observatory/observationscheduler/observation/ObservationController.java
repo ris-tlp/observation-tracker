@@ -1,10 +1,7 @@
 package com.observatory.observationscheduler.observation;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.observatory.observationscheduler.observation.dto.CreateObservationCommentDto;
-import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
-import com.observatory.observationscheduler.observation.dto.GetObservationCommentDto;
-import com.observatory.observationscheduler.observation.dto.GetObservationDto;
+import com.observatory.observationscheduler.observation.dto.*;
 import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.websocket.server.PathParam;
 import org.h2.util.json.JSONObject;
@@ -27,7 +24,7 @@ public class ObservationController {
     }
 
     @GetMapping(params = "userUuid")
-    public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getAllObservationsOfUser(@RequestParam String userUuid) {
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getAllObservationsOfUser(@RequestParam String userUuid) {
         return service.getAllObservations(userUuid);
     }
 
@@ -59,7 +56,7 @@ public class ObservationController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getPublishedObservations() {
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getPublishedObservations() {
         return service.getPublishedCourses();
     }
 

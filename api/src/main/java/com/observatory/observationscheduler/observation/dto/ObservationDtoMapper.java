@@ -3,7 +3,9 @@ package com.observatory.observationscheduler.observation.dto;
 import com.observatory.observationscheduler.observation.models.Observation;
 import com.observatory.observationscheduler.observation.models.ObservationComment;
 import com.observatory.observationscheduler.observation.models.ObservationImage;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -22,5 +24,11 @@ public interface ObservationDtoMapper {
     ObservationComment createDtoToObservationComment(CreateObservationCommentDto comment);
 
     GetObservationCommentDto observationCommentToGetDto(ObservationComment comment);
+
+    @Named("toSlimDto")
+    GetSlimObservationDto observationToGetSlimDto(Observation observation);
+
+    @IterableMapping(qualifiedByName = "toSlimDto")
+    List<GetSlimObservationDto> observationListToGetSlimDtoList(List<Observation> observations);
 
 }
