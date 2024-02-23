@@ -2,7 +2,6 @@ package com.observatory.observationscheduler.domain.observation;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationscheduler.domain.observation.dto.*;
-import domain.observation.dto.*;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;

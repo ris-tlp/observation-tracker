@@ -3,7 +3,6 @@ package com.observatory.observationscheduler.domain.celestialevent;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationscheduler.domain.celestialevent.dto.*;
 import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEventStatus;
-import domain.celestialevent.dto.*;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;

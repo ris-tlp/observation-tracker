@@ -7,23 +7,21 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationscheduler.aws.S3Service;
 import com.observatory.observationscheduler.aws.exceptions.InvalidImageException;
-import com.observatory.observationscheduler.domain.celestialevent.dto.*;
-import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEventStatus;
+import com.observatory.observationscheduler.configuration.JacksonConfig;
 import com.observatory.observationscheduler.domain.celestialevent.assemblers.CelestialEventDtoAssembler;
 import com.observatory.observationscheduler.domain.celestialevent.assemblers.CelestialEventSlimDtoAssembler;
-import domain.celestialevent.dto.*;
+import com.observatory.observationscheduler.domain.celestialevent.dto.*;
 import com.observatory.observationscheduler.domain.celestialevent.exceptions.CelestialEventCommentNotFoundException;
 import com.observatory.observationscheduler.domain.celestialevent.exceptions.CelestialEventStatusNotFoundException;
 import com.observatory.observationscheduler.domain.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationscheduler.domain.celestialevent.exceptions.IncorrectCelestialEventFormatException;
-import com.observatory.observationscheduler.celestialevent.models.*;
 import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEventComment;
 import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEventImage;
+import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEventStatus;
 import com.observatory.observationscheduler.domain.celestialevent.repositories.CelestialEventCommentRepository;
 import com.observatory.observationscheduler.domain.celestialevent.repositories.CelestialEventImageRepository;
 import com.observatory.observationscheduler.domain.celestialevent.repositories.CelestialEventRepository;
-import com.observatory.observationscheduler.configuration.JacksonConfig;
 import com.observatory.observationscheduler.domain.useraccount.UserAccount;
 import com.observatory.observationscheduler.domain.useraccount.UserAccountRepository;
 import org.springframework.hateoas.CollectionModel;
@@ -38,7 +36,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 
 // @TODO all fetch showign replies
