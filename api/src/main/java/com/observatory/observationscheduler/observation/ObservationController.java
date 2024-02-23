@@ -1,7 +1,9 @@
 package com.observatory.observationscheduler.observation;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationscheduler.observation.dto.CreateObservationCommentDto;
 import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
+import com.observatory.observationscheduler.observation.dto.GetObservationCommentDto;
 import com.observatory.observationscheduler.observation.dto.GetObservationDto;
 import com.observatory.observationscheduler.observation.models.Observation;
 import jakarta.websocket.server.PathParam;
@@ -47,7 +49,7 @@ public class ObservationController {
 
     @PatchMapping(path = "/{observationUuid}", consumes = "application/json-patch+json")
     public ResponseEntity<EntityModel<GetObservationDto>> patchObservation(@PathVariable String observationUuid,
-                                                                     @RequestBody JsonPatch patch) {
+                                                                           @RequestBody JsonPatch patch) {
         return service.patchObservation(observationUuid, patch);
     }
 
@@ -59,5 +61,13 @@ public class ObservationController {
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getPublishedObservations() {
         return service.getPublishedCourses();
+    }
+
+    @PostMapping(value = "/{observationUuid}/comments", params = "userUuid", consumes =
+            MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetObservationCommentDto> addCommentToObservation(@PathVariable String observationUuid, @RequestParam String userUuid,
+                                                                            @RequestBody CreateObservationCommentDto newComment) {
+
+    return service.addCommentToObservation(observationUuid, userUuid, newComment);
     }
 }

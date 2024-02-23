@@ -15,7 +15,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
+// @TODO: Link Observation to ObservationComment - done
+// @TODO: Create ObservationCommentDto and SlimDto for parsing
+// @TODO: Create controller endpoints to create reply and create comment
+// @TODO Split assembler into two different ones
+// @TODO: Create repo with custom query - 1/2 done
 @Entity
 public class Observation {
     @Id

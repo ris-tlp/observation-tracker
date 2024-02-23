@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.observation.dto;
 
 import com.observatory.observationscheduler.observation.models.Observation;
+import com.observatory.observationscheduler.observation.models.ObservationComment;
 import com.observatory.observationscheduler.observation.models.ObservationImage;
 import org.mapstruct.Mapper;
 
@@ -17,4 +18,8 @@ public interface ObservationDtoMapper {
     GetObservationImageDto observationImageToGetDto(ObservationImage observationImage);
 
     List<GetObservationImageDto> observationImageListToGetDtoList(List<ObservationImage> observationImages);
+
+    ObservationComment createDtoToObservationComment(CreateObservationCommentDto comment);
+
+    GetObservationCommentDto observationCommentToGetDto(ObservationComment comment);
 }

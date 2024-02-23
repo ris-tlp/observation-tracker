@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.observation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.observatory.observationscheduler.celestialevent.dto.GetCelestialEventDto;
+import com.observatory.observationscheduler.celestialevent.dto.GetSlimCelestialEventDto;
 import com.observatory.observationscheduler.useraccount.dto.GetUserAccountDto;
 
 import java.sql.Timestamp;
@@ -24,11 +25,13 @@ public class GetObservationDto {
 
     private Timestamp updatedTimestamp;
 
-    private GetCelestialEventDto celestialEvent;
+    private GetSlimCelestialEventDto celestialEvent;
 
     private GetUserAccountDto owner;
 
     private List<GetObservationImageDto> images;
+
+    private List<GetObservationCommentDto> comments;
 
     public String getObservationName() {
         return observationName;
@@ -86,11 +89,11 @@ public class GetObservationDto {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public GetCelestialEventDto getCelestialEvent() {
+    public GetSlimCelestialEventDto getCelestialEvent() {
         return celestialEvent;
     }
 
-    public void setCelestialEvent(GetCelestialEventDto celestialEvent) {
+    public void setCelestialEvent(GetSlimCelestialEventDto celestialEvent) {
         this.celestialEvent = celestialEvent;
     }
 
@@ -108,5 +111,13 @@ public class GetObservationDto {
 
     public void setImages(List<GetObservationImageDto> images) {
         this.images = images;
+    }
+
+    public List<GetObservationCommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<GetObservationCommentDto> comments) {
+        this.comments = comments;
     }
 }

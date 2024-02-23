@@ -11,14 +11,13 @@ import com.observatory.observationscheduler.celestialevent.exceptions.CelestialE
 import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
 import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationscheduler.configuration.JacksonConfig;
-import com.observatory.observationscheduler.observation.dto.CreateObservationDto;
-import com.observatory.observationscheduler.observation.dto.GetObservationDto;
-import com.observatory.observationscheduler.observation.dto.GetObservationImageDto;
-import com.observatory.observationscheduler.observation.dto.ObservationDtoMapper;
+import com.observatory.observationscheduler.observation.dto.*;
 import com.observatory.observationscheduler.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationscheduler.observation.exceptions.ObservationNotFoundException;
 import com.observatory.observationscheduler.observation.models.Observation;
+import com.observatory.observationscheduler.observation.models.ObservationComment;
 import com.observatory.observationscheduler.observation.models.ObservationImage;
+import com.observatory.observationscheduler.observation.repositories.ObservationCommentRepository;
 import com.observatory.observationscheduler.observation.repositories.ObservationImageRepository;
 import com.observatory.observationscheduler.observation.repositories.ObservationRepository;
 import com.observatory.observationscheduler.useraccount.UserAccount;
@@ -47,6 +46,7 @@ public class ObservationService {
     private final CelestialEventRepository celestialEventRepository;
     private final ObservationImageRepository observationImageRepository;
     private final ObservationAssembler assembler;
+    private final ObservationCommentRepository commentRepository;
 
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
@@ -57,6 +57,7 @@ public class ObservationService {
                               ObservationAssembler assembler, S3Service s3Service,
                               ObservationImageRepository observationImageRepository,
                               CelestialEventRepository celestialEventRepository,
+                              ObservationCommentRepository commentRepository,
                               JacksonConfig jacksonConfig,
                               ObservationDtoMapper dtoMapper) {
         this.assembler = assembler;
@@ -67,13 +68,14 @@ public class ObservationService {
         this.celestialEventRepository = celestialEventRepository;
         this.jacksonConfig = jacksonConfig;
         this.dtoMapper = dtoMapper;
+        this.commentRepository = commentRepository;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<GetObservationDto>>> getAllObservations(String userUuid) {
         List<Observation> observations =
                 observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
 
-        for (Observation observation: observations) {
+        for (Observation observation : observations) {
             System.out.println(observation);
         }
 
@@ -200,6 +202,28 @@ public class ObservationService {
 //                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
                 )
         );
+    }
+
+    public ResponseEntity<GetObservationCommentDto> addCommentToObservation(String observationUuid,
+                                                                               String userUuid,
+                                                                               CreateObservationCommentDto newComment) {
+        Observation observation =
+                observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+        UserAccount author =
+                userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+
+        ObservationComment comment = dtoMapper.createDtoToObservationComment(newComment);
+        comment.setAuthor(author);
+
+        comment.setObservation(observation);
+        observation.getComments().add(comment);
+
+        commentRepository.save(comment);
+        observationRepository.save(observation);
+
+        GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(comment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }
 }
 
