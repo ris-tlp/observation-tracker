@@ -90,7 +90,7 @@ public class ObservationService {
 
     public ResponseEntity<EntityModel<GetObservationDto>> getObservationByUuid(String observationUuid) {
         Observation observation =
-                observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+                observationRepository.findByNullParentComment(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
 
         GetObservationDto observationDto = dtoMapper.observationToGetDto(observation);
         Link rootLink =
