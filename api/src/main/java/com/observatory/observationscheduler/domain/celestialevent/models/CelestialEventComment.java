@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.domain.celestialevent.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.observatory.observationscheduler.domain.common.IdentifiableEntity;
 import com.observatory.observationscheduler.domain.useraccount.UserAccount;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class CelestialEventComment {
+public class CelestialEventComment extends IdentifiableEntity {
     @Id
     @GeneratedValue
     @Column(name = "celestial_event_comment_id")
@@ -30,18 +31,12 @@ public class CelestialEventComment {
     @ManyToOne(cascade = CascadeType.ALL)
     private CelestialEventComment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "parentComment",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
     private List<CelestialEventComment> replies;
-
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false, nullable = false)
-    private String uuid;
-
-    @CreationTimestamp
-    private Timestamp createdTimestamp;
-
-    @UpdateTimestamp
-    private Timestamp updatedTimestamp;
 
     @PrePersist
     private void initializeUuid() {
@@ -52,13 +47,6 @@ public class CelestialEventComment {
     private void updateTimestamp() {
         this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
-
-//    public void addReply(CelestialEventComment reply) {
-//        if (replies == null) {
-//            replies = new ArrayList<>();
-//        }
-//        replies.add(reply);
-//    }
 
     public CelestialEventComment() {
     }
@@ -103,30 +91,6 @@ public class CelestialEventComment {
         this.replies = replies;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
-
     public UserAccount getAuthor() {
         return author;
     }
@@ -142,7 +106,6 @@ public class CelestialEventComment {
                 ", content='" + content + '\'' +
                 ", parentComment=" + parentComment +
                 ", replies=" + replies +
-                ", uuid='" + uuid + '\'' +
                 '}';
     }
 }

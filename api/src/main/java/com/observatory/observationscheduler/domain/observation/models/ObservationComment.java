@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.domain.observation.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.observatory.observationscheduler.domain.common.IdentifiableEntity;
 import com.observatory.observationscheduler.domain.useraccount.UserAccount;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class ObservationComment {
+public class ObservationComment extends IdentifiableEntity {
     @Id
     @GeneratedValue
     @Column(name = "observation_comment_id")
@@ -30,18 +31,12 @@ public class ObservationComment {
     @ManyToOne(cascade = CascadeType.ALL)
     private ObservationComment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "parentComment",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
     private List<ObservationComment> replies;
-
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false, nullable = false)
-    private String uuid;
-
-    @CreationTimestamp
-    private Timestamp createdTimestamp;
-
-    @UpdateTimestamp
-    private Timestamp updatedTimestamp;
 
     @PrePersist
     private void initializeUuid() {
@@ -53,7 +48,8 @@ public class ObservationComment {
         this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
-    public ObservationComment() {}
+    public ObservationComment() {
+    }
 
     public Long getObservationCommentId() {
         return observationCommentId;
@@ -103,30 +99,6 @@ public class ObservationComment {
         this.replies = replies;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
-
     @Override
     public String toString() {
         return "ObservationComment{" +
@@ -135,9 +107,6 @@ public class ObservationComment {
                 ", author=" + author +
                 ", parentComment=" + parentComment +
                 ", replies=" + replies +
-                ", uuid='" + uuid + '\'' +
-                ", createdTimestamp=" + createdTimestamp +
-                ", updatedTimestamp=" + updatedTimestamp +
                 '}';
     }
 }

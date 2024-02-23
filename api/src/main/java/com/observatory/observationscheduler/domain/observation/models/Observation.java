@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.domain.observation.models;
 
 import com.fasterxml.jackson.annotation.*;
 import com.observatory.observationscheduler.domain.celestialevent.models.CelestialEvent;
+import com.observatory.observationscheduler.domain.common.IdentifiableEntity;
 import com.observatory.observationscheduler.domain.useraccount.UserAccount;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-public class Observation {
+public class Observation extends IdentifiableEntity {
     @Id
     @GeneratedValue
     @Column(name = "observation_id")
@@ -32,12 +33,6 @@ public class Observation {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime observationDateTime;
 
-    @CreationTimestamp
-    private Timestamp createdTimestamp;
-
-    @UpdateTimestamp
-    private Timestamp updatedTimestamp;
-
     @ManyToOne
     @JoinColumn(name = "celestial_event_id", nullable = false)
     private CelestialEvent celestialEvent;
@@ -47,16 +42,20 @@ public class Observation {
     private UserAccount owner;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "observation", cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "observation",
+            cascade = CascadeType.ALL
+    )
     private List<ObservationImage> images;
 
 
-    @OneToMany(mappedBy = "observation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "observation",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
     private List<ObservationComment> comments;
 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false, nullable = false)
-    private String uuid;
 
     @PrePersist
     private void initializeUuid() {
@@ -100,22 +99,6 @@ public class Observation {
         this.observationName = observationName;
     }
 
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
-
     public UserAccount getOwner() {
         return owner;
     }
@@ -130,14 +113,6 @@ public class Observation {
 
     public void setObservationDescription(String observationDescription) {
         this.observationDescription = observationDescription;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     public LocalDateTime getObservationDateTime() {
@@ -188,13 +163,10 @@ public class Observation {
                 ", observationDescription='" + observationDescription + '\'' +
                 ", isPublished=" + isPublished +
                 ", observationDateTime=" + observationDateTime +
-                ", createdTimestamp=" + createdTimestamp +
-                ", updatedTimestamp=" + updatedTimestamp +
 //                ", celestialEvent=" + celestialEvent +
                 ", owner=" + owner +
                 ", images=" + images +
                 ", comments=" + comments +
-                ", uuid='" + uuid + '\'' +
                 '}';
     }
 }

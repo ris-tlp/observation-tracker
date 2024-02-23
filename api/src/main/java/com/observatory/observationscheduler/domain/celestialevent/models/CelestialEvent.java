@@ -2,6 +2,7 @@ package com.observatory.observationscheduler.domain.celestialevent.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.observatory.observationscheduler.domain.common.IdentifiableEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -13,15 +14,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-public class CelestialEvent {
+public class CelestialEvent extends IdentifiableEntity {
     @Id
     @GeneratedValue
     @Column(name = "celestial_event_id")
     private Long celestialEventId;
-
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false, nullable = false)
-    private String uuid;
 
     @Column(nullable = false)
     private String celestialEventName;
@@ -29,20 +26,21 @@ public class CelestialEvent {
     private String celestialEventDescription;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "celestialEvent",
+            cascade = CascadeType.ALL
+    )
     private List<CelestialEventImage> images;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime celestialEventDateTime;
 
-    @OneToMany(mappedBy = "celestialEvent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "celestialEvent",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
     private List<CelestialEventComment> comments;
-
-    @CreationTimestamp
-    private Timestamp createdTimestamp;
-
-    @UpdateTimestamp
-    private Timestamp updatedTimestamp;
 
     @Enumerated(EnumType.STRING)
     private CelestialEventStatus eventStatus;
@@ -82,14 +80,6 @@ public class CelestialEvent {
         this.celestialEventId = id;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getCelestialEventName() {
         return celestialEventName;
     }
@@ -112,22 +102,6 @@ public class CelestialEvent {
 
     public void setCelestialEventDateTime(LocalDateTime celestialEventTime) {
         this.celestialEventDateTime = celestialEventTime;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
     }
 
     public CelestialEventStatus getEventStatus() {
@@ -154,14 +128,4 @@ public class CelestialEvent {
         this.comments = comments;
     }
 
-    @Override
-    public String toString() {
-        return "CelestialEvent{" +
-                "uuid='" + uuid + '\'' +
-                ", celestialEventName='" + celestialEventName + '\'' +
-                ", celestialEventDescription='" + celestialEventDescription + '\'' +
-                ", images=" + images +
-                ", eventStatus=" + eventStatus +
-                '}';
-    }
 }

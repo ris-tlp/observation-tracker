@@ -1,6 +1,7 @@
 package com.observatory.observationscheduler.domain.observation.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.observatory.observationscheduler.domain.common.IdentifiableEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -8,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.sql.Timestamp;
 
 @Entity
-public class ObservationImage {
+public class ObservationImage extends IdentifiableEntity {
     @Id
     @GeneratedValue
     @Column(name = "observation_image_id")
@@ -20,12 +21,6 @@ public class ObservationImage {
     private Observation observation;
 
     private String url;
-
-    @CreationTimestamp
-    private Timestamp createdTimestamp;
-
-    @UpdateTimestamp
-    private Timestamp updatedTimestamp;
 
     public ObservationImage() {
     }
@@ -57,22 +52,6 @@ public class ObservationImage {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
     }
 
     @Override

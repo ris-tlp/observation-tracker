@@ -1,5 +1,6 @@
 package com.observatory.observationscheduler.domain.useraccount;
 
+import com.observatory.observationscheduler.domain.common.IdentifiableEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -8,10 +9,9 @@ import java.util.UUID;
 import java.sql.Timestamp;
 
 @Entity
-public class UserAccount {
+public class UserAccount extends IdentifiableEntity {
     @Id
     @GeneratedValue
-//    @JsonIgnore
     @Column(name = "user_id")
     private Long id;
 
@@ -19,16 +19,6 @@ public class UserAccount {
 
     @Column(unique = true)
     private String email;
-
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, updatable = false)
-    private String uuid;
-
-    @CreationTimestamp
-    private Timestamp createdTimestamp;
-
-    @UpdateTimestamp
-    private Timestamp updatedTimestamp;
 
     @PrePersist
     private void initializeUuid() {
@@ -72,32 +62,13 @@ public class UserAccount {
         this.email = email;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
-
     @Override
     public String toString() {
-        return "UserAccount{" + "userId=" + id + ", name='" + name + '\'' + ", email='" + email + '\'' + ", uuid=" + uuid + '}';
+        return "UserAccount{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                super.toString() +
+                '}';
     }
 }
