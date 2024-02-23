@@ -68,6 +68,19 @@ public class ObservationController {
     public ResponseEntity<GetObservationCommentDto> addCommentToObservation(@PathVariable String observationUuid, @RequestParam String userUuid,
                                                                             @RequestBody CreateObservationCommentDto newComment) {
 
-    return service.addCommentToObservation(observationUuid, userUuid, newComment);
+        System.out.println("in here");
+        return service.addCommentToObservation(observationUuid, userUuid, newComment);
+    }
+
+@PostMapping(value = "/{observationUuid}/comments", params = {"userUuid", "parentCommentUuid"}, consumes =
+        MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetObservationCommentDto> addReplyToObservation(
+            @PathVariable String observationUuid,
+            @RequestParam String userUuid,
+            @RequestParam String parentCommentUuid,
+            @RequestBody CreateObservationCommentDto newReply
+    )
+    {
+        return service.addReplyToObservation(observationUuid, userUuid, parentCommentUuid, newReply);
     }
 }

@@ -205,8 +205,8 @@ public class ObservationService {
     }
 
     public ResponseEntity<GetObservationCommentDto> addCommentToObservation(String observationUuid,
-                                                                               String userUuid,
-                                                                               CreateObservationCommentDto newComment) {
+                                                                            String userUuid,
+                                                                            CreateObservationCommentDto newComment) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
         UserAccount author =
@@ -215,6 +215,7 @@ public class ObservationService {
         ObservationComment comment = dtoMapper.createDtoToObservationComment(newComment);
         comment.setAuthor(author);
 
+        // Maintaining bidirectional relationship of comments and observations
         comment.setObservation(observation);
         observation.getComments().add(comment);
 
@@ -222,6 +223,29 @@ public class ObservationService {
         observationRepository.save(observation);
 
         GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(comment);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
+    }
+
+    public ResponseEntity<GetObservationCommentDto> addReplyToObservation(String observationUuid, String userUuid,
+                                                                          String parentCommentUuid,
+                                                                          CreateObservationCommentDto newReply) {
+        Observation observation = observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
+        UserAccount author = userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+        ObservationComment parentComment = commentRepository.findObservationCommentByUuid(parentCommentUuid).orElseThrow(() -> new ObservationNotFoundException(parentCommentUuid));
+        ObservationComment reply = dtoMapper.createDtoToObservationComment(newReply);
+
+        reply.setAuthor(author);
+        reply.setObservation(observation);
+
+        // Maintaining bidirectional relationship3
+        reply.setParentComment(parentComment);
+        parentComment.getReplies().add(reply);
+
+        commentRepository.save(reply);
+        commentRepository.save(parentComment);
+
+        GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(reply);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }

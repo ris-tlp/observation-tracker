@@ -126,4 +126,18 @@ public class ObservationComment {
     public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
     }
+
+    @Override
+    public String toString() {
+        return "ObservationComment{" +
+                "observationCommentId=" + observationCommentId +
+                ", content='" + content + '\'' +
+                ", author=" + author +
+                ", parentComment=" + parentComment +
+                ", replies=" + replies +
+                ", uuid='" + uuid + '\'' +
+                ", createdTimestamp=" + createdTimestamp +
+                ", updatedTimestamp=" + updatedTimestamp +
+                '}';
+    }
 }

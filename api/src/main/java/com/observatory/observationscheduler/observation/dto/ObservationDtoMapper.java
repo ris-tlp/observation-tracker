@@ -22,4 +22,5 @@ public interface ObservationDtoMapper {
     ObservationComment createDtoToObservationComment(CreateObservationCommentDto comment);
 
     GetObservationCommentDto observationCommentToGetDto(ObservationComment comment);
+
 }

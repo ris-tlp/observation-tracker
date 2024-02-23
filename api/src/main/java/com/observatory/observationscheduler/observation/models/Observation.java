@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 // @TODO: Link Observation to ObservationComment - done
-// @TODO: Create ObservationCommentDto and SlimDto for parsing
-// @TODO: Create controller endpoints to create reply and create comment
+// @TODO: Create ObservationCommentDto and SlimDto for parsing - have to create slim
+// @TODO: Create controller endpoints to create reply and create comment - done
 // @TODO Split assembler into two different ones
 // @TODO: Create repo with custom query - 1/2 done
+// @TODO: integrate comment replies properly to specific fetches and bulk fetches
 @Entity
 public class Observation {
     @Id
@@ -189,12 +190,17 @@ public class Observation {
     @Override
     public String toString() {
         return "Observation{" +
-                "observationName='" + observationName + '\'' +
+                "observationId=" + observationId +
+                ", observationName='" + observationName + '\'' +
                 ", observationDescription='" + observationDescription + '\'' +
                 ", isPublished=" + isPublished +
-                ", celestialEvent=" + celestialEvent +
+                ", observationDateTime=" + observationDateTime +
+                ", createdTimestamp=" + createdTimestamp +
+                ", updatedTimestamp=" + updatedTimestamp +
+//                ", celestialEvent=" + celestialEvent +
                 ", owner=" + owner +
                 ", images=" + images +
+                ", comments=" + comments +
                 ", uuid='" + uuid + '\'' +
                 '}';
     }
