@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.observatory.observation-scheduler' is invalid and this project uses 'com.observatory.observationscheduler' instead.
+* The original package name 'com.observatory.observation-scheduler' is invalid and this project uses 'com.observatory.observationtracker' instead.
 
 # Getting Started
 
