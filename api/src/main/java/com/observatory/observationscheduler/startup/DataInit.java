@@ -1,21 +1,13 @@
 package com.observatory.observationscheduler.startup;
 
-import com.observatory.observationscheduler.celestialevent.models.CelestialEvent;
-import com.observatory.observationscheduler.celestialevent.models.CelestialEventImage;
-import com.observatory.observationscheduler.celestialevent.repositories.CelestialEventRepository;
-import com.observatory.observationscheduler.observation.models.Observation;
-import com.observatory.observationscheduler.observation.repositories.ObservationImageRepository;
-import com.observatory.observationscheduler.observation.repositories.ObservationRepository;
-import com.observatory.observationscheduler.useraccount.UserAccount;
-import com.observatory.observationscheduler.useraccount.UserAccountRepository;
+import com.observatory.observationscheduler.domain.celestialevent.repositories.CelestialEventRepository;
+import com.observatory.observationscheduler.domain.observation.repositories.ObservationImageRepository;
+import com.observatory.observationscheduler.domain.observation.repositories.ObservationRepository;
+import com.observatory.observationscheduler.domain.useraccount.UserAccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Component
 public class DataInit implements CommandLineRunner {
