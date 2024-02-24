@@ -18,11 +18,6 @@ public class UserAccount extends IdentifiableEntity {
     @Column(unique = true)
     private String email;
 
-    @PrePersist
-    private void initializeUuid() {
-        this.setUuid(UUID.randomUUID().toString());
-    }
-
     public UserAccount() {
     }
 

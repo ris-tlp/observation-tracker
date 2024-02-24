@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.observatory.observationtracker.aws.exceptions.InvalidImageException;
+import com.observatory.observationtracker.configuration.AwsConfig;
 import org.springframework.beans.factory.annotation.Value;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,16 @@ import java.util.Objects;
 // @TODO Better error handling
 @Service
 public class S3Service {
-    @Value("${region}")
-    private String region;
+    private final AwsConfig awsConfig;
 
-    @Value("${s3.bucket.name}")
-    private String bucketName;
+    private final String region;
+    private final String imageBucketName;
+
+    public S3Service(AwsConfig awsConfig) {
+        this.awsConfig = awsConfig;
+        this.imageBucketName = awsConfig.getImageBucketName();
+        this.region = awsConfig.getRegion();
+    }
 
     public String uploadImage(MultipartFile image) throws InvalidImageException {
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
@@ -31,10 +37,10 @@ public class S3Service {
             File convertedImage = convertMultipartFileToFile(image);
             String uploadedFileName = generateFilename(image.getOriginalFilename());
             PutObjectRequest request = new PutObjectRequest(
-                    this.bucketName, uploadedFileName, convertedImage
+                    imageBucketName, uploadedFileName, convertedImage
             );
             request.setCannedAcl(CannedAccessControlList.PublicRead);
-            String url = String.valueOf(s3Client.getUrl(bucketName, uploadedFileName));
+            String url = String.valueOf(s3Client.getUrl(imageBucketName, uploadedFileName));
             s3Client.putObject(request);
             convertedImage.delete();
 
@@ -48,7 +54,7 @@ public class S3Service {
     public void deleteImage(String imageUrl) {
         AmazonS3URI uri = new AmazonS3URI(imageUrl);
         AmazonS3 s3client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
-        s3client.deleteObject(this.bucketName, uri.getKey());
+        s3client.deleteObject(imageBucketName, uri.getKey());
     }
 
     private File convertMultipartFileToFile(MultipartFile image) throws IOException {

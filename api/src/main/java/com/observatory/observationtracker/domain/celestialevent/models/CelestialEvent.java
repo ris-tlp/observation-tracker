@@ -52,17 +52,7 @@ public class CelestialEvent extends IdentifiableEntity {
         this.celestialEventName = celestialEventName;
         this.celestialEventDescription = celestialEventDescription;
         this.celestialEventDateTime = celestialEventTime;
-    }
-
-    @PrePersist
-    private void initializeUuid() {
-        this.setUuid(UUID.randomUUID().toString());
         this.setEventStatus(CelestialEventStatus.UPCOMING);
-    }
-
-    @PreUpdate
-    private void updateTimestamp() {
-        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
 

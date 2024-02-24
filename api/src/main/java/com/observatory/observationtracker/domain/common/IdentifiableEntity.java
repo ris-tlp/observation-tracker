@@ -1,25 +1,24 @@
 package com.observatory.observationtracker.domain.common;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.MappedSuperclass;
+import com.observatory.observationtracker.domain.celestialevent.models.CelestialEventStatus;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @MappedSuperclass
 public class IdentifiableEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, updatable = false, nullable = false)
-    private String uuid;
+    protected String uuid;
 
     @CreationTimestamp
-    private Timestamp createdTimestamp;
+    protected Timestamp createdTimestamp;
 
     @UpdateTimestamp
-    private Timestamp updatedTimestamp;
+    protected Timestamp updatedTimestamp;
 
     public String getUuid() {
         return uuid;
@@ -44,6 +43,17 @@ public class IdentifiableEntity {
     public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
         this.updatedTimestamp = updatedTimestamp;
     }
+
+    @PrePersist
+    private void initializeUuid() {
+        this.setUuid(UUID.randomUUID().toString());
+    }
+
+    @PreUpdate
+    private void updateTimestamp() {
+        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
+    }
+
 
     @Override
     public String toString() {

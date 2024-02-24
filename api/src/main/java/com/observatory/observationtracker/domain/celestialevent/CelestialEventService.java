@@ -54,12 +54,14 @@ public class CelestialEventService {
     private final S3Service s3Service;
     private final CelestialEventDtoMapper celestialEventDtoMapper;
 
-    public CelestialEventService(CelestialEventRepository celestialEventRepository, CelestialEventDtoAssembler dtoAssembler
+    public CelestialEventService(CelestialEventRepository celestialEventRepository,
+                                 CelestialEventDtoAssembler dtoAssembler
             , JacksonConfig jacksonConfig, S3Service s3Service,
                                  CelestialEventDtoMapper celestialEventDtoMapper,
                                  CelestialEventImageRepository celestialEventImageRepository,
                                  UserAccountRepository userAccountRepository,
-                                 CelestialEventCommentRepository celestialEventCommentRepository, CelestialEventSlimDtoAssembler slimDtoAssembler
+                                 CelestialEventCommentRepository celestialEventCommentRepository,
+                                 CelestialEventSlimDtoAssembler slimDtoAssembler
     ) {
         this.celestialEventRepository = celestialEventRepository;
         this.dtoAssembler = dtoAssembler;
@@ -91,7 +93,8 @@ public class CelestialEventService {
     public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
         List<CelestialEvent> events =
                 celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
-        List<GetSlimCelestialEventDto> celestialEventDtos = celestialEventDtoMapper.celestialEventListToGetSlimDtoList(events);
+        List<GetSlimCelestialEventDto> celestialEventDtos =
+                celestialEventDtoMapper.celestialEventListToGetSlimDtoList(events);
         return ResponseEntity.status(HttpStatus.OK).body(
                 CollectionModel.of(
                         slimDtoAssembler.toCollectionModel(celestialEventDtos),
@@ -129,7 +132,8 @@ public class CelestialEventService {
     }
 
     public ResponseEntity<EntityModel<GetCelestialEventDto>> getCelestialEventByUuid(String celestialEventUuid) {
-        CelestialEvent event = celestialEventRepository.findByNullParentComment(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
+        CelestialEvent event =
+                celestialEventRepository.findByNullParentComment(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
 
         GetCelestialEventDto celestialEventDto = celestialEventDtoMapper.celestialEventToGetDto(event);
         Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
@@ -144,6 +148,7 @@ public class CelestialEventService {
                 try {
                     return s3Service.uploadImage(image);
                 } catch (InvalidImageException e) {
+                    System.out.println(e.getMessage());
                     return null;
                 }
             }).toList();
@@ -154,14 +159,18 @@ public class CelestialEventService {
             newCelestialEventEntity.setImages(celestialEventImages);
 
             newCelestialEventEntity = celestialEventRepository.save(newCelestialEventEntity);
+
+            System.out.println(newCelestialEventEntity);
             GetCelestialEventDto createdEvent = celestialEventDtoMapper.celestialEventToGetDto(newCelestialEventEntity);
 
             Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
             return ResponseEntity.status(HttpStatus.CREATED).body(dtoAssembler.toModel(createdEvent).add(rootLink));
-        } catch (RuntimeException e) {
+        } catch (
+                RuntimeException e) {
             System.out.println(e.getMessage());
             throw new IncorrectCelestialEventFormatException();
         }
+
     }
 
     public ResponseEntity<Void> deleteCelestialEvent(String celestialEventUuid) {
