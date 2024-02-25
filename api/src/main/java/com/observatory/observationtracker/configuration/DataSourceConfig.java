@@ -1,8 +1,10 @@
 package com.observatory.observationtracker.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
@@ -17,9 +19,9 @@ public class DataSourceConfig {
 
     public DataSourceConfig(AwsConfig awsConfig) {
         this.awsConfig = awsConfig;
-        this.rdsUri = "jdbc:postgresql://" + awsConfig.getRdsUri() + "/" + awsConfig.getRdsName();
-        this.rdsUsername = awsConfig.getRdsUsername();
-        this.rdsPassword = awsConfig.getRdsPassword();
+        this.rdsUri = "jdbc:postgresql://" + this.awsConfig.getRdsUri() + "/" + this.awsConfig.getRdsName();
+        this.rdsUsername = this.awsConfig.getRdsUsername();
+        this.rdsPassword = this.awsConfig.getRdsPassword();
         this.driverClassName = org.postgresql.Driver.class.getName();
     }
 

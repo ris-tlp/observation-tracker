@@ -7,8 +7,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class ObservationTrackerApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder()
-                .profiles("dev").
-                sources(ObservationTrackerApplication.class)
+                .sources(ObservationTrackerApplication.class)
+                .profiles("dev")
                 .run(args);
     }
 
