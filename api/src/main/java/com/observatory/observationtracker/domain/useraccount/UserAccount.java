@@ -3,15 +3,12 @@ package com.observatory.observationtracker.domain.useraccount;
 import com.observatory.observationtracker.domain.common.IdentifiableEntity;
 import jakarta.persistence.*;
 
-import java.util.UUID;
-import java.sql.Timestamp;
-
 @Entity
 public class UserAccount extends IdentifiableEntity {
     @Id
     @GeneratedValue
     @Column(name = "user_id")
-    private Long id;
+    private Long userId;
 
     private String name;
 
@@ -26,17 +23,13 @@ public class UserAccount extends IdentifiableEntity {
         this.email = email;
     }
 
-    @PreUpdate
-    private void updateTimestamp() {
-        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
+
+    public Long getUserId() {
+        return userId;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long userId) {
-        this.id = userId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -58,10 +51,9 @@ public class UserAccount extends IdentifiableEntity {
     @Override
     public String toString() {
         return "UserAccount{" +
-                "id=" + id +
+                "id=" + userId +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                super.toString() +
                 '}';
     }
 }

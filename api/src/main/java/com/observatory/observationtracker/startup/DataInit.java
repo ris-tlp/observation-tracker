@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 
 @Component
 public class DataInit implements CommandLineRunner {
@@ -39,11 +40,11 @@ public class DataInit implements CommandLineRunner {
 //        userRepo.deleteAll();
 //        eventRepository.deleteAll();
 
-//        userRepo.saveAndFlush(new UserAccount("name", "emaila"));
+
 //        UserAccount user = new UserAccount("newName", "newEmail");
-//        userRepo.saveAndFlush(user);
+//        UserAccount user1 = new UserAccount("Name", "Emaila");
+//        userRepo.saveAll(Arrays.asList(user, user1));
 //
-////
 //        CelestialEvent event = new CelestialEvent("Event name", "Event Description", LocalDateTime.of
 //                (LocalDate.of(1999, 11, 11), LocalTime.now()));
 //        eventRepository.saveAndFlush(event);
