@@ -1,15 +1,17 @@
 package com.observatory.observationtracker.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
 
 @Configuration
+@Import(AwsConfig.class)
+@Profile("prod")
 public class DataSourceConfig {
     private final AwsConfig awsConfig;
     private final String rdsUri;
@@ -32,6 +34,20 @@ public class DataSourceConfig {
         builder.username(rdsUsername);
         builder.password(rdsPassword);
         builder.driverClassName(driverClassName);
+
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+        System.out.println("LFMAOOOOOOOOOOOOOOAENOAENOGAEIONGAENOIGOAEGOAEGOGAEOGAEOBGOUBAEGBUU");
+
 
         return builder.build();
     }
