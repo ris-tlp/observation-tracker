@@ -43,3 +43,21 @@ resource "aws_ssm_parameter" "database_endpoint" {
   type  = "SecureString"
   value = aws_db_instance.rds_instance.endpoint
 }
+
+resource "aws_ssm_parameter" "repository_uri" {
+  name = "/config/observation-tracker/repository.uri"
+  type = "SecureString"
+  value = aws_ecrpublic_repository.observation-tracker-docker-repo.repository_uri
+}
+
+
+resource "aws_ssm_parameter" "repository_name" {
+  name = "/config/observation-tracker/repository.name"
+  type = "SecureString"
+  value = aws_ecrpublic_repository.observation-tracker-docker-repo.repository_name
+}
+
+
+
+
+
