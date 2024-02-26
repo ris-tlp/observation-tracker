@@ -12,8 +12,3 @@ provider "aws" {
 }
 
 
-resource "aws_ssm_parameter" "aws_region" {
-  name = "/config/observation-tracker_dev/region"
-  type = "SecureString"
-  value = var.aws_region
-}

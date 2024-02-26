@@ -24,9 +24,3 @@ resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
   }
 }
 
-resource "aws_ssm_parameter" "s3_secret" {
-  name = "/config/observation-tracker_dev/s3.bucket.name"
-  type = "SecureString"
-  value = aws_s3_bucket.observation-tracker-bucket.id
-}
-
