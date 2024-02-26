@@ -10,10 +10,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.observatory</groupId>
-    <artifactId>observation-scheduler</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>observation-scheduler</name>
-    <description>Observation planner for amateur and professional astronomers alike.</description>
+    <artifactId>observation-tracker</artifactId>
+    <name>observation-tracker</name>
+    <version>RELEASE</version>
+    <description>Observation tracker for amateur and professional astronomers alike.</description>
     <properties>
         <java.version>17</java.version>
     </properties>
