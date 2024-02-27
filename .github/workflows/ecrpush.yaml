@@ -1,6 +1,10 @@
 name: Push to ECR
-'on':
-  - push
+
+on:
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
     name: Push to ECR
@@ -16,7 +20,7 @@ jobs:
           aws-region: us-east-1
       - name: Get ECR Repository URI
         id: fetch-ecr-repo
-        run: | 
+        run: |
           export REPOSITORY_URI=$(aws ssm get-parameter --name "/config/observation-tracker/repository.uri" --with-decryption --query Parameter.Value --output text)
           echo "::set-output name=repository_uri::$REPOSITORY_URI"
 
