@@ -1,0 +1,10 @@
+services:
+  api:
+    build:
+      context: api/
+      dockerfile: Dockerfile
+    working_dir: /api
+    volumes:
+      - ~/.aws/:/root/.aws
+    ports:
+      - "8080:8080"

@@ -1,6 +1,10 @@
+FROM maven:3.9.6-eclipse-temurin-17 as MAVEN_BUILD
+COPY pom.xml /build/
+COPY src /build/src/
+WORKDIR /build/
+RUN mvn clean package
+
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-EXPOSE 8080
-COPY target/observation-tracker-RELEASE.jar /app/observation-tracker-RELEASE.jar
-#ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar","/app/observation-tracker-RELEASE.jar"]
+COPY --from=MAVEN_BUILD /build/target/observation-tracker-RELEASE.jar /app/
 ENTRYPOINT ["java", "-jar","/app/observation-tracker-RELEASE.jar"]
