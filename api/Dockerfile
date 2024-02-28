@@ -7,4 +7,5 @@ RUN mvn clean package
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=MAVEN_BUILD /build/target/observation-tracker-RELEASE.jar /app/
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar","/app/observation-tracker-RELEASE.jar"]
