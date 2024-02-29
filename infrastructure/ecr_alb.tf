@@ -1,4 +1,4 @@
-resource "aws_lb_target_group" "observation_tracker_api" {
+resource "aws_lb_target_group" "observation_tracker_lb_target" {
   name        = "observation-tracker-api"
   port        = 8080
   protocol    = "HTTP"
@@ -7,22 +7,21 @@ resource "aws_lb_target_group" "observation_tracker_api" {
 
   health_check {
     enabled = true
-    healthy_threshold = 2
-    interval = 30
-    path = "/actuator/health/db"
+    path    = "/actuator/health/db"
     matcher = "200"
   }
 
-  depends_on = [aws_alb.observation_tracker_alb]
+  depends_on = [aws_alb.observation_tracker_api_alb]
 }
 
-resource "aws_alb" "observation_tracker_alb" {
-  name               = "observation-tracker-lb"
+resource "aws_alb" "observation_tracker_api_alb" {
+  name               = "observation-tracker-api-alb"
   internal           = false
   load_balancer_type = "application"
 
   subnets = [
-    aws_subnet.public_a.id, aws_subnet.public_b.id
+    aws_subnet.public_a.id,
+    aws_subnet.public_b.id,
   ]
 
   security_groups = [
@@ -31,20 +30,20 @@ resource "aws_alb" "observation_tracker_alb" {
     aws_security_group.egress_all.id,
   ]
 
-  depends_on = [aws_internet_gateway.igw]
+  depends_on = [aws_internet_gateway.internet_gateway]
 }
 
-resource "aws_alb_listener" "sun_api_http" {
-  load_balancer_arn = aws_alb.observation_tracker_alb.arn
-  port              = 80
+resource "aws_alb_listener" "observation_tracker_api_http" {
+  load_balancer_arn = aws_alb.observation_tracker_api_alb.arn
+  port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.observation_tracker_api.arn
+    target_group_arn = aws_lb_target_group.observation_tracker_lb_target.arn
   }
 }
 
 output "alb_url" {
-  value = "http://${aws_alb.observation_tracker_alb.dns_name}"
+  value = "http://${aws_alb.observation_tracker_api_alb.dns_name}"
 }
