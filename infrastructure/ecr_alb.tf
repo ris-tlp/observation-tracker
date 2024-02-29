@@ -5,6 +5,14 @@ resource "aws_lb_target_group" "observation_tracker_api" {
   target_type = "ip"
   vpc_id      = aws_vpc.vpc.id
 
+  health_check {
+    enabled = true
+    healthy_threshold = 2
+    interval = 30
+    path = "/actuator/health/db"
+    matcher = "200"
+  }
+
   depends_on = [aws_alb.observation_tracker_alb]
 }
 
@@ -28,7 +36,7 @@ resource "aws_alb" "observation_tracker_alb" {
 
 resource "aws_alb_listener" "sun_api_http" {
   load_balancer_arn = aws_alb.observation_tracker_alb.arn
-  port              = "80"
+  port              = 80
   protocol          = "HTTP"
 
   default_action {
