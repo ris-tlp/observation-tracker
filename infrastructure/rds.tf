@@ -18,4 +18,11 @@ resource "aws_db_instance" "rds_instance" {
   publicly_accessible    = true
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.rds_security_group.id]
+<<<<<<< Updated upstream
 }
+=======
+  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
+
+}
+
+>>>>>>> Stashed changes
