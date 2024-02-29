@@ -148,7 +148,6 @@ public class ObservationService {
                     observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
 
-            System.out.println(updatedObservation);
 
             observationRepository.save(updatedObservation);
             GetObservationDto observationDto = dtoMapper.observationToGetDto(updatedObservation);
@@ -157,7 +156,6 @@ public class ObservationService {
                     observationDtoAssembler.toModel(observationDto)
             );
         } catch (JsonPatchException | JsonProcessingException exception) {
-            System.out.println(exception);
             throw new IncorrectObservationFormatException();
         }
     }

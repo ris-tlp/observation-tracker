@@ -10,7 +10,6 @@ resource "aws_ssm_parameter" "s3_secret" {
   value = aws_s3_bucket.observation-tracker-bucket.id
 }
 
-
 resource "aws_ssm_parameter" "database_username" {
   name  = "/config/observation-tracker/rds.username"
   type  = "SecureString"
@@ -30,7 +29,6 @@ resource "aws_ssm_parameter" "database_port" {
   type  = "SecureString"
   value = aws_db_instance.rds_instance.port
 }
-
 
 resource "aws_ssm_parameter" "database_name" {
   name  = "/config/observation-tracker/rds.database"
@@ -57,7 +55,11 @@ resource "aws_ssm_parameter" "repository_name" {
   value = aws_ecrpublic_repository.observation-tracker-docker-repo.repository_name
 }
 
-
+resource "aws_ssm_parameter" "api_url" {
+  name = "/config/observation-tracker/api.url"
+  type = "SecureString"
+  value = "http://${aws_alb.observation_tracker_api_alb.dns_name}"
+}
 
 
 

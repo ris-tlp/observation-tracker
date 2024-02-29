@@ -8,8 +8,3 @@ variable "bucket_prefix" {
   type        = string
   default     = "observation-tracker-"
 }
-
-variable "versioning" {
-  type    = string
-  default = "Enabled"
-}

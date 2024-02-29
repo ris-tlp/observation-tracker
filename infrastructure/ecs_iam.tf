@@ -28,7 +28,8 @@ resource "aws_iam_policy" "ecs_execution_policy" {
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
           "logs:CreateLogStream",
-          "logs:PutLogEvents"
+          "logs:PutLogEvents",
+          "s3:*"
         ],
         "Resource" : "*"
       }

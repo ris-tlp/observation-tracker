@@ -1,13 +1,11 @@
 package com.observatory.observationtracker.aws;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.AmazonS3URI;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
+
 import com.observatory.observationtracker.aws.exceptions.InvalidImageException;
 import com.observatory.observationtracker.configuration.AwsConfig;
-import org.springframework.beans.factory.annotation.Value;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,16 +30,25 @@ public class S3Service {
     }
 
     public String uploadImage(MultipartFile image) throws InvalidImageException {
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
+        S3Client s3Client = S3Client.builder()
+                .region(Region.of(this.region))
+                .build();
+
+
         try {
             File convertedImage = convertMultipartFileToFile(image);
             String uploadedFileName = generateFilename(image.getOriginalFilename());
-            PutObjectRequest request = new PutObjectRequest(
-                    imageBucketName, uploadedFileName, convertedImage
-            );
-            request.setCannedAcl(CannedAccessControlList.PublicRead);
-            String url = String.valueOf(s3Client.getUrl(imageBucketName, uploadedFileName));
-            s3Client.putObject(request);
+            PutObjectRequest putObjectRequest =
+                    PutObjectRequest.builder()
+                            .bucket(imageBucketName)
+                            .key(uploadedFileName)
+                            .acl(ObjectCannedACL.PUBLIC_READ)
+                            .build();
+
+
+            s3Client.putObject(putObjectRequest, convertedImage.toPath());
+
+            String url = "https://" + imageBucketName + ".s3." + region + ".amazonaws.com/" + uploadedFileName;
             convertedImage.delete();
 
             return url;
@@ -52,9 +59,16 @@ public class S3Service {
 
     // @TODO Better error handling
     public void deleteImage(String imageUrl) {
-        AmazonS3URI uri = new AmazonS3URI(imageUrl);
-        AmazonS3 s3client = AmazonS3ClientBuilder.standard().withRegion(this.region).build();
-        s3client.deleteObject(imageBucketName, uri.getKey());
+        String key = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+
+        S3Client s3client = S3Client.builder()
+                .region(Region.of(this.region))
+                .build();
+
+        s3client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(imageBucketName)
+                .key(key)
+                .build());
     }
 
     private File convertMultipartFileToFile(MultipartFile image) throws IOException {

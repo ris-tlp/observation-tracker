@@ -148,7 +148,6 @@ public class CelestialEventService {
                 try {
                     return s3Service.uploadImage(image);
                 } catch (InvalidImageException e) {
-                    System.out.println(e.getMessage());
                     return null;
                 }
             }).toList();
@@ -160,14 +159,13 @@ public class CelestialEventService {
 
             newCelestialEventEntity = celestialEventRepository.save(newCelestialEventEntity);
 
-            System.out.println(newCelestialEventEntity);
             GetCelestialEventDto createdEvent = celestialEventDtoMapper.celestialEventToGetDto(newCelestialEventEntity);
 
             Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
             return ResponseEntity.status(HttpStatus.CREATED).body(dtoAssembler.toModel(createdEvent).add(rootLink));
         } catch (
                 RuntimeException e) {
-            System.out.println(e.getMessage());
+
             throw new IncorrectCelestialEventFormatException();
         }
 
@@ -201,7 +199,6 @@ public class CelestialEventService {
 
             return ResponseEntity.status(HttpStatus.OK).body(dtoAssembler.toModel(celestialEventDto));
         } catch (JsonPatchException | JsonProcessingException exception) {
-            System.out.println(exception.getMessage());
             throw new IncorrectCelestialEventFormatException();
         }
     }
