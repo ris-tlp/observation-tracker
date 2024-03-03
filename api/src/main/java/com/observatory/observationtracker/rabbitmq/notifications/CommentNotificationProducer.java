@@ -6,8 +6,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+// @TODO: why does this get triggered at startup
 @Service
-public class NotificationProducer {
+public class CommentNotificationProducer {
     @Value("${rabbitmq.exchange.observation.notification}")
     private String observationNotificationExchange;
 
@@ -16,14 +17,16 @@ public class NotificationProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public NotificationProducer(RabbitTemplate rabbitTemplate) {
+    public CommentNotificationProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendObservationCommentMessage(GetUserAccountDto observationAuthor,
-                                              GetObservationCommentDto createdComment) {
-        ObservationCommentNotification notification = new ObservationCommentNotification(
+    public void addObservationCommentMessage(GetUserAccountDto observationAuthor,
+                                             GetObservationCommentDto createdComment) {
+        CommentNotification notification = new CommentNotification(
                 observationAuthor, createdComment);
         rabbitTemplate.convertAndSend(observationNotificationExchange, observationNotificationKey, notification);
     }
+
+
 }
