@@ -2,6 +2,7 @@ package com.observatory.observationtracker.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
 @Configuration
 public class AwsConfig {
     @Value("${region}")
@@ -26,6 +27,9 @@ public class AwsConfig {
 
     @Value("${rds.endpoint}")
     private String rdsUri;
+
+    @Value("${notification.sender-email}")
+    private String notificationSenderEmail;
 
 
     public String getRegion() {
@@ -54,5 +58,9 @@ public class AwsConfig {
 
     public String getRdsUri() {
         return rdsUri;
+    }
+
+    public String getNotificationSenderEmail() {
+        return notificationSenderEmail;
     }
 }
