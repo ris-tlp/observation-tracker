@@ -221,6 +221,7 @@ public class ObservationService {
 
         GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(comment);
 
+        // Add new notification to queue
         notificationProducer.sendObservationCommentMessage(
                 dtoMapper.observationToGetDto(observation).getOwner(), returnDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
