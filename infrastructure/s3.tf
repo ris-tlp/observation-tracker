@@ -1,3 +1,10 @@
+variable "bucket_prefix" {
+  description = "Bucket prefix for the S3"
+  type        = string
+  default     = "observation-tracker-"
+}
+
+
 resource "aws_s3_bucket" "observation-tracker-bucket" {
   bucket_prefix = var.bucket_prefix
   force_destroy = true

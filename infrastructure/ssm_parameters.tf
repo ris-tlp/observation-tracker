@@ -62,4 +62,9 @@ resource "aws_ssm_parameter" "api_url" {
 }
 
 
+resource "aws_ssm_parameter" "notification_sender_email" {
+  name = "/config/observation-tracker/notification.sender-email"
+  type = "SecureString"
+  value = var.notification_sender_email
+}
 
