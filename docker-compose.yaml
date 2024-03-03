@@ -7,4 +7,11 @@ services:
     volumes:
       - ~/.aws/:/root/.aws
     ports:
-      - "8080:8080"
+      - 8080:8080
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
