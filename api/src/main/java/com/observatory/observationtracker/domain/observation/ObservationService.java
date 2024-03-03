@@ -24,6 +24,7 @@ import com.observatory.observationtracker.domain.observation.repositories.Observ
 import com.observatory.observationtracker.domain.useraccount.UserAccount;
 import com.observatory.observationtracker.domain.useraccount.UserAccountRepository;
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
+import com.observatory.observationtracker.rabbitmq.notifications.NotificationProducer;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -49,6 +50,7 @@ public class ObservationService {
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
     private final ObservationDtoMapper dtoMapper;
+    private final NotificationProducer notificationProducer;
 
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
@@ -57,7 +59,8 @@ public class ObservationService {
                               CelestialEventRepository celestialEventRepository,
                               ObservationCommentRepository commentRepository,
                               JacksonConfig jacksonConfig,
-                              ObservationDtoMapper dtoMapper) {
+                              ObservationDtoMapper dtoMapper,
+                              NotificationProducer notificationProducer) {
         this.observationDtoAssembler = observationDtoAssembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
@@ -67,6 +70,7 @@ public class ObservationService {
         this.dtoMapper = dtoMapper;
         this.commentRepository = commentRepository;
         this.observationSlimDtoAssembler = observationSlimDtoAssembler;
+        this.notificationProducer = notificationProducer;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getAllObservations(String userUuid) {
@@ -208,7 +212,6 @@ public class ObservationService {
 
         ObservationComment comment = dtoMapper.createDtoToObservationComment(newComment);
         comment.setAuthor(author);
-
         // Maintaining bidirectional relationship of comments and observations
         comment.setObservation(observation);
         observation.getComments().add(comment);
@@ -218,6 +221,8 @@ public class ObservationService {
 
         GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(comment);
 
+        notificationProducer.sendObservationCommentMessage(
+                dtoMapper.observationToGetDto(observation).getOwner(), returnDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }
 

@@ -13,3 +13,5 @@ set-actions-secrets:
 	gh secret set --app actions --body $$(aws configure get aws_secret_access_key) aws_secret_access_key
 	gh secret set --app actions --body $$(aws configure get aws_access_key_id) aws_access_key_id
 
+down-cluster-service:
+	aws ecs update-service --desired-count 0 --cluster "observation_tracker_api_cluster" --service "observation_tracker_api_service"
