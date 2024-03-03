@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 // @TODO: why does this get triggered at startup
 @Service
 public class CommentNotificationProducer {
-    @Value("${rabbitmq.exchange.observation.notification}")
-    private String observationNotificationExchange;
+    @Value("${rabbitmq.exchange.notification}")
+    private String notificationExchange;
 
     @Value("${rabbitmq.routing.key.observation.notification}")
     private String observationNotificationKey;
@@ -25,7 +25,7 @@ public class CommentNotificationProducer {
                                              GetObservationCommentDto createdComment) {
         CommentNotification notification = new CommentNotification(
                 observationAuthor, createdComment);
-        rabbitTemplate.convertAndSend(observationNotificationExchange, observationNotificationKey, notification);
+        rabbitTemplate.convertAndSend(notificationExchange, observationNotificationKey, notification);
     }
 
 

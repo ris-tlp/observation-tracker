@@ -8,37 +8,50 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
 public class RabbitMQConfig {
-    @Value("${rabbitmq.queue.observation.notification}")
-    private String observationNotificationQueue;
+    @Value("${rabbitmq.exchange.notification}")
+    private String notificationExchange;
 
-    @Value("${rabbitmq.exchange.observation.notification}")
-    private String observationNotificationExchange;
+    @Value("${rabbitmq.queue.observation.notification}")
+    private String commentNotificationQueue;
 
     @Value("${rabbitmq.routing.key.observation.notification}")
-    private String observationNotificationKey;
+    private String commentNotificationKey;
 
+    @Value("${rabbitmq.queue.reply.notification}")
+    private String replyNotificationQueue;
 
-    @Bean
-    public Queue jsonQueue() {
-        return new Queue(observationNotificationQueue);
-    }
+    @Value("${rabbitmq.routing.key.reply.notification}")
+    private String replyNotificationKey;
+
 
     @Bean
     public TopicExchange exchange() {
-        return new TopicExchange(observationNotificationExchange);
+        return new TopicExchange(notificationExchange);
     }
 
+    @Bean
+    public Queue commentNotificationQueue() {
+        return new Queue(commentNotificationQueue);
+    }
 
     @Bean
-    public Binding jsonBinding() {
-        return BindingBuilder.bind(jsonQueue())
+    public Binding commentNotificationBinding() {
+        return BindingBuilder.bind(commentNotificationQueue())
                 .to(exchange())
-                .with(observationNotificationKey);
+                .with(commentNotificationKey);
+    }
+
+    @Bean
+    public Queue replyNotificationQueue() { return new Queue(replyNotificationQueue);}
+
+    @Bean
+    public Binding replyNotificationBinding() {
+        return BindingBuilder.bind(replyNotificationQueue())
+                .to(exchange())
+                .with(replyNotificationKey);
     }
 
     @Bean
