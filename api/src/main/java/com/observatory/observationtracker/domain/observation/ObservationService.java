@@ -24,6 +24,8 @@ import com.observatory.observationtracker.domain.observation.repositories.Observ
 import com.observatory.observationtracker.domain.useraccount.UserAccount;
 import com.observatory.observationtracker.domain.useraccount.UserAccountRepository;
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
+import com.observatory.observationtracker.rabbitmq.notifications.CommentNotificationProducer;
+import com.observatory.observationtracker.rabbitmq.notifications.ReplyNotificationProducer;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -50,6 +52,9 @@ public class ObservationService {
     private final JacksonConfig jacksonConfig;
     private final ObservationDtoMapper dtoMapper;
 
+    private final CommentNotificationProducer commentNotificationProducer;
+    private final ReplyNotificationProducer replyNotificationProducer;
+
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
                               ObservationDtoAssembler observationDtoAssembler, S3Service s3Service,
@@ -57,7 +62,9 @@ public class ObservationService {
                               CelestialEventRepository celestialEventRepository,
                               ObservationCommentRepository commentRepository,
                               JacksonConfig jacksonConfig,
-                              ObservationDtoMapper dtoMapper) {
+                              ObservationDtoMapper dtoMapper,
+                              CommentNotificationProducer commentNotificationProducer,
+                              ReplyNotificationProducer replyNotificationProducer) {
         this.observationDtoAssembler = observationDtoAssembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
@@ -67,6 +74,8 @@ public class ObservationService {
         this.dtoMapper = dtoMapper;
         this.commentRepository = commentRepository;
         this.observationSlimDtoAssembler = observationSlimDtoAssembler;
+        this.commentNotificationProducer = commentNotificationProducer;
+        this.replyNotificationProducer = replyNotificationProducer;
     }
 
     public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getAllObservations(String userUuid) {
@@ -208,7 +217,6 @@ public class ObservationService {
 
         ObservationComment comment = dtoMapper.createDtoToObservationComment(newComment);
         comment.setAuthor(author);
-
         // Maintaining bidirectional relationship of comments and observations
         comment.setObservation(observation);
         observation.getComments().add(comment);
@@ -218,6 +226,9 @@ public class ObservationService {
 
         GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(comment);
 
+        // Add new notification to queue
+        commentNotificationProducer.addObservationCommentMessage(
+                dtoMapper.observationToGetDto(observation).getOwner(), returnDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }
 
@@ -235,7 +246,7 @@ public class ObservationService {
         reply.setAuthor(author);
         reply.setObservation(observation);
 
-        // Maintaining bidirectional relationship3
+        // Maintaining bidirectional relationships
         reply.setParentComment(parentComment);
         parentComment.getReplies().add(reply);
 
@@ -243,6 +254,12 @@ public class ObservationService {
         commentRepository.save(parentComment);
 
         GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(reply);
+        
+        replyNotificationProducer.addReplyMessage(
+                dtoMapper.observationCommentToGetDto(parentComment).getAuthor(),
+                dtoMapper.observationCommentToGetDto(reply).getAuthor(),
+                dtoMapper.observationCommentToGetDto(parentComment)
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }

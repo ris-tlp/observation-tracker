@@ -2,6 +2,7 @@ package com.observatory.observationtracker.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
 @Configuration
 public class AwsConfig {
     @Value("${region}")
@@ -27,6 +28,19 @@ public class AwsConfig {
     @Value("${rds.endpoint}")
     private String rdsUri;
 
+    // SES Parameters
+    @Value("${notification.sender-email}")
+    private String notificationSenderEmail;
+
+    // RabbitMQ Parameters
+    @Value("${rabbitmq.username}")
+    private String rabbitMqUsername;
+
+    @Value("${rabbitmq.password}")
+    private String rabbitMqPassword;
+
+    @Value("${rabbitmq.endpoint}")
+    private String rabbitMqEndpoint;
 
     public String getRegion() {
         return region;
@@ -54,5 +68,21 @@ public class AwsConfig {
 
     public String getRdsUri() {
         return rdsUri;
+    }
+
+    public String getNotificationSenderEmail() {
+        return notificationSenderEmail;
+    }
+
+    public String getRabbitMqUsername() {
+        return rabbitMqUsername;
+    }
+
+    public String getRabbitMqPassword() {
+        return rabbitMqPassword;
+    }
+
+    public String getRabbitMqEndpoint() {
+        return rabbitMqEndpoint;
     }
 }

@@ -8,7 +8,7 @@ resource "random_password" "rds_password" {
 resource "aws_db_instance" "rds_instance" {
   allocated_storage = 20
   identifier        = "rds-terraform"
-  instance_class    = "db.t3.micro"
+  instance_class    = "db.t3.small"
   engine            = "postgres"
 
   db_name  = "observation_tracker_database"
@@ -19,4 +19,5 @@ resource "aws_db_instance" "rds_instance" {
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.rds_security_group.id]
 }
+
 

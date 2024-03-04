@@ -4,7 +4,43 @@ services:
       context: api/
       dockerfile: Dockerfile
     working_dir: /api
+    container_name: api
     volumes:
       - ~/.aws/:/root/.aws
     ports:
-      - "8080:8080"
+      - 8080:8080
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      db:
+        condition: service_started
+    networks:
+      - network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - network
+
+  db:
+    image: postgres:13.1-alpine
+    container_name: db
+    environment:
+      - POSTGRES_USER=compose-postgres
+      - POSTGRES_PASSWORD=compose-postgres
+      - POSTGRES_DB=observation_tracker
+    volumes:
+      - ./api/database:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - network
+
+
+networks:
+  network:
+    driver: bridge
