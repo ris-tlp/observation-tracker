@@ -24,9 +24,14 @@ import com.observatory.observationtracker.domain.celestialevent.repositories.Cel
 import com.observatory.observationtracker.domain.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationtracker.domain.useraccount.UserAccount;
 import com.observatory.observationtracker.domain.useraccount.UserAccountRepository;
+import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -49,20 +54,21 @@ public class CelestialEventService {
     private final CelestialEventSlimDtoAssembler slimDtoAssembler;
     private final UserAccountRepository userAccountRepository;
     private final CelestialEventCommentRepository celestialEventCommentRepository;
+    private final PagedResourcesAssembler<GetSlimCelestialEventDto> pagedResourcesAssembler;
+
 
     private final JacksonConfig jacksonConfig;
     private final S3Service s3Service;
     private final CelestialEventDtoMapper celestialEventDtoMapper;
 
     public CelestialEventService(CelestialEventRepository celestialEventRepository,
-                                 CelestialEventDtoAssembler dtoAssembler
-            , JacksonConfig jacksonConfig, S3Service s3Service,
-                                 CelestialEventDtoMapper celestialEventDtoMapper,
+                                 CelestialEventDtoAssembler dtoAssembler, JacksonConfig jacksonConfig,
+                                 S3Service s3Service, CelestialEventDtoMapper celestialEventDtoMapper,
                                  CelestialEventImageRepository celestialEventImageRepository,
                                  UserAccountRepository userAccountRepository,
                                  CelestialEventCommentRepository celestialEventCommentRepository,
-                                 CelestialEventSlimDtoAssembler slimDtoAssembler
-    ) {
+                                 CelestialEventSlimDtoAssembler slimDtoAssembler,
+                                 PagedResourcesAssembler<GetSlimCelestialEventDto> pagedResourcesAssembler) {
         this.celestialEventRepository = celestialEventRepository;
         this.dtoAssembler = dtoAssembler;
         this.jacksonConfig = jacksonConfig;
@@ -72,36 +78,38 @@ public class CelestialEventService {
         this.userAccountRepository = userAccountRepository;
         this.celestialEventCommentRepository = celestialEventCommentRepository;
         this.slimDtoAssembler = slimDtoAssembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getAllCelestialEvents() {
-        List<CelestialEvent> allCelestialEvents = celestialEventRepository.findAll();
-        List<GetSlimCelestialEventDto> celestialEventDtos =
-                celestialEventDtoMapper.celestialEventListToGetSlimDtoList(allCelestialEvents);
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getAllCelestialEvents(Pageable pageable) {
+        Page<GetSlimCelestialEventDto> pagedCelestialEvents =
+                celestialEventRepository.findAll(pageable).map(celestialEventDtoMapper::celestialEventToGetSlimDto);
+        PagedModel<EntityModel<GetSlimCelestialEventDto>> pagedCelestialEvent =
+                pagedResourcesAssembler.toModel(pagedCelestialEvents, slimDtoAssembler);
 
+        return ResponseEntity.status(HttpStatus.OK).body(
+                pagedCelestialEvent
+                        .add(
+                                linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null,
+                                        null)).withRel("filter-by-status").withType("GET")
+                        )
+        );
+    }
+
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status, Pageable pageable) {
+        Page<GetSlimCelestialEventDto> events =
+                celestialEventRepository.findPagedCelestialEventByEventStatus(status, pageable)
+                        .orElseThrow(() -> new CelestialEventStatusNotFoundException(status))
+                        .map(celestialEventDtoMapper::celestialEventToGetSlimDto);
+
+        PagedModel<EntityModel<GetSlimCelestialEventDto>> pagedEvents = pagedResourcesAssembler.toModel(events,
+                slimDtoAssembler);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CollectionModel.of(
-                        slimDtoAssembler.toCollectionModel(celestialEventDtos),
-                        linkTo(CelestialEventController.class).withSelfRel().withType("GET, POST"),
-                        linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withRel(
-                                "filter-by-status").withType("GET")
-                ));
-
-    }
-
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(CelestialEventStatus status) {
-        List<CelestialEvent> events =
-                celestialEventRepository.findCelestialEventByEventStatus(status).orElseThrow(() -> new CelestialEventStatusNotFoundException(status));
-        List<GetSlimCelestialEventDto> celestialEventDtos =
-                celestialEventDtoMapper.celestialEventListToGetSlimDtoList(events);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                CollectionModel.of(
-                        slimDtoAssembler.toCollectionModel(celestialEventDtos),
-                        linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null)).withSelfRel().withType("GET"),
-                        linkTo(CelestialEventController.class).withRel("all").withType("GET, POST")
-                )
-        );
+                .body(
+                        pagedEvents
+                                .add(linkTo(CelestialEventController.class).withRel("all").withType("GET, POST"))
+                );
     }
 
     /*
@@ -114,8 +122,6 @@ public class CelestialEventService {
                 events.stream().map(this::updateEventStatus).filter(Objects::nonNull).toList();
 
         return ResponseEntity.status(HttpStatus.OK).build();
-
-//        return null;
     }
 
     /*
@@ -141,8 +147,7 @@ public class CelestialEventService {
         return ResponseEntity.status(HttpStatus.OK).body(dtoAssembler.toModel(celestialEventDto).add(rootLink));
     }
 
-    public ResponseEntity<EntityModel<GetCelestialEventDto>> createCelestialEvent(CreateCelestialEventDto celestialEvent,
-                                                                                  List<MultipartFile> images) {
+    public ResponseEntity<EntityModel<GetCelestialEventDto>> createCelestialEvent(CreateCelestialEventDto celestialEvent, List<MultipartFile> images) {
         try {
             List<String> imageUrls = images.stream().map(image -> {
                 try {
@@ -163,8 +168,7 @@ public class CelestialEventService {
 
             Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
             return ResponseEntity.status(HttpStatus.CREATED).body(dtoAssembler.toModel(createdEvent).add(rootLink));
-        } catch (
-                RuntimeException e) {
+        } catch (RuntimeException e) {
 
             throw new IncorrectCelestialEventFormatException();
         }
@@ -233,9 +237,7 @@ public class CelestialEventService {
         GetCelestialEventCommentDto returnDto =
                 celestialEventDtoMapper.celestialEventCommentToGetDto(celestialEventComment);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                returnDto
-        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
     }
 
     public ResponseEntity<GetSlimCelestialEventCommentDto> addReplyToCelestialEventComment(String celestialEventUuid,

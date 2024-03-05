@@ -1,6 +1,7 @@
 package com.observatory.observationtracker.domain.celestialevent.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.observatory.observationtracker.domain.celestialevent.models.CelestialEvent;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEventStatus;
 
 import java.sql.Timestamp;
@@ -17,6 +18,17 @@ public class GetSlimCelestialEventDto {
     private Timestamp createdTimestamp;
     private Timestamp updatedTimestamp;
     private CelestialEventStatus eventStatus;
+
+//    public GetSlimCelestialEventDto(CelestialEvent event) {
+//        this.uuid = event.getUuid();
+//        this.celestialEventName = event.getCelestialEventName();
+//        this.celestialEventDescription = event.getCelestialEventDescription();
+//        this.celestialEventDateTime = event.getCelestialEventDateTime();
+//        this.createdTimestamp = event.getCreatedTimestamp();
+//        this.updatedTimestamp = event.getUpdatedTimestamp();
+//        this.eventStatus = event.getEventStatus();
+//
+//    }
 
     public String getUuid() {
         return uuid;
