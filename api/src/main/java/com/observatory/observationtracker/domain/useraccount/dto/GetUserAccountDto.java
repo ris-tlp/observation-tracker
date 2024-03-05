@@ -1,11 +1,19 @@
 package com.observatory.observationtracker.domain.useraccount.dto;
 
+import com.observatory.observationtracker.domain.useraccount.UserAccount;
+
 public class GetUserAccountDto {
     private String name;
 
     private String email;
 
     private String uuid;
+
+    public GetUserAccountDto(UserAccount user) {
+        this.name = user.getName();
+        this.email = user.getEmail();
+        this.uuid = user.getUuid();
+    }
 
     public String getName() {
         return name;
