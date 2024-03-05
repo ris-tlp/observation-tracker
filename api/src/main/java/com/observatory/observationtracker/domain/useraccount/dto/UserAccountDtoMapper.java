@@ -2,6 +2,7 @@ package com.observatory.observationtracker.domain.useraccount.dto;
 
 import com.observatory.observationtracker.domain.useraccount.UserAccount;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 

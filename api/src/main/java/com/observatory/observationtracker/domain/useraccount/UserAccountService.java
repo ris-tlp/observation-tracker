@@ -77,8 +77,7 @@ public class UserAccountService {
     }
 
     public ResponseEntity<PagedModel<EntityModel<GetUserAccountDto>>> getAllUsers(Pageable pageable) {
-        Page<UserAccount> allUserAccounts = repository.findAll(pageable);
-        Page<GetUserAccountDto> users = allUserAccounts.map(GetUserAccountDto::new);
+        Page<GetUserAccountDto> users = repository.findAll(pageable).map(userAccountDtoMapper::userAccountToGetDto);
         PagedModel<EntityModel<GetUserAccountDto>> pagedUsers = pagedResourcesAssembler.toModel(users, assembler);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagedUsers);
