@@ -26,9 +26,13 @@ import com.observatory.observationtracker.domain.useraccount.UserAccountReposito
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
 import com.observatory.observationtracker.rabbitmq.notifications.CommentNotificationProducer;
 import com.observatory.observationtracker.rabbitmq.notifications.ReplyNotificationProducer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,6 +51,7 @@ public class ObservationService {
     private final ObservationDtoAssembler observationDtoAssembler;
     private final ObservationSlimDtoAssembler observationSlimDtoAssembler;
     private final ObservationCommentRepository commentRepository;
+    private final PagedResourcesAssembler<GetSlimObservationDto> pagedResourcesAssembler;
 
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
@@ -64,7 +69,8 @@ public class ObservationService {
                               JacksonConfig jacksonConfig,
                               ObservationDtoMapper dtoMapper,
                               CommentNotificationProducer commentNotificationProducer,
-                              ReplyNotificationProducer replyNotificationProducer) {
+                              ReplyNotificationProducer replyNotificationProducer,
+                              PagedResourcesAssembler<GetSlimObservationDto> pagedResourcesAssembler) {
         this.observationDtoAssembler = observationDtoAssembler;
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
@@ -76,21 +82,19 @@ public class ObservationService {
         this.observationSlimDtoAssembler = observationSlimDtoAssembler;
         this.commentNotificationProducer = commentNotificationProducer;
         this.replyNotificationProducer = replyNotificationProducer;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getAllObservations(String userUuid) {
-        List<Observation> observations =
-                observationRepository.findByOwnerUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
+    public ResponseEntity<PagedModel<EntityModel<GetSlimObservationDto>>> getAllObservations(String userUuid,
+                                                                                             Pageable pageable) {
+        Page<GetSlimObservationDto> observations =
+                observationRepository.findByOwnerUuid(userUuid, pageable).map(dtoMapper::observationToGetSlimDto);
 
-        List<GetSlimObservationDto> observationDtos = dtoMapper.observationListToGetSlimDtoList(observations);
-        CollectionModel<EntityModel<GetSlimObservationDto>> assembledRequest =
-                observationSlimDtoAssembler.toCollectionModel(observationDtos);
+        PagedModel<EntityModel<GetSlimObservationDto>> pagedObservations =
+                pagedResourcesAssembler.toModel(observations, observationSlimDtoAssembler);
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                CollectionModel.of(
-                        assembledRequest,
-                        linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(userUuid)).withSelfRel().withType("GET,  POST")
-                )
+                pagedObservations
         );
     }
 
@@ -182,29 +186,20 @@ public class ObservationService {
 
         try {
             observationRepository.delete(observation);
-//            observation.getImages().forEach(observationImage -> s3Service.deleteImage(observationImage.getUrl()));
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (RuntimeException e) {
             throw new RuntimeException("There was an error in deletion");
         }
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getPublishedCourses() {
-        List<Observation> observations =
-                observationRepository.findObservationsByIsPublishedIsTrue().orElseThrow();
+    public ResponseEntity<PagedModel<EntityModel<GetSlimObservationDto>>> getPublishedCourses(Pageable pageable) {
+        Page<GetSlimObservationDto> observations =
+                observationRepository.findObservationsByIsPublishedIsTrue(pageable).map(dtoMapper::observationToGetSlimDto);
 
-        List<GetSlimObservationDto> observationDtos = dtoMapper.observationListToGetSlimDtoList(observations);
+        PagedModel<EntityModel<GetSlimObservationDto>> pagedObservations =
+                pagedResourcesAssembler.toModel(observations, observationSlimDtoAssembler);
 
-        CollectionModel<EntityModel<GetSlimObservationDto>> assembledRequest =
-                observationSlimDtoAssembler.toCollectionModel(observationDtos);
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                CollectionModel.of(
-                        assembledRequest,
-                        linkTo(methodOn(ObservationController.class).getPublishedObservations()).withSelfRel()
-//                        linkTo(methodOn().withSelfRel().withType("GET,  POST")
-                )
-        );
+        return ResponseEntity.status(HttpStatus.OK).body(pagedObservations);
     }
 
     public ResponseEntity<GetObservationCommentDto> addCommentToObservation(String observationUuid,
@@ -254,7 +249,7 @@ public class ObservationService {
         commentRepository.save(parentComment);
 
         GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(reply);
-        
+
         replyNotificationProducer.addReplyMessage(
                 dtoMapper.observationCommentToGetDto(parentComment).getAuthor(),
                 dtoMapper.observationCommentToGetDto(reply).getAuthor(),
