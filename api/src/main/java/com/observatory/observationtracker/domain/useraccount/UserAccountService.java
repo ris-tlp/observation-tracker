@@ -8,8 +8,12 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.UserAccountDtoMapper;
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +30,16 @@ public class UserAccountService {
     private final UserAccountRepository repository;
     private final UserModelAssembler assembler;
     private final UserAccountDtoMapper userAccountDtoMapper;
+    private final PagedResourcesAssembler<GetUserAccountDto> pagedResourcesAssembler;
 
-    public UserAccountService(UserAccountRepository repository, UserModelAssembler assembler, UserAccountDtoMapper userAccountDtoMapper) {
+    public UserAccountService(UserAccountRepository repository, UserModelAssembler assembler,
+                              UserAccountDtoMapper userAccountDtoMapper,
+                              PagedResourcesAssembler<GetUserAccountDto> pagedResourcesAssembler
+    ) {
         this.repository = repository;
         this.assembler = assembler;
         this.userAccountDtoMapper = userAccountDtoMapper;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     public EntityModel<GetUserAccountDto> oneUserByUuid(String uuid) {
@@ -67,11 +76,14 @@ public class UserAccountService {
         return mapper.treeToValue(patched, UserAccount.class);
     }
 
-    public ResponseEntity<CollectionModel<EntityModel<GetUserAccountDto>>> getAllUsers() {
-        List<UserAccount> allUserAccounts = repository.findAll();
-        List<GetUserAccountDto> userAccountDtos = userAccountDtoMapper.userAccountListToGetDtoList(allUserAccounts);
-        return ResponseEntity.status(HttpStatus.OK).body(assembler.toCollectionModel(userAccountDtos));
+    public ResponseEntity<PagedModel<EntityModel<GetUserAccountDto>>> getAllUsers(Pageable pageable) {
+        Page<GetUserAccountDto> users = repository.findAll(pageable).map(userAccountDtoMapper::userAccountToGetDto);
+        PagedModel<EntityModel<GetUserAccountDto>> pagedUsers = pagedResourcesAssembler.toModel(users, assembler);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pagedUsers);
     }
+
+
 }
 
 

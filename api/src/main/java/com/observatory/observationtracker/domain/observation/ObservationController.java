@@ -2,8 +2,10 @@ package com.observatory.observationtracker.domain.observation;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationtracker.domain.observation.dto.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +23,8 @@ public class ObservationController {
     }
 
     @GetMapping(params = "userUuid")
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getAllObservationsOfUser(@RequestParam String userUuid) {
-        return service.getAllObservations(userUuid);
+    public ResponseEntity<PagedModel<EntityModel<GetSlimObservationDto>>> getAllObservationsOfUser(@RequestParam String userUuid, Pageable pageable) {
+        return service.getAllObservations(userUuid, pageable);
     }
 
     @PostMapping(params = {"userUuid", "celestialEventUuid"},
@@ -53,8 +55,8 @@ public class ObservationController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimObservationDto>>> getPublishedObservations() {
-        return service.getPublishedCourses();
+    public ResponseEntity<PagedModel<EntityModel<GetSlimObservationDto>>> getPublishedObservations(Pageable pageable) {
+        return service.getPublishedCourses(pageable);
     }
 
     @PostMapping(value = "/{observationUuid}/comments", params = "userUuid", consumes =

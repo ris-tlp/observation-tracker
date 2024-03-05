@@ -3,6 +3,7 @@ package com.observatory.observationtracker.domain.celestialevent;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationtracker.domain.celestialevent.dto.*;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEventStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
@@ -24,8 +25,8 @@ public class CelestialEventController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEvents() {
-        return celestialEventService.getAllCelestialEvents();
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEvents(Pageable pageable) {
+        return celestialEventService.getAllCelestialEvents(pageable);
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -35,8 +36,11 @@ public class CelestialEventController {
     }
 
     @GetMapping(params = "status")
-    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(@RequestParam CelestialEventStatus status) {
-        return celestialEventService.getCelestialEventsByStatus(status);
+    public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEventsByStatus(
+            Pageable pageable,
+            @RequestParam CelestialEventStatus status
+    ) {
+        return celestialEventService.getCelestialEventsByStatus(status, pageable);
     }
 
     @GetMapping("/{celestialEventUuid}")
