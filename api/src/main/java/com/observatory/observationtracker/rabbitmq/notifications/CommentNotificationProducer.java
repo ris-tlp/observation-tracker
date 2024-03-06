@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-// @TODO: why does this get triggered at startup
 @Service
 public class CommentNotificationProducer {
     @Value("${rabbitmq.exchange.notification}")

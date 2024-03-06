@@ -1,6 +1,10 @@
 package com.observatory.observationtracker.domain.observation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.observatory.observationtracker.domain.celestialevent.dto.GetSlimCelestialEventDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 
@@ -18,13 +22,15 @@ public class GetSlimObservationDto {
     private List<GetObservationImageDto> images;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime observationDateTime;
 
     private Timestamp createdTimestamp;
 
     private Timestamp updatedTimestamp;
 
-    private GetUserAccountDto author;
+    private GetUserAccountDto owner;
 
     private GetSlimCelestialEventDto celestialEvent;
 
@@ -84,12 +90,12 @@ public class GetSlimObservationDto {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public GetUserAccountDto getAuthor() {
-        return author;
+    public GetUserAccountDto getOwner() {
+        return owner;
     }
 
-    public void setAuthor(GetUserAccountDto author) {
-        this.author = author;
+    public void setOwner(GetUserAccountDto owner) {
+        this.owner = owner;
     }
 
     public GetSlimCelestialEventDto getCelestialEvent() {
