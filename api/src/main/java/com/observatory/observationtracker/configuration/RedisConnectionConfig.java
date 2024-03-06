@@ -25,9 +25,8 @@ public class RedisConnectionConfig {
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(
-                Collections.singletonList(String.format("%s:%s", elasticacheEndpoint, elasticachePort))
-        );
-        return new LettuceConnectionFactory(clusterConfiguration);
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(elasticacheEndpoint,
+                Integer.parseInt(elasticachePort));
+        return new LettuceConnectionFactory(configuration);
     }
 }
