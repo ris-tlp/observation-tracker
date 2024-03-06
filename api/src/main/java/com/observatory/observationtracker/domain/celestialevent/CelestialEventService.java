@@ -137,17 +137,17 @@ public class CelestialEventService {
         return null;
     }
 
-    public ResponseEntity<EntityModel<GetCelestialEventDto>> getCelestialEventByUuid(String celestialEventUuid) {
+    public GetCelestialEventDto getCelestialEventByUuid(String celestialEventUuid) {
         CelestialEvent event =
                 celestialEventRepository.findByNullParentComment(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
 
-        GetCelestialEventDto celestialEventDto = celestialEventDtoMapper.celestialEventToGetDto(event);
-        Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
+        GetCelestialEventDto eventDto = celestialEventDtoMapper.celestialEventToGetDto(event);
+        return eventDto;
 
-        return ResponseEntity.status(HttpStatus.OK).body(dtoAssembler.toModel(celestialEventDto).add(rootLink));
     }
 
-    public ResponseEntity<EntityModel<GetCelestialEventDto>> createCelestialEvent(CreateCelestialEventDto celestialEvent, List<MultipartFile> images) {
+    public GetCelestialEventDto createCelestialEvent(CreateCelestialEventDto celestialEvent,
+                                                     List<MultipartFile> images) {
         try {
             List<String> imageUrls = images.stream().map(image -> {
                 try {
@@ -166,8 +166,10 @@ public class CelestialEventService {
 
             GetCelestialEventDto createdEvent = celestialEventDtoMapper.celestialEventToGetDto(newCelestialEventEntity);
 
-            Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
-            return ResponseEntity.status(HttpStatus.CREATED).body(dtoAssembler.toModel(createdEvent).add(rootLink));
+            return createdEvent;
+
+//            Link rootLink = linkTo(CelestialEventController.class).withRel("all").withType("GET, POST");
+//            return ResponseEntity.status(HttpStatus.CREATED).body(dtoAssembler.toModel(createdEvent).add(rootLink));
         } catch (RuntimeException e) {
 
             throw new IncorrectCelestialEventFormatException();
@@ -190,7 +192,7 @@ public class CelestialEventService {
 
     }
 
-    public ResponseEntity<EntityModel<GetCelestialEventDto>> updateCelestialEvent(String celestialEventUuid,
+    public GetCelestialEventDto updateCelestialEvent(String celestialEventUuid,
                                                                                   JsonPatch patch) {
         try {
             CelestialEvent celestialEvent =
@@ -198,12 +200,15 @@ public class CelestialEventService {
             CelestialEvent updatedCelestialEvent = applyPatchToCelestialEvent(patch, celestialEvent);
             celestialEventRepository.save(updatedCelestialEvent);
 
-            GetCelestialEventDto celestialEventDto =
+            GetCelestialEventDto eventDto =
                     celestialEventDtoMapper.celestialEventToGetDto(updatedCelestialEvent);
 
-            return ResponseEntity.status(HttpStatus.OK).body(dtoAssembler.toModel(celestialEventDto));
+            return eventDto;
+
+//            return ResponseEntity.status(HttpStatus.OK).body(dtoAssembler.toModel(celestialEventDto));
         } catch (JsonPatchException | JsonProcessingException exception) {
-            throw new IncorrectCelestialEventFormatException();
+            return null;
+//            throw new IncorrectCelestialEventFormatException();
         }
     }
 
@@ -214,7 +219,7 @@ public class CelestialEventService {
     }
 
 
-    public ResponseEntity<GetCelestialEventCommentDto> addCommentToCelestialEvent(String celestialEventUuid,
+    public GetCelestialEventCommentDto addCommentToCelestialEvent(String celestialEventUuid,
                                                                                   String userUuid,
                                                                                   CreateCelestialEventCommentDto newComment) {
         CelestialEvent celestialEvent =
@@ -237,10 +242,10 @@ public class CelestialEventService {
         GetCelestialEventCommentDto returnDto =
                 celestialEventDtoMapper.celestialEventCommentToGetDto(celestialEventComment);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
+        return returnDto;
     }
 
-    public ResponseEntity<GetSlimCelestialEventCommentDto> addReplyToCelestialEventComment(String celestialEventUuid,
+    public GetSlimCelestialEventCommentDto addReplyToCelestialEventComment(String celestialEventUuid,
                                                                                            String userUuid,
                                                                                            String parentCommentUuid,
                                                                                            CreateCelestialEventCommentDto newComment) {
@@ -268,7 +273,7 @@ public class CelestialEventService {
         GetSlimCelestialEventCommentDto returnDto =
                 celestialEventDtoMapper.celestialEventReplyToGetSlimDto(celestialEventReply);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
+        return returnDto;
     }
 }
 
