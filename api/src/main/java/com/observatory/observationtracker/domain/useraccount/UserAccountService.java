@@ -33,18 +33,22 @@ public class UserAccountService {
         this.userAccountDtoMapper = userAccountDtoMapper;
     }
 
+    @Cacheable(value = "singleUser", key = "#uuid")
     public GetUserAccountDto oneUserByUuid(String uuid) {
         UserAccount account = repository.findUserAccountByUuid(uuid).orElseThrow(() -> new UserNotFoundException(uuid));
         return userAccountDtoMapper.userAccountToGetDto(account);
     }
 
+    @Cacheable(value = "singleUser")
     public GetUserAccountDto createUser(UserAccount newAccount) {
+        System.out.println(newAccount);
         UserAccount userAccount = repository.save(newAccount);
         GetUserAccountDto userDto = userAccountDtoMapper.userAccountToGetDto(userAccount);
 
         return userDto;
     }
 
+    @Cacheable(value = "singleUser", key = "#uuid")
     public GetUserAccountDto patchUser(String uuid, JsonPatch patch) {
         try {
             UserAccount user =
