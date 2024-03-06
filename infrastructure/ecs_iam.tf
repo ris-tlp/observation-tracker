@@ -67,7 +67,8 @@ resource "aws_iam_policy" "ecs_task_policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
           "elasticache:*",
-          "mq:*"
+          "mq:*",
+          "ses:*"
         ]
         Resource = "*"
       }
