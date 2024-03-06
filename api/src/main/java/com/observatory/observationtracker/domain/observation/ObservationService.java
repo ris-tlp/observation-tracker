@@ -24,6 +24,9 @@ import com.observatory.observationtracker.domain.useraccount.UserAccountReposito
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
 import com.observatory.observationtracker.rabbitmq.notifications.CommentNotificationProducer;
 import com.observatory.observationtracker.rabbitmq.notifications.ReplyNotificationProducer;
+import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -76,6 +79,7 @@ public class ObservationService {
         return observationsDto;
     }
 
+    @Cacheable(value = "singleObservation", key = "#uuid")
     public GetObservationDto getObservationByUuid(String observationUuid) {
         Observation observation =
                 observationRepository.findByNullParentComment(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
@@ -86,6 +90,8 @@ public class ObservationService {
     }
 
     // @TODO: May need to be changed according to react frontend request test, check DTOs out
+    @Cacheable(value = "singleObservation")
+
     public GetObservationDto createObservation(CreateObservationDto newObservation,
                                                String userUuid,
                                                String celestialEventUuid,
@@ -125,10 +131,12 @@ public class ObservationService {
     }
 
     // Used to patch specific fields of a PATCH request
-    public GetObservationDto patchObservation(String uuid, JsonPatch patch) {
+    @Cacheable(value = "singleObservation", key = "#observationUuid")
+
+    public GetObservationDto patchObservation(String observationUuid, JsonPatch patch) {
         try {
             Observation observation =
-                    observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
+                    observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
             Observation updatedObservation = applyPatchToObservation(patch, observation);
 
 
@@ -148,6 +156,7 @@ public class ObservationService {
     }
 
 
+    @CacheEvict(value = "singleObservation", key = "#observationUuid")
     public ResponseEntity<Void> deleteObservation(String observationUuid) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
@@ -167,6 +176,7 @@ public class ObservationService {
         return observationsDto;
     }
 
+    @Cacheable(value = "singleObservationComment")
     public GetObservationCommentDto addCommentToObservation(String observationUuid,
                                                             String userUuid,
                                                             CreateObservationCommentDto newComment) {
@@ -193,6 +203,7 @@ public class ObservationService {
         return commentDto;
     }
 
+    @Cacheable(value = "singleObservationComment")
     public GetObservationCommentDto addReplyToObservation(String observationUuid, String userUuid,
                                                           String parentCommentUuid,
                                                           CreateObservationCommentDto newReply) {
