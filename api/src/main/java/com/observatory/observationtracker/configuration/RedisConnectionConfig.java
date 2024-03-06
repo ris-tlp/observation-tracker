@@ -4,8 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @Import(AwsConfig.class)
@@ -21,9 +25,9 @@ public class RedisConnectionConfig {
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
-                elasticacheEndpoint, Integer.parseInt(elasticachePort)
+        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(
+                Collections.singletonList(String.format("%s:%s", elasticacheEndpoint, elasticachePort))
         );
-        return new LettuceConnectionFactory(redisStandaloneConfiguration);
+        return new LettuceConnectionFactory(clusterConfiguration);
     }
 }
