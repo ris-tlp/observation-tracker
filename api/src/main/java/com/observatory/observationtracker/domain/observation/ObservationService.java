@@ -79,7 +79,7 @@ public class ObservationService {
         return observationsDto;
     }
 
-    @Cacheable(value = "singleObservation", key = "#uuid")
+    @Cacheable(value = "singleObservation", key = "#observationUuid")
     public GetObservationDto getObservationByUuid(String observationUuid) {
         Observation observation =
                 observationRepository.findByNullParentComment(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
