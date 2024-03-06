@@ -11,8 +11,6 @@ import com.observatory.observationtracker.configuration.JacksonConfig;
 import com.observatory.observationtracker.domain.celestialevent.exceptions.CelestialEventUuidNotFoundException;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEvent;
 import com.observatory.observationtracker.domain.celestialevent.repositories.CelestialEventRepository;
-import com.observatory.observationtracker.domain.observation.assemblers.ObservationDtoAssembler;
-import com.observatory.observationtracker.domain.observation.assemblers.ObservationSlimDtoAssembler;
 import com.observatory.observationtracker.domain.observation.dto.*;
 import com.observatory.observationtracker.domain.observation.exceptions.IncorrectObservationFormatException;
 import com.observatory.observationtracker.domain.observation.exceptions.ObservationNotFoundException;
@@ -28,11 +26,6 @@ import com.observatory.observationtracker.rabbitmq.notifications.CommentNotifica
 import com.observatory.observationtracker.rabbitmq.notifications.ReplyNotificationProducer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,18 +33,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @Service
 public class ObservationService {
     private final ObservationRepository observationRepository;
     private final UserAccountRepository userRepository;
     private final CelestialEventRepository celestialEventRepository;
-    private final ObservationDtoAssembler observationDtoAssembler;
-    private final ObservationSlimDtoAssembler observationSlimDtoAssembler;
     private final ObservationCommentRepository commentRepository;
-    private final PagedResourcesAssembler<GetSlimObservationDto> pagedResourcesAssembler;
 
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
@@ -62,16 +49,14 @@ public class ObservationService {
 
 
     public ObservationService(ObservationRepository observationRepository, UserAccountRepository userRepository,
-                              ObservationDtoAssembler observationDtoAssembler, S3Service s3Service,
-                              ObservationSlimDtoAssembler observationSlimDtoAssembler,
+                              S3Service s3Service,
                               CelestialEventRepository celestialEventRepository,
                               ObservationCommentRepository commentRepository,
                               JacksonConfig jacksonConfig,
                               ObservationDtoMapper dtoMapper,
                               CommentNotificationProducer commentNotificationProducer,
-                              ReplyNotificationProducer replyNotificationProducer,
-                              PagedResourcesAssembler<GetSlimObservationDto> pagedResourcesAssembler) {
-        this.observationDtoAssembler = observationDtoAssembler;
+                              ReplyNotificationProducer replyNotificationProducer
+    ) {
         this.userRepository = userRepository;
         this.observationRepository = observationRepository;
         this.s3Service = s3Service;
@@ -79,42 +64,32 @@ public class ObservationService {
         this.jacksonConfig = jacksonConfig;
         this.dtoMapper = dtoMapper;
         this.commentRepository = commentRepository;
-        this.observationSlimDtoAssembler = observationSlimDtoAssembler;
         this.commentNotificationProducer = commentNotificationProducer;
         this.replyNotificationProducer = replyNotificationProducer;
-        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    public ResponseEntity<PagedModel<EntityModel<GetSlimObservationDto>>> getAllObservations(String userUuid,
-                                                                                             Pageable pageable) {
-        Page<GetSlimObservationDto> observations =
+    public Page<GetSlimObservationDto> getAllObservations(String userUuid,
+                                                          Pageable pageable) {
+        Page<GetSlimObservationDto> observationsDto =
                 observationRepository.findByOwnerUuid(userUuid, pageable).map(dtoMapper::observationToGetSlimDto);
 
-        PagedModel<EntityModel<GetSlimObservationDto>> pagedObservations =
-                pagedResourcesAssembler.toModel(observations, observationSlimDtoAssembler);
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                pagedObservations
-        );
+        return observationsDto;
     }
 
-    public ResponseEntity<EntityModel<GetObservationDto>> getObservationByUuid(String observationUuid) {
+    public GetObservationDto getObservationByUuid(String observationUuid) {
         Observation observation =
                 observationRepository.findByNullParentComment(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
 
         GetObservationDto observationDto = dtoMapper.observationToGetDto(observation);
-        Link rootLink =
-                linkTo(ObservationController.class, observation.getOwner().getUuid()).withRel("all").withType("GET, " +
-                        "POST");
 
-        return ResponseEntity.status(HttpStatus.OK).body(observationDtoAssembler.toModel(observationDto).add(rootLink));
+        return observationDto;
     }
 
     // @TODO: May need to be changed according to react frontend request test, check DTOs out
-    public ResponseEntity<EntityModel<GetObservationDto>> createObservation(CreateObservationDto newObservation,
-                                                                            String userUuid,
-                                                                            String celestialEventUuid,
-                                                                            List<MultipartFile> images) {
+    public GetObservationDto createObservation(CreateObservationDto newObservation,
+                                               String userUuid,
+                                               String celestialEventUuid,
+                                               List<MultipartFile> images) {
         try {
             UserAccount user =
                     userRepository.findUserAccountByUuid(userUuid).orElseThrow(() -> new UserNotFoundException(userUuid));
@@ -143,19 +118,14 @@ public class ObservationService {
             Observation createdObservationEntity = observationRepository.save(newObservationEntity);
             GetObservationDto observationDto = dtoMapper.observationToGetDto(createdObservationEntity);
 
-            Link rootLink =
-                    linkTo(ObservationController.class, newObservationEntity.getOwner().getUuid()).withRel("all").withType(
-                            "GET, POST");
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    observationDtoAssembler.toModel(observationDto).add(rootLink));
+            return observationDto;
         } catch (RuntimeException e) {
             throw new IncorrectObservationFormatException();
         }
     }
 
     // Used to patch specific fields of a PATCH request
-    public ResponseEntity<EntityModel<GetObservationDto>> patchObservation(String uuid, JsonPatch patch) {
+    public GetObservationDto patchObservation(String uuid, JsonPatch patch) {
         try {
             Observation observation =
                     observationRepository.findObservationByUuid(uuid).orElseThrow(() -> new ObservationNotFoundException(uuid));
@@ -165,9 +135,7 @@ public class ObservationService {
             observationRepository.save(updatedObservation);
             GetObservationDto observationDto = dtoMapper.observationToGetDto(updatedObservation);
 
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                    observationDtoAssembler.toModel(observationDto)
-            );
+            return observationDto;
         } catch (JsonPatchException | JsonProcessingException exception) {
             throw new IncorrectObservationFormatException();
         }
@@ -192,19 +160,16 @@ public class ObservationService {
         }
     }
 
-    public ResponseEntity<PagedModel<EntityModel<GetSlimObservationDto>>> getPublishedCourses(Pageable pageable) {
-        Page<GetSlimObservationDto> observations =
+    public Page<GetSlimObservationDto> getPublishedCourses(Pageable pageable) {
+        Page<GetSlimObservationDto> observationsDto =
                 observationRepository.findObservationsByIsPublishedIsTrue(pageable).map(dtoMapper::observationToGetSlimDto);
 
-        PagedModel<EntityModel<GetSlimObservationDto>> pagedObservations =
-                pagedResourcesAssembler.toModel(observations, observationSlimDtoAssembler);
-
-        return ResponseEntity.status(HttpStatus.OK).body(pagedObservations);
+        return observationsDto;
     }
 
-    public ResponseEntity<GetObservationCommentDto> addCommentToObservation(String observationUuid,
-                                                                            String userUuid,
-                                                                            CreateObservationCommentDto newComment) {
+    public GetObservationCommentDto addCommentToObservation(String observationUuid,
+                                                            String userUuid,
+                                                            CreateObservationCommentDto newComment) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
         UserAccount author =
@@ -219,17 +184,18 @@ public class ObservationService {
         commentRepository.save(comment);
         observationRepository.save(observation);
 
-        GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(comment);
+        GetObservationCommentDto commentDto = dtoMapper.observationCommentToGetDto(comment);
 
         // Add new notification to queue
         commentNotificationProducer.addObservationCommentMessage(
-                dtoMapper.observationToGetDto(observation).getOwner(), returnDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
+                dtoMapper.observationToGetDto(observation).getOwner(), commentDto);
+
+        return commentDto;
     }
 
-    public ResponseEntity<GetObservationCommentDto> addReplyToObservation(String observationUuid, String userUuid,
-                                                                          String parentCommentUuid,
-                                                                          CreateObservationCommentDto newReply) {
+    public GetObservationCommentDto addReplyToObservation(String observationUuid, String userUuid,
+                                                          String parentCommentUuid,
+                                                          CreateObservationCommentDto newReply) {
         Observation observation =
                 observationRepository.findObservationByUuid(observationUuid).orElseThrow(() -> new ObservationNotFoundException(observationUuid));
         UserAccount author =
@@ -248,14 +214,15 @@ public class ObservationService {
         commentRepository.save(reply);
         commentRepository.save(parentComment);
 
-        GetObservationCommentDto returnDto = dtoMapper.observationCommentToGetDto(reply);
+        GetObservationCommentDto commentDto = dtoMapper.observationCommentToGetDto(reply);
 
+        // Add new notification to queue
         replyNotificationProducer.addReplyMessage(
                 dtoMapper.observationCommentToGetDto(parentComment).getAuthor(),
                 dtoMapper.observationCommentToGetDto(reply).getAuthor(),
                 dtoMapper.observationCommentToGetDto(parentComment)
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(returnDto);
+        return commentDto;
     }
 }
