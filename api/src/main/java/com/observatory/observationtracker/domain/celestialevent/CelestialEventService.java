@@ -8,8 +8,6 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationtracker.aws.S3Service;
 import com.observatory.observationtracker.aws.exceptions.InvalidImageException;
 import com.observatory.observationtracker.configuration.JacksonConfig;
-import com.observatory.observationtracker.domain.celestialevent.assemblers.CelestialEventDtoAssembler;
-import com.observatory.observationtracker.domain.celestialevent.assemblers.CelestialEventSlimDtoAssembler;
 import com.observatory.observationtracker.domain.celestialevent.dto.*;
 import com.observatory.observationtracker.domain.celestialevent.exceptions.CelestialEventCommentNotFoundException;
 import com.observatory.observationtracker.domain.celestialevent.exceptions.CelestialEventStatusNotFoundException;
@@ -24,14 +22,10 @@ import com.observatory.observationtracker.domain.celestialevent.repositories.Cel
 import com.observatory.observationtracker.domain.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationtracker.domain.useraccount.UserAccount;
 import com.observatory.observationtracker.domain.useraccount.UserAccountRepository;
-import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -41,11 +35,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-
-// @TODO all fetch showign replies
+// @TODO all fetch showing replies
 @Service
 public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
@@ -115,6 +106,7 @@ public class CelestialEventService {
         return null;
     }
 
+    @Cacheable(value = "singleCelestialEvent", key = "#celestialEventUuid")
     public GetCelestialEventDto getCelestialEventByUuid(String celestialEventUuid) {
         CelestialEvent event =
                 celestialEventRepository.findByNullParentComment(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
@@ -124,6 +116,7 @@ public class CelestialEventService {
 
     }
 
+    @Cacheable(value = "singleCelestialEvent")
     public GetCelestialEventDto createCelestialEvent(CreateCelestialEventDto celestialEvent,
                                                      List<MultipartFile> images) {
         try {
@@ -151,6 +144,7 @@ public class CelestialEventService {
 
     }
 
+    @CacheEvict(value = "singleCelestialEvent", key = "#celestialEventUuid")
     public ResponseEntity<Void> deleteCelestialEvent(String celestialEventUuid) {
         CelestialEvent celestialEvent =
                 celestialEventRepository.findCelestialEventByUuid(celestialEventUuid).orElseThrow(() -> new CelestialEventUuidNotFoundException(celestialEventUuid));
@@ -166,6 +160,7 @@ public class CelestialEventService {
 
     }
 
+    @CacheEvict(value = "singleCelestialEvent", key = "#celestialEventUuid")
     public GetCelestialEventDto updateCelestialEvent(String celestialEventUuid,
                                                      JsonPatch patch) {
         try {
@@ -190,6 +185,7 @@ public class CelestialEventService {
     }
 
 
+    @Cacheable(value = "celestialEventComment")
     public GetCelestialEventCommentDto addCommentToCelestialEvent(String celestialEventUuid,
                                                                   String userUuid,
                                                                   CreateCelestialEventCommentDto newComment) {
@@ -216,6 +212,7 @@ public class CelestialEventService {
         return returnDto;
     }
 
+    @Cacheable(value = "celestialEventComment")
     public GetSlimCelestialEventCommentDto addReplyToCelestialEventComment(String celestialEventUuid,
                                                                            String userUuid,
                                                                            String parentCommentUuid,
