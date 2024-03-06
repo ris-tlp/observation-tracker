@@ -7,10 +7,15 @@ import java.util.List;
 
 public class GetObservationCommentDto {
     private String content;
+
     private String uuid;
+
     private GetUserAccountDto author;
+
     private Timestamp createdTimestamp;
+
     private Timestamp updatedTimestamp;
+    
     private List<GetObservationCommentDto> replies;
 
     public String getContent() {

@@ -8,9 +8,13 @@ import java.sql.Timestamp;
 // Primarily used to return a reply once created
 public class GetSlimCelestialEventCommentDto {
     private String content;
+
     private GetUserAccountDto author;
+
     private Timestamp createdTimestamp;
+
     private Timestamp updatedTimestamp;
+
     private String uuid;
 
     public String getContent() {

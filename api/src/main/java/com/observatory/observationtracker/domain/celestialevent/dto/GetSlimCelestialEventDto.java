@@ -14,27 +14,23 @@ import java.util.List;
 
 public class GetSlimCelestialEventDto {
     private String uuid;
+
     private String celestialEventName;
+
     private String celestialEventDescription;
+
     private List<GetCelestialEventImageDto> images;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime celestialEventDateTime;
-    private Timestamp createdTimestamp;
-    private Timestamp updatedTimestamp;
-    private CelestialEventStatus eventStatus;
 
-//    public GetSlimCelestialEventDto(CelestialEvent event) {
-//        this.uuid = event.getUuid();
-//        this.celestialEventName = event.getCelestialEventName();
-//        this.celestialEventDescription = event.getCelestialEventDescription();
-//        this.celestialEventDateTime = event.getCelestialEventDateTime();
-//        this.createdTimestamp = event.getCreatedTimestamp();
-//        this.updatedTimestamp = event.getUpdatedTimestamp();
-//        this.eventStatus = event.getEventStatus();
-//
-//    }
+    private Timestamp createdTimestamp;
+
+    private Timestamp updatedTimestamp;
+
+    private CelestialEventStatus eventStatus;
 
     public String getUuid() {
         return uuid;

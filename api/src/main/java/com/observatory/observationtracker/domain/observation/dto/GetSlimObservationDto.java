@@ -1,6 +1,10 @@
 package com.observatory.observationtracker.domain.observation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.observatory.observationtracker.domain.celestialevent.dto.GetSlimCelestialEventDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 
@@ -8,8 +12,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
-// @TODO: Fix author showing as null
 public class GetSlimObservationDto {
     private String uuid;
 
@@ -20,6 +22,8 @@ public class GetSlimObservationDto {
     private List<GetObservationImageDto> images;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime observationDateTime;
 
     private Timestamp createdTimestamp;

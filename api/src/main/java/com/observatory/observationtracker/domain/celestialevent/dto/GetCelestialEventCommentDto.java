@@ -7,10 +7,15 @@ import java.util.List;
 
 public class GetCelestialEventCommentDto {
     private String content;
+
     private String uuid;
+
     private GetUserAccountDto author;
+
     private Timestamp createdTimestamp;
+
     private Timestamp updatedTimestamp;
+
     private List<GetCelestialEventCommentDto> replies;
 
 
