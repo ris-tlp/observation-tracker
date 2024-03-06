@@ -1,6 +1,10 @@
 package com.observatory.observationtracker.domain.celestialevent.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEvent;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEventStatus;
 
@@ -14,6 +18,8 @@ public class GetSlimCelestialEventDto {
     private String celestialEventDescription;
     private List<GetCelestialEventImageDto> images;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime celestialEventDateTime;
     private Timestamp createdTimestamp;
     private Timestamp updatedTimestamp;
