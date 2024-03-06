@@ -7,11 +7,13 @@ import com.observatory.observationtracker.domain.celestialevent.dto.*;
 import com.observatory.observationtracker.domain.celestialevent.exceptions.IncorrectCelestialEventFormatException;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEventStatus;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 // @TODO: make superclass entity and everything
 // @TODO: slim celestial event for batch searches
@@ -46,7 +49,17 @@ public class CelestialEventController {
 
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<GetSlimCelestialEventDto>>> getCelestialEvents(Pageable pageable) {
-        return celestialEventService.getAllCelestialEvents(pageable);
+        Page<GetSlimCelestialEventDto> pagedDtos = celestialEventService.getAllCelestialEvents(pageable);
+        PagedModel<EntityModel<GetSlimCelestialEventDto>> pagedCelestialEvent =
+                pagedResourcesAssembler.toModel(pagedDtos, slimDtoAssembler);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                pagedCelestialEvent
+                        .add(
+                                linkTo(methodOn(CelestialEventController.class).getCelestialEventsByStatus(null,
+                                        null)).withRel("filter-by-status").withType("GET")
+                        )
+        );
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -63,7 +76,15 @@ public class CelestialEventController {
             Pageable pageable,
             @RequestParam CelestialEventStatus status
     ) {
-        return celestialEventService.getCelestialEventsByStatus(status, pageable);
+        Page<GetSlimCelestialEventDto> eventDtos = celestialEventService.getCelestialEventsByStatus(status, pageable);
+        PagedModel<EntityModel<GetSlimCelestialEventDto>> pagedEvents = pagedResourcesAssembler.toModel(eventDtos,
+                slimDtoAssembler);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        pagedEvents
+                                .add(linkTo(CelestialEventController.class).withRel("all").withType("GET, POST"))
+                );
     }
 
     @GetMapping("/{celestialEventUuid}")
@@ -114,8 +135,9 @@ public class CelestialEventController {
                                                                                            @RequestBody CreateCelestialEventCommentDto newComment,
                                                                                            @RequestParam String userUuid,
                                                                                            @RequestParam String parentCommentUuid) {
-        GetSlimCelestialEventCommentDto commentDto = celestialEventService.addReplyToCelestialEventComment(celestialEventUuid, userUuid, parentCommentUuid,
-                newComment);
+        GetSlimCelestialEventCommentDto commentDto =
+                celestialEventService.addReplyToCelestialEventComment(celestialEventUuid, userUuid, parentCommentUuid,
+                        newComment);
 
         return ResponseEntity.status(HttpStatus.OK).body(commentDto);
     }
