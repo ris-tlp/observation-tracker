@@ -65,7 +65,9 @@ resource "aws_iam_policy" "ecs_task_policy" {
           "cloudwatch:*",
           "ssm:GetParameter",
           "ssm:GetParameters",
-          "ssm:GetParametersByPath"
+          "ssm:GetParametersByPath",
+          "elasticache:*",
+          "mq:*"
         ]
         Resource = "*"
       }

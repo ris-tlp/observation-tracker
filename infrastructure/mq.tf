@@ -16,6 +16,7 @@ resource "aws_mq_broker" "rabbitmq_broker" {
   host_instance_type  = "mq.t3.micro"
   publicly_accessible = true
   deployment_mode     = "SINGLE_INSTANCE"
+  logs { general = true }
 
   user {
     password       = random_password.rabbitmq_password.result
