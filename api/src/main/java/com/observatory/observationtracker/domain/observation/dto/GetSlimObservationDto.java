@@ -26,7 +26,7 @@ public class GetSlimObservationDto {
 
     private Timestamp updatedTimestamp;
 
-    private GetUserAccountDto author;
+    private GetUserAccountDto owner;
 
     private GetSlimCelestialEventDto celestialEvent;
 
@@ -86,12 +86,12 @@ public class GetSlimObservationDto {
         this.updatedTimestamp = updatedTimestamp;
     }
 
-    public GetUserAccountDto getAuthor() {
-        return author;
+    public GetUserAccountDto getOwner() {
+        return owner;
     }
 
-    public void setAuthor(GetUserAccountDto author) {
-        this.author = author;
+    public void setOwner(GetUserAccountDto owner) {
+        this.owner = owner;
     }
 
     public GetSlimCelestialEventDto getCelestialEvent() {

@@ -13,7 +13,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import java.time.Duration;
 
 @Configuration
-
 public class RedisConfig {
     private final String elasticacheEndpoint;
     private final String elasticachePort;
