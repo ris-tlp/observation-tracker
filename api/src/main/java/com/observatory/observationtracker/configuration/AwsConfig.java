@@ -42,6 +42,13 @@ public class AwsConfig {
     @Value("${rabbitmq.endpoint}")
     private String rabbitMqEndpoint;
 
+    // ElastiCache Parameters
+    @Value("${elasticache.endpoint}")
+    private String elasticacheEndpoint;
+
+    @Value("${elasticache.port}")
+    private String elasticachePort;
+
     public String getRegion() {
         return region;
     }
@@ -84,5 +91,13 @@ public class AwsConfig {
 
     public String getRabbitMqEndpoint() {
         return rabbitMqEndpoint;
+    }
+
+    public String getElasticacheEndpoint() {
+        return elasticacheEndpoint;
+    }
+
+    public String getElasticachePort() {
+        return elasticachePort;
     }
 }

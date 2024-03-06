@@ -1,5 +1,6 @@
 package com.observatory.observationtracker.configuration;
 
+import com.observatory.observationtracker.configuration.AwsConfig;
 import com.rabbitmq.client.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
