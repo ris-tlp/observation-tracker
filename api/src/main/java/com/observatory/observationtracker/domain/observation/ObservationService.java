@@ -126,6 +126,7 @@ public class ObservationService {
 
             return observationDto;
         } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
             throw new IncorrectObservationFormatException();
         }
     }

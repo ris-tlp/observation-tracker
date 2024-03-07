@@ -15,3 +15,6 @@ set-actions-secrets:
 
 down-cluster-service:
 	aws ecs update-service --desired-count 0 --cluster "observation_tracker_api_cluster" --service "observation_tracker_api_service"
+
+localstack-permission:
+	chmod +x infrastructure/init_localstack_infra.sh

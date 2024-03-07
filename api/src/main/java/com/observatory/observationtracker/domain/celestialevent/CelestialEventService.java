@@ -124,6 +124,7 @@ public class CelestialEventService {
                 try {
                     return s3Service.uploadImage(image);
                 } catch (InvalidImageException e) {
+                    System.out.println(e.getMessage());
                     return null;
                 }
             }).toList();

@@ -57,6 +57,22 @@ services:
     networks:
       - network
 
+  localstack:
+    image: localstack/localstack
+    user: root
+    environment:
+      - SERVICES=s3,ses
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - 4566:4566
+    env_file:
+      - .env
+    volumes:
+      - ./infrastructure/init_localstack_infra.sh:/etc/localstack/init/ready.d/init_localstack_infra.sh
+      - ./api/tmp/localstack:/tmp/localstack
+    networks:
+      - network
+
 networks:
   network:
     driver: bridge

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
+import java.net.URI;
+
 @Service
 public class SesService {
     private AwsConfig awsConfig;

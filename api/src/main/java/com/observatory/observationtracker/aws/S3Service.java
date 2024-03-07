@@ -1,5 +1,6 @@
 package com.observatory.observationtracker.aws;
 
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 import java.util.Objects;
 
@@ -20,8 +22,8 @@ import java.util.Objects;
 public class S3Service {
     private final AwsConfig awsConfig;
 
-    private final String region;
-    private final String imageBucketName;
+    private String region;
+    private String imageBucketName;
 
     public S3Service(AwsConfig awsConfig) {
         this.awsConfig = awsConfig;
@@ -30,10 +32,21 @@ public class S3Service {
     }
 
     public String uploadImage(MultipartFile image) throws InvalidImageException {
-        S3Client s3Client = S3Client.builder()
-                .region(Region.of(this.region))
-                .build();
+//        URI uri = URI.create(
+//                String.format("https://s3.%s.amazonaws.com/", region));
+        URI uri = URI.create(
+                "http://localhost:4566/"
+        );
 
+        region = "us-east-1";
+
+        imageBucketName = "bucketname";
+
+        S3Client s3Client = S3Client.builder()
+                .region(Region.of(region))
+                .endpointOverride(uri)
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
 
         try {
             File convertedImage = convertMultipartFileToFile(image);
@@ -61,11 +74,16 @@ public class S3Service {
     public void deleteImage(String imageUrl) {
         String key = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
 
-        S3Client s3client = S3Client.builder()
-                .region(Region.of(this.region))
+        URI uri = URI.create(
+                String.format("https://s3.%s.amazonaws.com/", region));
+
+        S3Client s3Client = S3Client.builder()
+                .region(Region.of(region))
+                .endpointOverride(uri)
+                .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
 
-        s3client.deleteObject(DeleteObjectRequest.builder()
+        s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(imageBucketName)
                 .key(key)
                 .build());

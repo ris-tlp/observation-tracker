@@ -11,6 +11,12 @@ resource "aws_ssm_parameter" "s3_secret" {
   value = aws_s3_bucket.observation-tracker-bucket.id
 }
 
+resource "aws_ssm_parameter" "s3_url" {
+  name  = "/config/observation-tracker/s3.bucket.uri"
+  type  = "SecureString"
+  value = "https://${aws_s3_bucket.observation-tracker-bucket.id}.s3.${aws_s3_bucket.observation-tracker-bucket.region}.amazonaws.com"
+}
+
 # RDS
 resource "aws_ssm_parameter" "database_username" {
   name  = "/config/observation-tracker/rds.username"
