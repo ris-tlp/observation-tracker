@@ -1,52 +1,49 @@
 package com.observatory.observationtracker.aws;
 
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
+import com.observatory.observationtracker.configuration.services.ServicesConfig;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import com.observatory.observationtracker.aws.exceptions.InvalidImageException;
-import com.observatory.observationtracker.configuration.AwsConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 import java.util.Objects;
 
 // @TODO Better error handling
 @Service
 public class S3Service {
-    private final AwsConfig awsConfig;
+    private final ServicesConfig servicesConfig;
+    private final S3Client s3Client;
 
-    private String region;
-    private String imageBucketName;
+    private final String region;
+    private final String imageBucketName;
 
-    public S3Service(AwsConfig awsConfig) {
-        this.awsConfig = awsConfig;
-        this.imageBucketName = awsConfig.getImageBucketName();
-        this.region = awsConfig.getRegion();
+    public S3Service(ServicesConfig servicesConfig) {
+        this.servicesConfig = servicesConfig;
+        this.imageBucketName = servicesConfig.getImageBucketName();
+        this.region = servicesConfig.getRegion();
+        this.s3Client = servicesConfig.s3Client();
     }
 
     public String uploadImage(MultipartFile image) throws InvalidImageException {
 //        URI uri = URI.create(
-//                String.format("https://s3.%s.amazonaws.com/", region));
-        URI uri = URI.create(
-                "http://localhost:4566/"
-        );
+//                "http://localhost:4566/"
+//        );
+//
+//        region = "us-east-1";
+//
+//        imageBucketName = "bucketname";
 
-        region = "us-east-1";
-
-        imageBucketName = "bucketname";
-
-        S3Client s3Client = S3Client.builder()
-                .region(Region.of(region))
-                .endpointOverride(uri)
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
+//        S3Client s3Client = S3Client.builder()
+//                .region(Region.of(region))
+//                .endpointOverride(uri)
+//                .credentialsProvider(DefaultCredentialsProvider.create())
+//                .build();
 
         try {
             File convertedImage = convertMultipartFileToFile(image);
@@ -73,15 +70,6 @@ public class S3Service {
     // @TODO Better error handling
     public void deleteImage(String imageUrl) {
         String key = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-
-        URI uri = URI.create(
-                String.format("https://s3.%s.amazonaws.com/", region));
-
-        S3Client s3Client = S3Client.builder()
-                .region(Region.of(region))
-                .endpointOverride(uri)
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
 
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(imageBucketName)

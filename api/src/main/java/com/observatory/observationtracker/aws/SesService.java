@@ -1,23 +1,23 @@
 package com.observatory.observationtracker.aws;
 
-import com.observatory.observationtracker.configuration.AwsConfig;
+import com.observatory.observationtracker.configuration.services.ServicesConfig;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
-import java.net.URI;
-
 @Service
 public class SesService {
-    private AwsConfig awsConfig;
+    private final ServicesConfig servicesConfig;
     private final String notificationSenderEmail;
+    private final SesClient client;
 
-    public SesService(AwsConfig awsConfig) {
-        this.notificationSenderEmail = awsConfig.getNotificationSenderEmail();
+    public SesService(ServicesConfig servicesConfig) {
+        this.servicesConfig = servicesConfig;
+        this.client = servicesConfig.sesClient();
+        this.notificationSenderEmail = servicesConfig.getNotificationSenderEmail();
     }
 
     public void sendEmail(String subject, String body, String toEmail) {
-        SesClient client = SesClient.builder().build();
         toEmail = "omarkhantlp@gmail.com"; // for testing
 
         // Create email request with custom header
