@@ -7,14 +7,13 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEvent;
 import com.observatory.observationtracker.domain.celestialevent.models.CelestialEventStatus;
+import com.observatory.observationtracker.domain.common.IdentifiableDto;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class GetSlimCelestialEventDto {
-    private String uuid;
-
+public class GetSlimCelestialEventDto extends IdentifiableDto {
     private String celestialEventName;
 
     private String celestialEventDescription;
@@ -26,19 +25,7 @@ public class GetSlimCelestialEventDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime celestialEventDateTime;
 
-    private Timestamp createdTimestamp;
-
-    private Timestamp updatedTimestamp;
-
     private CelestialEventStatus eventStatus;
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 
     public String getCelestialEventName() {
         return celestialEventName;
@@ -72,22 +59,6 @@ public class GetSlimCelestialEventDto {
         this.celestialEventDateTime = celestialEventDateTime;
     }
 
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
-
     public CelestialEventStatus getEventStatus() {
         return eventStatus;
     }
@@ -96,17 +67,4 @@ public class GetSlimCelestialEventDto {
         this.eventStatus = eventStatus;
     }
 
-    @Override
-    public String toString() {
-        return "GetSlimCelestialEventDto{" +
-                "uuid='" + uuid + '\'' +
-                ", celestialEventName='" + celestialEventName + '\'' +
-                ", celestialEventDescription='" + celestialEventDescription + '\'' +
-                ", images=" + images +
-                ", celestialEventDateTime=" + celestialEventDateTime +
-//                ", createdTimestamp=" + createdTimestamp +
-//                ", updatedTimestamp=" + updatedTimestamp +
-                ", eventStatus=" + eventStatus +
-                '}';
-    }
 }

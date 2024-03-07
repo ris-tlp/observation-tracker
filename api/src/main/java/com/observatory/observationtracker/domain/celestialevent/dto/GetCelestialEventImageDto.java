@@ -1,14 +1,12 @@
 package com.observatory.observationtracker.domain.celestialevent.dto;
 
+import com.observatory.observationtracker.domain.common.IdentifiableDto;
+
 import java.sql.Timestamp;
 
-public class GetCelestialEventImageDto {
+public class GetCelestialEventImageDto extends IdentifiableDto {
 
     private String url;
-
-    private Timestamp createdTimestamp;
-
-    private Timestamp updatedTimestamp;
 
     public String getUrl() {
         return url;
@@ -18,19 +16,4 @@ public class GetCelestialEventImageDto {
         this.url = url;
     }
 
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
 }

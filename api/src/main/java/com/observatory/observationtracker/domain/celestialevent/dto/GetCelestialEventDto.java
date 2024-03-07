@@ -16,8 +16,6 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
 
     private String celestialEventDescription;
 
-    private String uuid;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -26,10 +24,6 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
     private List<GetCelestialEventCommentDto> comments;
 
     private List<GetCelestialEventImageDto> images;
-
-    private Timestamp createdTimestamp;
-
-    private Timestamp updatedTimestamp;
 
     private CelestialEventStatus eventStatus;
 
@@ -47,14 +41,6 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
 
     public void setCelestialEventDescription(String celestialEventDescription) {
         this.celestialEventDescription = celestialEventDescription;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     public LocalDateTime getCelestialEventDateTime() {
@@ -79,22 +65,6 @@ public class GetCelestialEventDto extends GetSlimCelestialEventDto{
 
     public void setEventStatus(CelestialEventStatus eventStatus) {
         this.eventStatus = eventStatus;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
     }
 
     public List<GetCelestialEventCommentDto> getComments() {

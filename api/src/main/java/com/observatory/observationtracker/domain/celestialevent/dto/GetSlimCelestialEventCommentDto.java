@@ -1,21 +1,17 @@
 package com.observatory.observationtracker.domain.celestialevent.dto;
 
+import com.observatory.observationtracker.domain.common.IdentifiableDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 
 import java.sql.Timestamp;
 
 
 // Primarily used to return a reply once created
-public class GetSlimCelestialEventCommentDto {
+public class GetSlimCelestialEventCommentDto extends IdentifiableDto {
     private String content;
 
     private GetUserAccountDto author;
 
-    private Timestamp createdTimestamp;
-
-    private Timestamp updatedTimestamp;
-
-    private String uuid;
 
     public String getContent() {
         return content;
@@ -33,27 +29,4 @@ public class GetSlimCelestialEventCommentDto {
         this.author = author;
     }
 
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 }

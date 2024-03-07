@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.observatory.observationtracker.domain.celestialevent.dto.GetSlimCelestialEventDto;
+import com.observatory.observationtracker.domain.common.IdentifiableDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -13,9 +14,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//@TODO: add redis serialization support for LocalDateTime in all Dtos
-
-public class GetObservationDto {
+public class GetObservationDto extends IdentifiableDto {
     private String observationName;
 
     private String observationDescription;
@@ -24,14 +23,8 @@ public class GetObservationDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using= LocalDateTimeDeserializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime observationDateTime;
-
-    private String uuid;
-
-    private Timestamp createdTimestamp;
-
-    private Timestamp updatedTimestamp;
 
     private GetSlimCelestialEventDto celestialEvent;
 
@@ -71,30 +64,6 @@ public class GetObservationDto {
 
     public void setObservationDateTime(LocalDateTime observationDateTime) {
         this.observationDateTime = observationDateTime;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
     }
 
     public GetSlimCelestialEventDto getCelestialEvent() {

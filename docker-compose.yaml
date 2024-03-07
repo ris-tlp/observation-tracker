@@ -3,7 +3,6 @@ services:
   api:
     image: maven:3.9.6-amazoncorretto-17
     command: mvn spring-boot:run
-    restart: always
     working_dir: /api
     container_name: api
     volumes:

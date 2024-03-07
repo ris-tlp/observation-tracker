@@ -6,15 +6,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.observatory.observationtracker.domain.celestialevent.dto.GetSlimCelestialEventDto;
+import com.observatory.observationtracker.domain.common.IdentifiableDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class GetSlimObservationDto {
-    private String uuid;
-
+public class GetSlimObservationDto extends IdentifiableDto {
     private String observationName;
 
     private String observationDescription;
@@ -26,21 +25,9 @@ public class GetSlimObservationDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime observationDateTime;
 
-    private Timestamp createdTimestamp;
-
-    private Timestamp updatedTimestamp;
-
     private GetUserAccountDto owner;
 
     private GetSlimCelestialEventDto celestialEvent;
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 
     public String getObservationName() {
         return observationName;
@@ -72,22 +59,6 @@ public class GetSlimObservationDto {
 
     public void setObservationDateTime(LocalDateTime observationDateTime) {
         this.observationDateTime = observationDateTime;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    public Timestamp getUpdatedTimestamp() {
-        return updatedTimestamp;
-    }
-
-    public void setUpdatedTimestamp(Timestamp updatedTimestamp) {
-        this.updatedTimestamp = updatedTimestamp;
     }
 
     public GetUserAccountDto getOwner() {
