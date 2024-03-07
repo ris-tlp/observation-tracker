@@ -140,6 +140,7 @@ public class CelestialEventService {
             return createdEvent;
 
         } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
             throw new IncorrectCelestialEventFormatException();
         }
 

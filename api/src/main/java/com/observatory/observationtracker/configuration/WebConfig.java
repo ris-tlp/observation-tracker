@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Automatically convert the CelestialEventStatus enum to Strings
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Override
