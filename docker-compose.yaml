@@ -1,13 +1,14 @@
 services:
 
   api:
-    build:
-      context: api/
-      dockerfile: Dockerfile
+    image: maven:3.9.6-amazoncorretto-17
+    command: mvn spring-boot:run
+    restart: always
     working_dir: /api
     container_name: api
     volumes:
       - ~/.aws/:/root/.aws
+      - ./api:/api
     env_file:
       - .env
     ports:
@@ -16,6 +17,8 @@ services:
       rabbitmq:
         condition: service_started
       db:
+        condition: service_started
+      redis:
         condition: service_started
     networks:
       - network
@@ -37,7 +40,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - ./api/database:/var/lib/postgresql/data
+      - ./api/tmp/database:/var/lib/postgresql/data
     ports:
       - 5432:5432
     networks:
@@ -47,7 +50,7 @@ services:
     image: redis/redis-stack
     container_name: redis
     volumes:
-      - ./api/redis:/var/lib/redis/data
+      - ./api/tmp/redis:/var/lib/redis/data
     ports:
       - 6379:6379
       - 8001:8001
