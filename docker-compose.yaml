@@ -20,6 +20,8 @@ services:
         condition: service_started
       redis:
         condition: service_started
+      localstack:
+        condition: service_started
     networks:
       - network
 
@@ -59,6 +61,7 @@ services:
 
   localstack:
     image: localstack/localstack
+    container_name: localstack
     user: root
     environment:
       - SERVICES=s3,ses
@@ -69,7 +72,6 @@ services:
       - .env
     volumes:
       - ./infrastructure/init_localstack_infra.sh:/etc/localstack/init/ready.d/init_localstack_infra.sh
-      - ./api/tmp/localstack:/tmp/localstack
     networks:
       - network
 
