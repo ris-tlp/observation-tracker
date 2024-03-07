@@ -24,7 +24,7 @@ import com.observatory.observationtracker.domain.useraccount.UserAccountReposito
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
 import com.observatory.observationtracker.rabbitmq.notifications.CommentNotificationProducer;
 import com.observatory.observationtracker.rabbitmq.notifications.ReplyNotificationProducer;
-import org.hibernate.annotations.Cache;
+import org.slf4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -43,6 +43,7 @@ public class ObservationService {
     private final CelestialEventRepository celestialEventRepository;
     private final ObservationCommentRepository commentRepository;
 
+    private final Logger logger;
     private final S3Service s3Service;
     private final JacksonConfig jacksonConfig;
     private final ObservationDtoMapper dtoMapper;
@@ -55,7 +56,7 @@ public class ObservationService {
                               S3Service s3Service,
                               CelestialEventRepository celestialEventRepository,
                               ObservationCommentRepository commentRepository,
-                              JacksonConfig jacksonConfig,
+                              Logger logger, JacksonConfig jacksonConfig,
                               ObservationDtoMapper dtoMapper,
                               CommentNotificationProducer commentNotificationProducer,
                               ReplyNotificationProducer replyNotificationProducer
@@ -64,6 +65,7 @@ public class ObservationService {
         this.observationRepository = observationRepository;
         this.s3Service = s3Service;
         this.celestialEventRepository = celestialEventRepository;
+        this.logger = logger;
         this.jacksonConfig = jacksonConfig;
         this.dtoMapper = dtoMapper;
         this.commentRepository = commentRepository;
@@ -89,7 +91,6 @@ public class ObservationService {
         return observationDto;
     }
 
-    // @TODO: May need to be changed according to react frontend request test, check DTOs out
     @Cacheable(value = "singleObservation")
 
     public GetObservationDto createObservation(CreateObservationDto newObservation,
@@ -108,7 +109,8 @@ public class ObservationService {
             List<String> imageUrls = images.stream().map(image -> {
                 try {
                     return s3Service.uploadImage(image);
-                } catch (InvalidImageException e) {
+                } catch (InvalidImageException exception) {
+                    logger.warn(exception.getMessage());
                     return null;
                 }
             }).toList();
@@ -125,8 +127,8 @@ public class ObservationService {
             GetObservationDto observationDto = dtoMapper.observationToGetDto(createdObservationEntity);
 
             return observationDto;
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (RuntimeException exception) {
+            logger.error(exception.getMessage());
             throw new IncorrectObservationFormatException();
         }
     }
@@ -146,6 +148,7 @@ public class ObservationService {
 
             return observationDto;
         } catch (JsonPatchException | JsonProcessingException exception) {
+            logger.error(exception.getMessage());
             throw new IncorrectObservationFormatException();
         }
     }
@@ -165,7 +168,8 @@ public class ObservationService {
         try {
             observationRepository.delete(observation);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
+        } catch (RuntimeException exception) {
+            logger.error(exception.getMessage());
             throw new RuntimeException("There was an error in deletion");
         }
     }

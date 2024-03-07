@@ -22,6 +22,7 @@ import com.observatory.observationtracker.domain.celestialevent.repositories.Cel
 import com.observatory.observationtracker.domain.celestialevent.repositories.CelestialEventRepository;
 import com.observatory.observationtracker.domain.useraccount.UserAccount;
 import com.observatory.observationtracker.domain.useraccount.UserAccountRepository;
+import org.slf4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -45,8 +46,9 @@ public class CelestialEventService {
     private final CelestialEventCommentRepository celestialEventCommentRepository;
 
 
-    private final JacksonConfig jacksonConfig;
+    private final Logger logger;
     private final S3Service s3Service;
+    private final JacksonConfig jacksonConfig;
     private final CelestialEventDtoMapper celestialEventDtoMapper;
 
     public CelestialEventService(CelestialEventRepository celestialEventRepository,
@@ -54,7 +56,8 @@ public class CelestialEventService {
                                  S3Service s3Service, CelestialEventDtoMapper celestialEventDtoMapper,
                                  CelestialEventImageRepository celestialEventImageRepository,
                                  UserAccountRepository userAccountRepository,
-                                 CelestialEventCommentRepository celestialEventCommentRepository
+                                 CelestialEventCommentRepository celestialEventCommentRepository,
+                                 Logger logger
     ) {
         this.celestialEventRepository = celestialEventRepository;
         this.jacksonConfig = jacksonConfig;
@@ -63,6 +66,7 @@ public class CelestialEventService {
         this.celestialEventDtoMapper = celestialEventDtoMapper;
         this.userAccountRepository = userAccountRepository;
         this.celestialEventCommentRepository = celestialEventCommentRepository;
+        this.logger = logger;
     }
 
     public Page<GetSlimCelestialEventDto> getAllCelestialEvents(Pageable pageable) {
@@ -123,8 +127,8 @@ public class CelestialEventService {
             List<String> imageUrls = images.stream().map(image -> {
                 try {
                     return s3Service.uploadImage(image);
-                } catch (InvalidImageException e) {
-                    System.out.println(e.getMessage());
+                } catch (InvalidImageException exception) {
+                    logger.warn(exception.getMessage());
                     return null;
                 }
             }).toList();
@@ -139,8 +143,8 @@ public class CelestialEventService {
             GetCelestialEventDto createdEvent = celestialEventDtoMapper.celestialEventToGetDto(newCelestialEventEntity);
             return createdEvent;
 
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+        } catch (RuntimeException exception) {
+            logger.error(exception.getMessage());
             throw new IncorrectCelestialEventFormatException();
         }
 
@@ -155,7 +159,8 @@ public class CelestialEventService {
             celestialEventRepository.delete(celestialEvent);
             celestialEvent.getImages().forEach(celestialEventImage -> s3Service.deleteImage(celestialEventImage.getUrl()));
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (RuntimeException e) {
+        } catch (RuntimeException exception) {
+            logger.error(exception.getMessage());
             throw new RuntimeException("There was an error in deletion");
         }
 
@@ -176,6 +181,7 @@ public class CelestialEventService {
 
             return eventDto;
         } catch (JsonPatchException | JsonProcessingException exception) {
+            logger.error(exception.getMessage());
             return null;
         }
     }

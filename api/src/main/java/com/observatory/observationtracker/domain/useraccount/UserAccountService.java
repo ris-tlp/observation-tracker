@@ -8,27 +8,24 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.UserAccountDtoMapper;
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
+import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.RepresentationModelAssembler;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class UserAccountService {
+    private final Logger logger;
     private final UserAccountRepository repository;
     private final UserAccountDtoMapper userAccountDtoMapper;
 
-    public UserAccountService(UserAccountRepository repository,
+    public UserAccountService(Logger logger, UserAccountRepository repository,
                               UserAccountDtoMapper userAccountDtoMapper
     ) {
+        this.logger = logger;
         this.repository = repository;
         this.userAccountDtoMapper = userAccountDtoMapper;
     }
@@ -58,6 +55,7 @@ public class UserAccountService {
             GetUserAccountDto userPatchedDto = userAccountDtoMapper.userAccountToGetDto(userPatched);
             return userPatchedDto;
         } catch (JsonPatchException | JsonProcessingException exception) {
+            logger.error(exception.getMessage());
             return null;
         }
     }
