@@ -224,3 +224,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 *iml
+/api/tmp/localstack/
+/api/tmp/
