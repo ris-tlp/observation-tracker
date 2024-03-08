@@ -33,7 +33,7 @@ public class UserAccountController {
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    @GetMapping(value = "/{uuid}", produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{uuid}")
     public ResponseEntity<EntityModel<GetUserAccountDto>> getOneUserByUuid(@PathVariable String uuid) {
         GetUserAccountDto userDto = service.oneUserByUuid(uuid);
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(userDto));
@@ -54,7 +54,6 @@ public class UserAccountController {
     public ResponseEntity<EntityModel<GetUserAccountDto>> patchUser(@PathVariable String uuid,
                                                                     @RequestBody JsonPatch patch) {
         GetUserAccountDto userDto = service.patchUser(uuid, patch);
-
         if (Objects.isNull(userDto)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } else {

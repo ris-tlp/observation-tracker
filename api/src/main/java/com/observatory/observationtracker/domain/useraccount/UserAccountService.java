@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.observatory.observationtracker.configuration.JacksonConfig;
 import com.observatory.observationtracker.domain.useraccount.dto.CreateUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.UserAccountDtoMapper;
@@ -20,13 +21,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @Service
 public class UserAccountService {
     private final Logger logger;
+    private final JacksonConfig jacksonConfig;
     private final UserAccountRepository repository;
     private final UserAccountDtoMapper userAccountDtoMapper;
 
-    public UserAccountService(Logger logger, UserAccountRepository repository,
+    public UserAccountService(Logger logger, JacksonConfig jacksonConfig, UserAccountRepository repository,
                               UserAccountDtoMapper userAccountDtoMapper
     ) {
         this.logger = logger;
+        this.jacksonConfig = jacksonConfig;
         this.repository = repository;
         this.userAccountDtoMapper = userAccountDtoMapper;
     }
@@ -62,7 +65,7 @@ public class UserAccountService {
 
     private UserAccount applyPatchToUser(JsonPatch patch, UserAccount user) throws JsonPatchException,
             JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = jacksonConfig.objectMapper();
         JsonNode patched = patch.apply(mapper.convertValue(user, JsonNode.class));
         return mapper.treeToValue(patched, UserAccount.class);
     }
