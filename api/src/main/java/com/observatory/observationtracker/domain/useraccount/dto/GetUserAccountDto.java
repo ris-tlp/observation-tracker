@@ -1,11 +1,12 @@
 package com.observatory.observationtracker.domain.useraccount.dto;
 
-public class GetUserAccountDto {
+import com.observatory.observationtracker.domain.common.IdentifiableDto;
+
+public class GetUserAccountDto extends IdentifiableDto {
     private String name;
 
     private String email;
 
-    private String uuid;
 
     public String getName() {
         return name;
@@ -21,13 +22,5 @@ public class GetUserAccountDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 }

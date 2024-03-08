@@ -1,6 +1,7 @@
 package com.observatory.observationtracker.domain.useraccount;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.observatory.observationtracker.domain.useraccount.dto.CreateUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +38,8 @@ public class UserAccountController {
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(userDto));
     }
 
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<EntityModel<GetUserAccountDto>> createUser(@RequestBody UserAccount newAccount) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<EntityModel<GetUserAccountDto>> createUser(@RequestPart(value = "newUser") CreateUserAccountDto newAccount) {
         GetUserAccountDto userDto = service.createUser(newAccount);
         EntityModel<GetUserAccountDto> entityModel = assembler.toModel(userDto);
 

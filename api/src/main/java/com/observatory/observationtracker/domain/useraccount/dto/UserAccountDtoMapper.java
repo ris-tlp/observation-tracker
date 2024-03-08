@@ -15,6 +15,7 @@ public interface UserAccountDtoMapper {
     GetUserAccountDto userAccountToGetDto(UserAccount userAccount);
 
     List<GetUserAccountDto> userAccountListToGetDtoList(List<UserAccount> userAccountList);
+
 }
 
 

@@ -10,7 +10,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class UserAccountModelAssembler implements RepresentationModelAssembler<GetUserAccountDto, EntityModel<GetUserAccountDto>> {
+public class UserAccountModelAssembler implements RepresentationModelAssembler<GetUserAccountDto,
+        EntityModel<GetUserAccountDto>> {
     @Override
     public EntityModel<GetUserAccountDto> toModel(GetUserAccountDto account) {
         return EntityModel.of(account,

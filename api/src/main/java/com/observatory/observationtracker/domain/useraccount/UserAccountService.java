@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.observatory.observationtracker.domain.useraccount.dto.CreateUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import com.observatory.observationtracker.domain.useraccount.dto.UserAccountDtoMapper;
 import com.observatory.observationtracker.domain.useraccount.exceptions.UserNotFoundException;
@@ -37,9 +38,8 @@ public class UserAccountService {
     }
 
     @Cacheable(value = "singleUser")
-    public GetUserAccountDto createUser(UserAccount newAccount) {
-        System.out.println(newAccount);
-        UserAccount userAccount = repository.save(newAccount);
+    public GetUserAccountDto createUser(CreateUserAccountDto newAccount) {
+        UserAccount userAccount = repository.save(userAccountDtoMapper.userAccountCreateDtoToUserAccount(newAccount));
         GetUserAccountDto userDto = userAccountDtoMapper.userAccountToGetDto(userAccount);
 
         return userDto;
