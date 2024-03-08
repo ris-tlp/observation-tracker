@@ -1,6 +1,7 @@
 package com.observatory.observationtracker.useraccount;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.observatory.observationtracker.domain.useraccount.UserAccountController;
 import com.observatory.observationtracker.domain.useraccount.UserAccountModelAssembler;
 import com.observatory.observationtracker.domain.useraccount.UserAccountService;
@@ -8,33 +9,31 @@ import com.observatory.observationtracker.domain.useraccount.dto.CreateUserAccou
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-//@ExtendWith(SpringExtension.class)
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserAccountController.class)
@@ -84,7 +83,8 @@ public class UserControllerTests {
         getDtoEntity = EntityModel.of(getDto)
                 .add(
                         linkTo(methodOn(UserAccountController.class).getOneUserByUuid(getDto.getUuid())).withSelfRel().withType("GET, PATCH"),
-                        linkTo(methodOn(UserAccountController.class).createUser(createDto)).withRel("user").withType("POST")
+                        linkTo(methodOn(UserAccountController.class).createUser(createDto)).withRel("user").withType(
+                                "POST")
                 );
 
     }
@@ -97,9 +97,7 @@ public class UserControllerTests {
 
 
         mockMvc.perform(get("/v1/users/{uuid}", uuid)
-                        .accept(MediaTypes.HAL_JSON)
                 )
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.name").value(getDto.getName()))
@@ -108,9 +106,14 @@ public class UserControllerTests {
                 .andExpect(jsonPath("$.uuid").exists())
                 .andExpect(jsonPath("$.uuid").value(getDto.getUuid()))
                 .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.self.href").value(baseUrl + "/" + getDto.getUuid()))
                 .andExpect(jsonPath("$._links.self.type").exists())
                 .andExpect(jsonPath("$._links.self.type").value("GET, PATCH"))
+                .andExpect(jsonPath("$._links.user.href").exists())
+                .andExpect(jsonPath("$._links.user.href").value(baseUrl))
+                .andExpect(jsonPath("$._links.user.type").exists())
                 .andExpect(jsonPath("$._links.user.type").value("POST"));
+
     }
 
 
@@ -124,7 +127,6 @@ public class UserControllerTests {
                         .content(mapper.writeValueAsString(createDto))
                 )
                 .andExpect(status().isCreated())
-                .andDo(print())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.name").value(getDto.getName()))
                 .andExpect(jsonPath("$.email").exists())
@@ -138,5 +140,59 @@ public class UserControllerTests {
                 .andExpect(jsonPath("$._links.user.href").value(baseUrl))
                 .andExpect(jsonPath("$._links.user.type").exists())
                 .andExpect(jsonPath("$._links.user.type").value("POST"));
+    }
+
+    @Test
+    public void patchUserIsNotNullTest() throws Exception {
+        String replacedName = "Replaced name";
+        Map<String, String> jsonPatch = new HashMap<>();
+        jsonPatch.put("op", "replace");
+        jsonPatch.put("path", "/name");
+        jsonPatch.put("value", replacedName);
+
+        getDto.setName(replacedName);
+        when(userAccountService.patchUser(anyString(), any(JsonPatch.class))).thenReturn(getDto);
+        when(userAccountModelAssembler.toModel(getDto)).thenReturn(getDtoEntity);
+
+        mockMvc.perform(patch("/v1/users/{uuid}", uuid)
+                        .contentType("application/json-patch+json")
+                        .content(mapper.writeValueAsString(List.of(jsonPatch)))
+                )
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.name").value(getDto.getName()))
+                .andExpect(jsonPath("$.email").exists())
+                .andExpect(jsonPath("$.email").value(getDto.getEmail()))
+                .andExpect(jsonPath("$.uuid").exists())
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.self.href").value(baseUrl + "/" + getDto.getUuid()))
+                .andExpect(jsonPath("$._links.self.type").exists())
+                .andExpect(jsonPath("$._links.self.type").value("GET, PATCH"))
+                .andExpect(jsonPath("$._links.user.href").exists())
+                .andExpect(jsonPath("$._links.user.href").value(baseUrl))
+                .andExpect(jsonPath("$._links.user.type").exists())
+                .andExpect(jsonPath("$._links.user.type").value("POST"));
+
+
+    }
+
+    @Test
+    public void patchUserIsNullTest() throws Exception {
+        String replacedName = "Replaced name";
+        Map<String, String> jsonPatch = new HashMap<>();
+        jsonPatch.put("op", "replace");
+        jsonPatch.put("path", "/name");
+        jsonPatch.put("value", replacedName);
+
+        getDto = null;
+        when(userAccountService.patchUser(anyString(), any(JsonPatch.class))).thenReturn(getDto);
+        when(userAccountModelAssembler.toModel(getDto)).thenReturn(getDtoEntity);
+
+        mockMvc.perform(patch("/v1/users/{uuid}", uuid)
+                        .contentType("application/json-patch+json")
+                        .content(mapper.writeValueAsString(List.of(jsonPatch)))
+                )
+                .andExpect(status().is(500));
     }
 }
