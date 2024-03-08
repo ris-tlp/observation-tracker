@@ -1,5 +1,7 @@
 package com.observatory.observationtracker.domain.useraccount.dto;
 
+import java.util.Objects;
+
 public class CreateUserAccountDto {
     private String name;
 
@@ -27,5 +29,17 @@ public class CreateUserAccountDto {
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CreateUserAccountDto that)) return false;
+        return Objects.equals(name, that.name) && Objects.equals(email, that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, email);
     }
 }

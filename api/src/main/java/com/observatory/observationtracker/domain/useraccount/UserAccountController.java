@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,15 +33,15 @@ public class UserAccountController {
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping(value = "/{uuid}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<GetUserAccountDto>> getOneUserByUuid(@PathVariable String uuid) {
         GetUserAccountDto userDto = service.oneUserByUuid(uuid);
         return ResponseEntity.status(HttpStatus.OK).body(assembler.toModel(userDto));
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<EntityModel<GetUserAccountDto>> createUser(@RequestPart(value = "newUser") CreateUserAccountDto newAccount) {
-        GetUserAccountDto userDto = service.createUser(newAccount);
+    @PostMapping
+    public ResponseEntity<EntityModel<GetUserAccountDto>> createUser(@RequestBody CreateUserAccountDto newUser) {
+        GetUserAccountDto userDto = service.createUser(newUser);
         EntityModel<GetUserAccountDto> entityModel = assembler.toModel(userDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
