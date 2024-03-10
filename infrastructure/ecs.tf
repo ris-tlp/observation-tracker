@@ -8,7 +8,7 @@ resource "aws_ecs_service" "observation_tracker_api" {
   cluster         = aws_ecs_cluster.observation_tracker_cluster.arn
   task_definition = aws_ecs_task_definition.observation_tracker_api_task.arn
   launch_type     = "FARGATE"
-  desired_count   = 1
+  desired_count   = 2
 
   load_balancer {
     target_group_arn = aws_lb_target_group.observation_tracker_lb_target.arn
