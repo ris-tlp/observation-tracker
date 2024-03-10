@@ -40,4 +40,83 @@ Configuration of AWS services is done entirely through Terraform, and connection
    - Once completed, the API URL will be given. It can also be retrieved from parameter store if needed.
 4. Run `curl -X GET http://<api_url>/v1/api-docs` to check if the API is up and running.
    
+## Sample Response
+`curl -X GET "http://localhost:8080/v1/celestial-events?page=1&size=2`
 
+```json
+{
+    "_embedded": {
+        "getSlimCelestialEventDtoList": [{
+            "uuid": "4c9699e1-4aac-4f00-9001-551017a45777",
+            "createdTimestamp": 1710099872974,
+            "updatedTimestamp": 1710099872974,
+            "celestialEventName": "Saturn at Opposition",
+            "celestialEventDescription": "The ringed planet will be at its closest approach to Earth and its face will be fully illuminated by the Sun. It will be brighter than any other time of the year and will be visible all night long.",
+            "images": [{
+                "uuid": "acb1cf1b-40ea-498e-9409-c5b59cfbebd5",
+                "createdTimestamp": 1710099872975,
+                "updatedTimestamp": 1710099872975,
+                "url": "https://bucketname.s3.us-east-1.amazonaws.com/1710099872960-saturn-equinox.png"
+            }],
+            "celestialEventDateTime": "2024-03-25 17:15:00",
+            "eventStatus": "UPCOMING",
+            "_links": {
+                "self": {
+                    "href": "http://localhost:8080/v1/celestial-events/4c9699e1-4aac-4f00-9001-551017a45777",
+                    "type": "GET, PATCH, DELETE"
+                }
+            }
+        }, {
+            "uuid": "9057fdea-777d-49c6-9caa-3ff7f67c732a",
+            "createdTimestamp": 1710099991624,
+            "updatedTimestamp": 1710099991624,
+            "celestialEventName": "September Equinox",
+            "celestialEventDescription": "The September equinox occurs at 12:39 UTC. The Sun will shine directly on the equator and there will be nearly equal amounts of day and night throughout the world.",
+            "images": [{
+                "uuid": "405cdd8e-0a0d-48f7-8482-ce4b7b4bbc08",
+                "createdTimestamp": 1710099991627,
+                "updatedTimestamp": 1710099991627,
+                "url": "https://bucketname.s3.us-east-1.amazonaws.com/1710099991538-sun.png"
+            }, {
+                "uuid": "a1a6f4e5-8bab-43d1-bf5b-a63a5e264b05",
+                "createdTimestamp": 1710099991629,
+                "updatedTimestamp": 1710099991629,
+                "url": "https://bucketname.s3.us-east-1.amazonaws.com/1710099991611-equinox.png"
+            }],
+            "celestialEventDateTime": "2024-11-22 17:15:00",
+            "eventStatus": "UPCOMING",
+            "_links": {
+                "self": {
+                    "href": "http://localhost:8080/v1/celestial-events/9057fdea-777d-49c6-9caa-3ff7f67c732a",
+                    "type": "GET, PATCH, DELETE"
+                }
+            }
+        }]
+    },
+    "_links": {
+        "first": {
+            "href": "http://localhost:8080/v1/celestial-events?page=0&size=2"
+        },
+        "prev": {
+            "href": "http://localhost:8080/v1/celestial-events?page=0&size=2"
+        },
+        "self": {
+            "href": "http://localhost:8080/v1/celestial-events?page=1&size=2"
+        },
+        "last": {
+            "href": "http://localhost:8080/v1/celestial-events?page=1&size=2"
+        },
+        "filter-by-status": {
+            "href": "http://localhost:8080/v1/celestial-events?status={status}",
+            "type": "GET",
+            "templated": true
+        }
+    },
+    "page": {
+        "size": 2,
+        "totalElements": 4,
+        "totalPages": 2,
+        "number": 1
+    }
+}
+```
