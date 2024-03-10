@@ -1,10 +1,6 @@
-#docker-start:
-#    docker build -t api:latest -f Dockerfile . \
-#    docker run -p 8080\:8080 -v ~/.aws/\:/root/.aws -d api
-
-#aws-infra:
-	#terraform -chdir=terraform/ init -input=false
-	#terraform -chdir=infrastructure/ apply --auto-approve
+aws-infra:
+	terraform -chdir=infrastructure/ init -input=false
+	terraform -chdir=infrastructure/ apply --auto-approve
 
 test-actions-ecrpush:
 	 act -s AWS_ACCESS_KEY_ID=$$(aws configure get aws_access_key_id) -s AWS_SECRET_ACCESS_KEY=$$(aws configure get aws_secret_access_key)
