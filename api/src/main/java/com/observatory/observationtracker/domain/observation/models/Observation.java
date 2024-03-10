@@ -151,7 +151,6 @@ public class Observation extends IdentifiableEntity {
                 ", observationDescription='" + observationDescription + '\'' +
                 ", isPublished=" + isPublished +
                 ", observationDateTime=" + observationDateTime +
-//                ", celestialEvent=" + celestialEvent +
                 ", owner=" + owner +
                 ", images=" + images +
                 ", comments=" + comments +

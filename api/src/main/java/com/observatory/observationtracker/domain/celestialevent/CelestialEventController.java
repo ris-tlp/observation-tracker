@@ -26,8 +26,6 @@ import java.util.Objects;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-// @TODO: make superclass entity and everything
-// @TODO: slim celestial event for batch searches
 @RestController
 @RequestMapping("/v1/celestial-events")
 public class CelestialEventController {

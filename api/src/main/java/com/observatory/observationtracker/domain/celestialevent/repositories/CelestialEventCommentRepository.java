@@ -9,7 +9,6 @@ import java.util.Optional;
 public interface CelestialEventCommentRepository extends JpaRepository<CelestialEventComment, Long>{
     Optional<CelestialEventComment> findCelestialEventCommentByUuid(String uuid);
     List<CelestialEventComment> findByParentCommentIsNull();
-
     List<CelestialEventComment> findByParentCommentIsNullAndCelestialEvent_Uuid(String uuid);
 
 }

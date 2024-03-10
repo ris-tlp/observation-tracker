@@ -1,6 +1,7 @@
 package com.observatory.observationtracker.rabbitmq.notifications;
 
 import com.observatory.observationtracker.aws.SesService;
+import com.observatory.observationtracker.rabbitmq.notifications.models.ReplyNotification;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 

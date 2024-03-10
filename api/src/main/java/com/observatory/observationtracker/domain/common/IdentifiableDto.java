@@ -9,8 +9,6 @@ public class IdentifiableDto {
 
     private Timestamp updatedTimestamp;
 
-
-
     public String getUuid() {
         return uuid;
     }

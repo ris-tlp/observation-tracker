@@ -36,16 +36,6 @@ public class ObservationComment extends IdentifiableEntity {
     )
     private List<ObservationComment> replies;
 
-    @PrePersist
-    private void initializeUuid() {
-        this.setUuid(UUID.randomUUID().toString());
-    }
-
-    @PreUpdate
-    private void updateTimestamp() {
-        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
-    }
-
     public ObservationComment() {
     }
 

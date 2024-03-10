@@ -9,8 +9,7 @@ public class RootDtoAssembler<T> {
     public EntityModel<T> toModel(T observation, String uuid) {
             return EntityModel.of(
                     observation,
-                    linkTo(ObservationController.class).slash(uuid).withSelfRel().withType("GET, PATCH, " +
-                            "DELETE")
+                    linkTo(ObservationController.class).slash(uuid).withSelfRel().withType("GET, PATCH, DELETE")
 //                linkTo(methodOn(ObservationController.class).getObservationByUuid(observation.getUuid(),
 //                observation.getOwner().getUuid())).withSelfRel().withType("GET"),
 //                linkTo(methodOn(ObservationController.class).getAllObservationsOfUser(observation.getOwner()

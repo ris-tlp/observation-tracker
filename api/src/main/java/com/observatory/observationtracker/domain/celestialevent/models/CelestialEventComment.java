@@ -36,15 +36,6 @@ public class CelestialEventComment extends IdentifiableEntity {
     )
     private List<CelestialEventComment> replies;
 
-    @PrePersist
-    private void initializeUuid() {
-        this.setUuid(UUID.randomUUID().toString());
-    }
-
-    @PreUpdate
-    private void updateTimestamp() {
-        this.setUpdatedTimestamp(new Timestamp(System.currentTimeMillis()));
-    }
 
     public CelestialEventComment() {
     }

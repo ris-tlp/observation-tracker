@@ -2,6 +2,7 @@ package com.observatory.observationtracker.rabbitmq.notifications;
 
 import com.observatory.observationtracker.domain.observation.dto.GetObservationCommentDto;
 import com.observatory.observationtracker.domain.useraccount.dto.GetUserAccountDto;
+import com.observatory.observationtracker.rabbitmq.notifications.models.CommentNotification;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

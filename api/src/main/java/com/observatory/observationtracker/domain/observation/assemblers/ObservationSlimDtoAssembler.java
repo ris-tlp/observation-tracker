@@ -1,7 +1,6 @@
 package com.observatory.observationtracker.domain.observation.assemblers;
 
 import com.observatory.observationtracker.domain.observation.dto.GetSlimObservationDto;
-import com.observatory.observationtracker.domain.celestialevent.assemblers.RootDtoAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;

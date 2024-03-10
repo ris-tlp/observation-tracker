@@ -31,20 +31,6 @@ public class S3Service {
     }
 
     public String uploadImage(MultipartFile image) throws InvalidImageException {
-//        URI uri = URI.create(
-//                "http://localhost:4566/"
-//        );
-//
-//        region = "us-east-1";
-//
-//        imageBucketName = "bucketname";
-
-//        S3Client s3Client = S3Client.builder()
-//                .region(Region.of(region))
-//                .endpointOverride(uri)
-//                .credentialsProvider(DefaultCredentialsProvider.create())
-//                .build();
-
         try {
             File convertedImage = convertMultipartFileToFile(image);
             String uploadedFileName = generateFilename(image.getOriginalFilename());

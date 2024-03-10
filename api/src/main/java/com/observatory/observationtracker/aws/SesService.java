@@ -18,8 +18,6 @@ public class SesService {
     }
 
     public void sendEmail(String subject, String body, String toEmail) {
-        toEmail = "omarkhantlp@gmail.com"; // for testing
-
         // Create email request with custom header
         SendEmailRequest request = SendEmailRequest.builder()
                 .destination(Destination.builder().toAddresses(toEmail).build())

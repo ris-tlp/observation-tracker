@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Objects;
 
 
-// @TODO all fetch showing replies
 @Service
 public class CelestialEventService {
     private final CelestialEventRepository celestialEventRepository;
