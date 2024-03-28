@@ -5,9 +5,9 @@ Observation Tracker is a tool designed for both amateur and professional astrono
 - Completely HATEOAS compliant Spring Boot API with paginated and sorted responses
 - Cached responses for frequently accessed data through Redis/ElastiCache
 - Asynchronous processing of notification emails through RabbitMQ/AmazonMQ and SES
-- Fault tolerant API through a load balanced multi-az deployment
-- Repository and data management through Hibernate
-- Docker image built and pushed to ECR on merge from feature branch through GitHub Actions CI/CD
+- Fault tolerant API through a load balanced multi-az ECS deployment
+- Repository and data management of S3/RDS data through Hibernate
+- Docker image built and pushed to ECR on merge from feature branch through GitHub Actions 
 - AWS infrastructure provisioned and managed through Terraform
 
 ## Production Architecture
