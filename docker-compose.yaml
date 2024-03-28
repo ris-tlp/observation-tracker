@@ -6,7 +6,6 @@ services:
     working_dir: /api
     container_name: api
     volumes:
-      - ~/.aws/:/root/.aws
       - ./api:/api
     env_file:
       - .env
