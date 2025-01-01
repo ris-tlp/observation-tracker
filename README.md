@@ -12,7 +12,7 @@ Observation Tracker is a tool designed for both amateur and professional astrono
 - Completely disjoint but identical development and production environments
 
 ## Production Architecture
-![Architecture](https://raw.githubusercontent.com/ris-tlp/observation-tracker/main/media/architecture_diagram.png?token=GHSAT0AAAAAAB6SHAUHAWFQINV2Z7KE2WSEZPNLQSQ)
+![Architecture](https://raw.githubusercontent.com/ris-tlp/observation-tracker/refs/heads/main/media/architecture_diagram.png)
 
 ## Documentation
 - OpenAPI Specification: `/v1/api-docs`
